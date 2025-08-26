@@ -28,11 +28,10 @@ jobs:
         run: pip install requests
 
       - name: Download release assets
-        uses: dsaltares/fetch-gh-release-asset@v1
+        uses: softprops/action-gh-release@v2.3.2
         with:
-          version: "latest"
-          file: "makelangelo-*-*.jar"
           token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ github.event.release.tag_name }}
 
       - name: Update FoxyCart downloadables
         run: python scripts/update_foxycart_downloadables.py
