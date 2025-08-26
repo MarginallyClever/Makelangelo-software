@@ -1,5 +1,6 @@
 import os
 import requests
+import base64
 import glob
 import sys
 import re
@@ -13,7 +14,7 @@ def get_access_token():
     client_secret = os.environ["FOXYCART_CLIENT_SECRET"]
     auth_str = f"{client_id}:{client_secret}"
     b64_auth = base64.b64encode(auth_str.encode()).decode()
-    
+
     resp = requests.post(
         FOXYCART_TOKEN_URL,
         data={
