@@ -46,7 +46,7 @@ public class SaveSVG implements TurtleSaver {
 		out.write("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">\n"); // viewbox would go in svg tag
 
 		for( var layer : turtle.getLayers() ) {
-			if(layer.isEmpty()) continue;
+			if(layer.isEmpty() || !layer.isVisible()) continue;
 			StringBuilder b = new StringBuilder();
 			b.append("  <path fill='none' stroke='")
 					.append(ColorPalette.getHexCode(layer.getColor()))

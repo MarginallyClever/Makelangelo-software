@@ -77,15 +77,15 @@ public class Converter_PulseCMYK extends ImageConverter {
 		turtle = new Turtle();
 		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 
-		outputChannel(cmyk.getY(),Color.YELLOW);
-		outputChannel(cmyk.getC(),Color.CYAN);
-		outputChannel(cmyk.getM(),Color.MAGENTA);
-		outputChannel(cmyk.getK(),Color.BLACK);
+		outputChannel(0,cmyk.getY(),Color.YELLOW);
+		outputChannel(1,cmyk.getC(),Color.CYAN);
+		outputChannel(2,cmyk.getM(),Color.MAGENTA);
+		outputChannel(3,cmyk.getK(),Color.BLACK);
 
 		fireConversionFinished();
 	}
 
-	protected void outputChannel(TransformedImage img,Color channel) {
+	protected void outputChannel(int phaseOffset,TransformedImage img,Color channel) {
 		Rectangle2D.Double rect = myPaper.getMarginRectangle();
 		double xLeft   = rect.getMinX();
 		double yBottom = rect.getMinY();
@@ -99,6 +99,7 @@ public class Converter_PulseCMYK extends ImageConverter {
 		newTurtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 
 		var wave = new WaveByIntensity(img,blockScale/2,sampleRate,zigDensity);
+        wave.setPhase(phaseOffset*15);
 
 		Vector2d majorAxis = new Vector2d(
 				Math.cos(Math.toRadians(angle)),
@@ -108,6 +109,7 @@ public class Converter_PulseCMYK extends ImageConverter {
 		double height = yTop-yBottom;
 		double width = xRight-xLeft;
 		double r = Math.sqrt(Math.pow(width/2,2) + Math.pow(height/2,2));
+        boolean isFirst=true;
 
 		double i=-r;
 		for(double j =-r; j <= r; j+= blockScale) {
@@ -116,11 +118,13 @@ public class Converter_PulseCMYK extends ImageConverter {
 			b.scale(j,majorAxis);
 			a.scaleAdd(-i,minorAxis,a);
 			b.scaleAdd(i,minorAxis,b);
-			newTurtle.add(wave.lineToWave(a,b));
+			wave.lineToWave(newTurtle,a,b,isFirst);
+            isFirst=false;
 		}
 
 		for(var layer : newTurtle.getLayers()) {
 			layer.setColor(channel);
+            layer.setName("0x"+Integer.toHexString(channel.getRGB()).substring(2).toUpperCase());
 		}
 
 		CropTurtle.run(newTurtle, myPaper.getMarginRectangle());

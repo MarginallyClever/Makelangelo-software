@@ -108,22 +108,24 @@ public class Converter_SpiralPulse extends ImageConverter {
 
 		Point2d a = new Point2d();
 		Point2d b = new Point2d();
-
+        boolean isFirst=true;
 		a.set(Math.cos(0) * r, Math.sin(0) * r);
 
 		while (r > toolDiameter*2.0) {
 			// find circumference of current circle
 			double circumference =  Math.floor((2.0f * r - toolDiameter) * Math.PI)*toolDiameter;
-			//if (circumference > 360.0f) circumference = 360.0f;
+			if (circumference < 360.0f) circumference = 360.0f;
 
 			for (int i = 0; i <= circumference; ++i) {
 				// tweak the diameter to make it look like a spiral
 				double r2 = r - ringSize * i / circumference;
 				double f = Math.PI * 2.0f * i / circumference;
 				b.set(Math.cos(f) * r2, Math.sin(f) * r2);
-
-				turtle.add(wave.lineToWave(a,b));
-				a.set(b);
+                if(a.distanceSquared(b)>=toolDiameter) {
+                    wave.lineToWave(turtle, a, b, isFirst);
+                    isFirst = false;
+                    a.set(b);
+                }
 			}
 			r -= ringSize;
 		}

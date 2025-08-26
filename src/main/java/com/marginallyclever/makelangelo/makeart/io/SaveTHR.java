@@ -43,6 +43,7 @@ public class SaveTHR implements TurtleSaver {
 		double previousTheta = 0;
 
 		for( var layer : turtle.getLayers() ) {
+            if(!layer.isVisible()) continue;
 			for( var line : layer.getAllLines() ) {
 				for( var p : line.getAllPoints() ) {
 					// turn x,y to theta,rho
