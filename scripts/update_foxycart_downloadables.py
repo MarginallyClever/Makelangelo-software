@@ -26,7 +26,7 @@ def get_access_token():
             "Content-Type": "application/x-www-form-urlencoded"
         },
     )
-    print("Request sent with client_id:", client_id)
+    print("Request sent with b64_auth:", b64_auth)
     print("Status code:", resp.status_code)
     print("Response body:", resp.text)
     resp.raise_for_status()
