@@ -19,6 +19,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Determine TAG_NAME for both release and manual runs
+      - name: Set TAG_NAME variable
+        id: set_tag
+        run: |
+          if [ "${{ github.event.release.tag_name }}" != "" ]; then
+            echo "tag_name=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          else
+            # Get latest tag from git
+            TAG=$(git describe --tags --abbrev=0)
+            echo "tag_name=$TAG" >> $GITHUB_OUTPUT
+          fi
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -31,7 +43,8 @@ jobs:
         uses: softprops/action-gh-release@v2.3.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag_name: ${{ github.event.release.tag_name }}
+          #tag_name: ${{ github.event.release.tag_name }}
+          tag_name: ${{ steps.set_tag.outputs.tag_name }}
 
       - name: Update FoxyCart downloadables
         run: python scripts/update_foxycart_downloadables.py
