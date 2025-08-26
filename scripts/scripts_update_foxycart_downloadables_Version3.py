@@ -1,0 +1,106 @@
+import os
+import requests
+import glob
+import sys
+import re
+
+FOXYCART_TOKEN_URL = "https://accounts.foxycart.com/token"
+FOXYCART_API_BASE = "https://api.foxycart.com"
+STORE_ID = os.environ.get("FOXYCART_STORE_ID", "53596")
+
+def get_access_token():
+    resp = requests.post(
+        FOXYCART_TOKEN_URL,
+        data={
+            "grant_type": "refresh_token",
+            "client_id": os.environ["FOXYCART_CLIENT_ID"],
+            "client_secret": os.environ["FOXYCART_CLIENT_SECRET"],
+            "refresh_token": os.environ["FOXYCART_REFRESH_TOKEN"],
+        },
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    resp.raise_for_status()
+    return resp.json()["access_token"]
+
+def get_downloadables(token):
+    url = f"{FOXYCART_API_BASE}/stores/{STORE_ID}/downloadables"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/json",
+    }
+    downloadables = []
+    while url:
+        resp = requests.get(url, headers=headers)
+        resp.raise_for_status()
+        data = resp.json()
+        downloadables.extend(data.get("_embedded", {}).get("fx:downloadables", []))
+        url = data.get("_links", {}).get("next", {}).get("href")
+    return downloadables
+
+def extract_os_key(asset_name):
+    # Matches Makelangelo-[os]-[date].[ext], case-insensitive, [os] may have dashes
+    m = re.match(r"(?i)makelangelo-(.+)-\d{8}\.[^.]+$", asset_name)
+    if m:
+        return m.group(1).lower()
+    return None
+
+def match_downloadable(asset_name, downloadables):
+    os_key = extract_os_key(asset_name)
+    if not os_key:
+        print(f"Could not extract OS key from asset name: {asset_name}")
+        return None
+    expected_code = f"soft-001{os_key}".lower()
+    for d in downloadables:
+        code = d.get("code", "").lower()
+        if code == expected_code:
+            return d
+    return None
+
+def update_downloadable(token, downloadable, asset_path):
+    upload_url = downloadable["_links"]["fx:file"]["href"]
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/octet-stream",
+        "Accept": "application/json",
+    }
+    with open(asset_path, "rb") as f:
+        resp = requests.put(upload_url, headers=headers, data=f)
+    resp.raise_for_status()
+    print(f"Updated {downloadable.get('name')} ({downloadable.get('code')}) with {asset_path}")
+
+def main():
+    try:
+        token = get_access_token()
+    except Exception as e:
+        print("Failed to obtain FoxyCart access token:", e)
+        sys.exit(1)
+
+    try:
+        downloadables = get_downloadables(token)
+    except Exception as e:
+        print("Failed to get FoxyCart downloadables:", e)
+        sys.exit(1)
+
+    assets = glob.glob("Makelangelo-*-*-*.*")
+    if not assets:
+        print("No Makelangelo-*-*-*.* assets found in current directory.")
+        sys.exit(0)
+
+    matched, unmatched = 0, 0
+    for asset_path in assets:
+        asset_name = os.path.basename(asset_path)
+        downloadable = match_downloadable(asset_name, downloadables)
+        if downloadable:
+            try:
+                update_downloadable(token, downloadable, asset_path)
+                matched += 1
+            except Exception as e:
+                print(f"Error updating {asset_name}: {e}")
+        else:
+            print(f"No FoxyCart downloadable matched for asset {asset_name}")
+            unmatched += 1
+
+    print(f"Done. {matched} assets updated. {unmatched} assets unmatched.")
+
+if __name__ == "__main__":
+    main()
