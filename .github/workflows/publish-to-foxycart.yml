@@ -1,0 +1,40 @@
+name: Update FoxyCart Downloadables
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  update-foxycart:
+    runs-on: ubuntu-latest
+
+    env:
+      FOXYCART_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      FOXYCART_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      FOXYCART_REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+      FOXYCART_STORE_ID: "53596"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Download release assets
+        uses: dsaltares/fetch-gh-release-asset@v1
+        with:
+          version: "latest"
+          file: "makelangelo-*-*.jar"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update FoxyCart downloadables
+        run: python scripts/update_foxycart_downloadables.py
+        env:
+          GITHUB_RELEASE_TAG: ${{ github.event.release.tag_name }}
