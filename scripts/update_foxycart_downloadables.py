@@ -10,8 +10,8 @@ FOXYCART_API_BASE = "https://api.foxycart.com"
 STORE_ID = os.environ.get("FOXYCART_STORE_ID", "53596")
 
 def get_access_token():
-    client_id = os.environ["FOXYCART_CLIENT_ID"]
-    client_secret = os.environ["FOXYCART_CLIENT_SECRET"]
+    client_id = os.environ["CLIENT_ID"]
+    client_secret = os.environ["CLIENT_SECRET"]
     auth_str = f"{client_id}:{client_secret}"
     b64_auth = base64.b64encode(auth_str.encode()).decode()
 
@@ -19,7 +19,7 @@ def get_access_token():
         FOXYCART_TOKEN_URL,
         data={
             "grant_type": "refresh_token",
-            "refresh_token": os.environ["FOXYCART_REFRESH_TOKEN"],
+            "refresh_token": os.environ["REFRESH_TOKEN"],
         },
         headers={
             "Authorization": f"Basic {b64_auth}",
