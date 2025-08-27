@@ -32,6 +32,7 @@ def get_access_token():
 def get_downloadables(token):
     url = f"{FOXYCART_API_BASE}/stores/{STORE_ID}/downloadables"
     headers = {
+        "FOXY-API-VERSION": "1",
         "Authorization": f"Bearer {token}",
         "Accept": "application/json",
     }
@@ -68,6 +69,7 @@ def match_downloadable(asset_name, downloadables):
 def update_downloadable(token, downloadable, asset_path):
     upload_url = downloadable["_links"]["fx:file"]["href"]
     headers = {
+        "FOXY-API-VERSION": "1",
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/octet-stream",
         "Accept": "application/json",
