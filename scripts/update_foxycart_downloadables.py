@@ -26,9 +26,6 @@ def get_access_token():
             "Content-Type": "application/x-www-form-urlencoded"
         },
     )
-    print("Request sent with b64_auth:", b64_auth)
-    print("Status code:", resp.status_code)
-    print("Response body:", resp.text)
     resp.raise_for_status()
     return resp.json()["access_token"]
 
@@ -41,6 +38,8 @@ def get_downloadables(token):
     downloadables = []
     while url:
         resp = requests.get(url, headers=headers)
+        print("Status code:", resp.status_code)
+        print("Response body:", resp.text)
         resp.raise_for_status()
         data = resp.json()
         downloadables.extend(data.get("_embedded", {}).get("fx:downloadables", []))
