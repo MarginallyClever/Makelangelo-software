@@ -26,6 +26,8 @@ def get_access_token():
             "Content-Type": "application/x-www-form-urlencoded"
         },
     )
+    print("Status code:", resp.status_code)
+    print("Response body:", resp.text)
     resp.raise_for_status()
     return resp.json()["access_token"]
 
