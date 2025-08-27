@@ -41,6 +41,7 @@ def get_downloadables(token):
     downloadables = []
     while url:
         resp = requests.get(url, headers=headers)
+        print("token:", token)
         print("Status code:", resp.status_code)
         print("Response body:", resp.text)
         resp.raise_for_status()
