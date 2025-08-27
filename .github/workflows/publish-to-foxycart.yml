@@ -8,13 +8,12 @@ on:
 jobs:
   update-foxycart:
     runs-on: ubuntu-latest
-    environment: First
 
     env:
-      FOXYCART_CLIENT_ID: ${{ secrets.CLIENT_ID }}
-      FOXYCART_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-      FOXYCART_REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
-      FOXYCART_STORE_ID: "53596"
+      FOXYCART_CLIENT_ID: ${{ secrets.FOXYCART_CLIENT_ID }}
+      FOXYCART_CLIENT_SECRET: ${{ secrets.FOXYCART_CLIENT_SECRET }}
+      FOXYCART_REFRESH_TOKEN: ${{ secrets.FOXYCART_REFRESH_TOKEN }}
+      FOXYCART_STORE_ID: ${{ secrets.FOXYCART_STORE_ID }}
 
     steps:
       - name: Checkout repository
