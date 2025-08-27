@@ -40,7 +40,7 @@ def get_downloadables(token):
     }
     downloadables = []
     while url:
-        resp = requests.post(url, headers=headers)
+        resp = requests.options(url, headers=headers)
         print("token:", token)
         print("Status code:", resp.status_code)
         print("Response body:", resp.text)
