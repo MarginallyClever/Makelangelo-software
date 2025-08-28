@@ -1,3 +1,9 @@
+#
+# This script updates FoxyCart downloadables with local files matching
+# the pattern Makelangelo-[os]-[date].[ext] in the current directory.
+# It uses environment variables for FoxyCart API credentials.
+#
+
 import os
 import requests
 import base64
@@ -105,7 +111,7 @@ def main():
         sys.exit(1)
 
     try:
-        confirm_token_ok()
+        confirm_token_ok(token)
     except Exception as e:
         print("FoxyCart access token is not valid:", e)
         sys.exit(1)
