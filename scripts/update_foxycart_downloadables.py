@@ -39,15 +39,15 @@ def get_downloadables(token):
         "Accept": "application/json",
     }
     downloadables = []
-    while url:
-        resp = requests.get(url, headers=headers)
-        print("token:", token)
-        print("Status code:", resp.status_code)
-        print("Response body:", resp.text)
-        resp.raise_for_status()
-        data = resp.json()
-        downloadables.extend(data.get("_embedded", {}).get("fx:downloadables", []))
-        url = data.get("_links", {}).get("next", {}).get("href")
+    resp = requests.get(url, headers=headers)
+    # while url:
+    #     print("token:", token)
+    #     print("Status code:", resp.status_code)
+    #     print("Response body:", resp.text)
+    #     resp.raise_for_status()
+    #     data = resp.json()
+    #     downloadables.extend(data.get("_embedded", {}).get("fx:downloadables", []))
+    #     url = data.get("_links", {}).get("next", {}).get("href")
     return downloadables
 
 def extract_os_key(asset_name):
