@@ -5,9 +5,10 @@ import glob
 import sys
 import re
 
-FOXYCART_TOKEN_URL = "https://api.foxycart.com/token"
-FOXYCART_API_BASE = "https://api.foxycart.com"
 STORE_ID = os.environ.get("FOXYCART_STORE_ID", "53596")
+FOXYCART_ROOT_URL = "https://api.foxycart.com"
+FOXYCART_TOKEN_URL = f"{FOXYCART_ROOT_URL}/token"
+FOXYCART_STORE_BASE = f"{FOXYCART_ROOT_URL}/stores/{STORE_ID}"
 
 def get_access_token():
     client_id = os.environ["FOXYCART_CLIENT_ID"]
@@ -31,15 +32,29 @@ def get_access_token():
     resp.raise_for_status()
     return resp.json()["access_token"]
 
+def confirm_token_ok(token):
+    print("Confirm token ok")
+    resp = requests.get(
+        FOXYCART_ROOT_URL,
+        headers={
+            "FOXY-API-VERSION": "1",
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/json",
+        },
+    )
+    print("reply:", resp.status_code, resp.text)
+    return None
+
 def get_downloadables(token):
-    url = f"{FOXYCART_API_BASE}/stores/{STORE_ID}/downloadables"
-    headers = {
-        "FOXY-API-VERSION": "1",
-        "Authorization": f"Bearer {token}",
-        "Accept": "application/json",
-    }
     downloadables = []
-    resp = requests.get(url, headers=headers)
+    resp = requests.get(
+        f"{FOXYCART_STORE_BASE}/downloadables",
+        headers={
+            "FOXY-API-VERSION": "1",
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/json",
+        },
+    )
     print("token:", token)
     print("Status code:", resp.status_code)
     print("Response body:", resp.text)
@@ -87,6 +102,12 @@ def main():
         token = get_access_token()
     except Exception as e:
         print("Failed to obtain FoxyCart access token:", e)
+        sys.exit(1)
+
+    try:
+        confirm_token_ok()
+    except Exception as e:
+        print("FoxyCart access token is not valid:", e)
         sys.exit(1)
 
     try:
