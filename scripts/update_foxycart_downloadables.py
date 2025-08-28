@@ -40,10 +40,10 @@ def get_downloadables(token):
     }
     downloadables = []
     resp = requests.get(url, headers=headers)
+    print("token:", token)
+    print("Status code:", resp.status_code)
+    print("Response body:", resp.text)
     # while url:
-    #     print("token:", token)
-    #     print("Status code:", resp.status_code)
-    #     print("Response body:", resp.text)
     #     resp.raise_for_status()
     #     data = resp.json()
     #     downloadables.extend(data.get("_embedded", {}).get("fx:downloadables", []))
