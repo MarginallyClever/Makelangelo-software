@@ -17,7 +17,7 @@ jobs:
       FOXYCART_CLIENT_SECRET: ${{ secrets.FOXYCART_CLIENT_SECRET }}
       FOXYCART_REFRESH_TOKEN: ${{ secrets.FOXYCART_REFRESH_TOKEN }}
       FOXYCART_STORE_ID: ${{ secrets.FOXYCART_STORE_ID }}
-      RELEASE_ASSETS_DIR: release_assets
+      RELEASE_ASSETS_DIR: ${{ github.workspace }}/release_assets
 
     steps:
       - name: Checkout repository
