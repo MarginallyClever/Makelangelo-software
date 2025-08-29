@@ -45,7 +45,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p "$RELEASE_ASSETS_DIR"
-          echo "Downloading assets for tag: ${{ steps.set_tag.outputs.tag_name }}"
+          echo "Downloading assets for tag: ${{ steps.set_tag.outputs.tag_name }} to directory: $RELEASE_ASSETS_DIR"
           gh release download "${{ steps.set_tag.outputs.tag_name }}" --dir "$RELEASE_ASSETS_DIR" --clobber
           ls -al "$RELEASE_ASSETS_DIR"
 
