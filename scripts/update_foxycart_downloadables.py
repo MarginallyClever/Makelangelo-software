@@ -76,16 +76,16 @@ def match_downloadable(asset_name, downloadables):
     return None
 
 def update_downloadable(token, downloadable, asset_path):
-    #upload_url = downloadable["_links"]["fx:file"]["href"]
-    #headers = {
-    #    "FOXY-API-VERSION": "1",
-    #    "Authorization": f"Bearer {token}",
-    #    "Content-Type": "application/octet-stream",
-    #    "Accept": "application/json",
-    #}
-    #with open(asset_path, "rb") as f:
-    #    resp = requests.put(upload_url, headers=headers, data=f)
-    #resp.raise_for_status()
+    upload_url = downloadable["_links"]["self"]["href"]
+    headers = {
+        "FOXY-API-VERSION": "1",
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/octet-stream",
+        "Accept": "application/json",
+    }
+    with open(asset_path, "rb") as f:
+        resp = requests.patch(upload_url, headers=headers, data=f)
+    resp.raise_for_status()
     print(f"Updated {downloadable.get('name')} ({downloadable.get('code')}) with {asset_path}")
 
 def main():
