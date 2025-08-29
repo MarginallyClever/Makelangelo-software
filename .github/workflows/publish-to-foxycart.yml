@@ -37,11 +37,6 @@ jobs:
             echo "tag_name=$TAG" >> $GITHUB_OUTPUT
           fi
 
-      - name: Install GitHub CLI
-        uses: cli/cli@v2.78.0
-        with:
-          version: latest
-
       - name: Download release assets
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
