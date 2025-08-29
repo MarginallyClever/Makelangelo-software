@@ -99,7 +99,8 @@ def main():
         print("Failed to get FoxyCart downloadables:", e)
         sys.exit(1)
 
-    assets = glob.glob("Makelangelo-*.*")
+    pattern = os.path.join(ASSET_DIR, "Makelangelo-*.*")
+    assets = glob.glob(pattern)
     print(f"Scanning {ASSET_DIR} -> {len(assets)} candidate files")
     if not assets:
         print("No Makelangelo-*.* assets found in current directory.")
