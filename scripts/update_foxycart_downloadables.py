@@ -63,10 +63,12 @@ def extract_os_key(asset_name):
 
 def match_downloadable(asset_name, downloadables):
     os_key = extract_os_key(asset_name)
+    print(f"Matching downloadable: {asset_name} produces OS key: {os_key}")
     if not os_key:
         print(f"Could not extract OS key from asset name: {asset_name}")
         return None
-    expected_code = f"soft-001{os_key}".lower()
+    expected_code = f"SOFT-0001{os_key}".lower()
+    print(f"Matching expected code {expected_code}")
     for d in downloadables:
         code = d.get("code", "").lower()
         if code == expected_code:
@@ -74,16 +76,16 @@ def match_downloadable(asset_name, downloadables):
     return None
 
 def update_downloadable(token, downloadable, asset_path):
-    upload_url = downloadable["_links"]["fx:file"]["href"]
-    headers = {
-        "FOXY-API-VERSION": "1",
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/octet-stream",
-        "Accept": "application/json",
-    }
-    with open(asset_path, "rb") as f:
-        resp = requests.put(upload_url, headers=headers, data=f)
-    resp.raise_for_status()
+    #upload_url = downloadable["_links"]["fx:file"]["href"]
+    #headers = {
+    #    "FOXY-API-VERSION": "1",
+    #    "Authorization": f"Bearer {token}",
+    #    "Content-Type": "application/octet-stream",
+    #    "Accept": "application/json",
+    #}
+    #with open(asset_path, "rb") as f:
+    #    resp = requests.put(upload_url, headers=headers, data=f)
+    #resp.raise_for_status()
     print(f"Updated {downloadable.get('name')} ({downloadable.get('code')}) with {asset_path}")
 
 def main():
@@ -113,10 +115,10 @@ def main():
     matched, unmatched = 0, 0
     for asset_path in assets:
         asset_name = os.path.basename(asset_path)
-        downloadable = match_downloadable(asset_name, downloadables)
-        if downloadable:
+        found = match_downloadable(asset_name, downloadables)
+        if found:
             try:
-                #update_downloadable(token, downloadable, asset_path)
+                update_downloadable(token, found, asset_path)
                 matched += 1
             except Exception as e:
                 print(f"Error updating {asset_name}: {e}")
