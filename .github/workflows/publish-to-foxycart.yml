@@ -45,6 +45,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p "$RELEASE_ASSETS_DIR"
+          echo "Downloading assets for tag: ${{ steps.set_tag.outputs.tag_name }}"
           gh release download "${{ steps.set_tag.outputs.tag_name }}" --dir "$RELEASE_ASSETS_DIR" --clobber
           ls -al "$RELEASE_ASSETS_DIR"
 
@@ -59,5 +60,5 @@ jobs:
       - name: Update FoxyCart downloadables
         run: python scripts/update_foxycart_downloadables.py
         env:
-          GITHUB_RELEASE_TAG: ${{ github.event.release.tag_name }}
+          GITHUB_RELEASE_TAG: ${{ steps.set_tag.outputs.tag_name }}
           RELEASE_ASSETS_DIR: ${{ env.RELEASE_ASSETS_DIR }}
