@@ -51,7 +51,7 @@ def get_downloadables(token):
     resp.raise_for_status()
     data = resp.json()
     downloadables = data.get("_embedded", {}).get("fx:downloadables", [])
-    print("downloadables:",downloadables)
+    print("downloadables:",len(downloadables))
     return downloadables
 
 def extract_os_key(asset_name):
