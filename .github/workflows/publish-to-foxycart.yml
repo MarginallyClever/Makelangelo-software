@@ -38,7 +38,7 @@ jobs:
           fi
 
       - name: Install GitHub CLI
-        uses: cli/cli@v3
+        uses: cli/cli@v2.78.0
         with:
           version: latest
 
