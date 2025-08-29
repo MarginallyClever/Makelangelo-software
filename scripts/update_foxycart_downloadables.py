@@ -103,7 +103,11 @@ def main():
     assets = glob.glob(pattern)
     print(f"Scanning {ASSET_DIR} -> {len(assets)} candidate files")
     if not assets:
-        print("No Makelangelo-*.* assets found in current directory.")
+        print("No matching Makelangelo assets.")
+        # List directory for diagnostics
+        print("Directory listing:")
+        for entry in os.listdir(ASSET_DIR):
+            print(" -", entry)
         sys.exit(1)
 
     matched, unmatched = 0, 0
