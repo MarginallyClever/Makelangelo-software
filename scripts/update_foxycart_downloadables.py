@@ -100,7 +100,7 @@ def main():
         sys.exit(1)
 
     assets = glob.glob("Makelangelo-*-*-*.*")
-    print(f"Scanning {ASSET_DIR} -> {len(asset_files)} candidate files")
+    print(f"Scanning {ASSET_DIR} -> {len(assets)} candidate files")
     if not assets:
         print("No Makelangelo-*-*-*.* assets found in current directory.")
         sys.exit(1)
