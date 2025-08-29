@@ -15,6 +15,7 @@ STORE_ID = os.environ.get("FOXYCART_STORE_ID", "53596")
 FOXYCART_ROOT_URL = "https://api.foxycart.com"
 FOXYCART_TOKEN_URL = f"{FOXYCART_ROOT_URL}/token"
 FOXYCART_STORE_BASE = f"{FOXYCART_ROOT_URL}/stores/{STORE_ID}"
+ASSET_DIR = os.environ.get("RELEASE_ASSETS_DIR", ".").rstrip("/")
 
 def get_access_token():
     client_id = os.environ["FOXYCART_CLIENT_ID"]
@@ -38,21 +39,7 @@ def get_access_token():
     resp.raise_for_status()
     return resp.json()["access_token"]
 
-def confirm_token_ok(token):
-    print("Confirm token ok")
-    resp = requests.get(
-        FOXYCART_ROOT_URL,
-        headers={
-            "FOXY-API-VERSION": "1",
-            "Authorization": f"Bearer {token}",
-            "Accept": "application/json",
-        },
-    )
-    print("reply:", resp.status_code, resp.text)
-    return None
-
 def get_downloadables(token):
-    downloadables = []
     resp = requests.get(
         f"{FOXYCART_STORE_BASE}/downloadables",
         headers={
@@ -61,14 +48,10 @@ def get_downloadables(token):
             "Accept": "application/json",
         },
     )
-    print("token:", token)
-    print("Status code:", resp.status_code)
-    print("Response body:", resp.text)
-    # while url:
-    #     resp.raise_for_status()
-    #     data = resp.json()
-    #     downloadables.extend(data.get("_embedded", {}).get("fx:downloadables", []))
-    #     url = data.get("_links", {}).get("next", {}).get("href")
+    resp.raise_for_status()
+    data = resp.json()
+    downloadables = data.get("_embedded", {}).get("fx:downloadables", [])
+    print("downloadables:",downloadables)
     return downloadables
 
 def extract_os_key(asset_name):
@@ -111,21 +94,16 @@ def main():
         sys.exit(1)
 
     try:
-        confirm_token_ok(token)
-    except Exception as e:
-        print("FoxyCart access token is not valid:", e)
-        sys.exit(1)
-
-    try:
         downloadables = get_downloadables(token)
     except Exception as e:
         print("Failed to get FoxyCart downloadables:", e)
         sys.exit(1)
 
     assets = glob.glob("Makelangelo-*-*-*.*")
+    print(f"Scanning {ASSET_DIR} -> {len(asset_files)} candidate files")
     if not assets:
         print("No Makelangelo-*-*-*.* assets found in current directory.")
-        sys.exit(0)
+        sys.exit(1)
 
     matched, unmatched = 0, 0
     for asset_path in assets:
@@ -133,7 +111,7 @@ def main():
         downloadable = match_downloadable(asset_name, downloadables)
         if downloadable:
             try:
-                update_downloadable(token, downloadable, asset_path)
+                #update_downloadable(token, downloadable, asset_path)
                 matched += 1
             except Exception as e:
                 print(f"Error updating {asset_name}: {e}")
