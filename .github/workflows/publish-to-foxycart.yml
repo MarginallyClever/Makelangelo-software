@@ -14,6 +14,7 @@ jobs:
       FOXYCART_CLIENT_SECRET: ${{ secrets.FOXYCART_CLIENT_SECRET }}
       FOXYCART_REFRESH_TOKEN: ${{ secrets.FOXYCART_REFRESH_TOKEN }}
       FOXYCART_STORE_ID: ${{ secrets.FOXYCART_STORE_ID }}
+      RELEASE_ASSETS_DIR: release_assets
 
     steps:
       - name: Checkout repository
@@ -36,6 +37,19 @@ jobs:
             echo "tag_name=$TAG" >> $GITHUB_OUTPUT
           fi
 
+      - name: Install GitHub CLI
+        uses: cli/cli@v3
+        with:
+          version: latest
+
+      - name: Download release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p "$RELEASE_ASSETS_DIR"
+          gh release download "${{ steps.set_tag.outputs.tag_name }}" --dir "$RELEASE_ASSETS_DIR" --clobber
+          ls -al "$RELEASE_ASSETS_DIR"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -44,14 +58,8 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Download release assets
-        uses: softprops/action-gh-release@v2.3.2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          #tag_name: ${{ github.event.release.tag_name }}
-          tag_name: ${{ steps.set_tag.outputs.tag_name }}
-
       - name: Update FoxyCart downloadables
         run: python scripts/update_foxycart_downloadables.py
         env:
           GITHUB_RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_ASSETS_DIR: ${{ env.RELEASE_ASSETS_DIR }}
