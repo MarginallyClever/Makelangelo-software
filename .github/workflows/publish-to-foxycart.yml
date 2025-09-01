@@ -1,0 +1,64 @@
+name: Update FoxyCart Downloadables
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  update-foxycart:
+    runs-on: ubuntu-latest
+
+    env:
+      FOXYCART_CLIENT_ID: ${{ secrets.FOXYCART_CLIENT_ID }}
+      FOXYCART_CLIENT_SECRET: ${{ secrets.FOXYCART_CLIENT_SECRET }}
+      FOXYCART_REFRESH_TOKEN: ${{ secrets.FOXYCART_REFRESH_TOKEN }}
+      FOXYCART_STORE_ID: ${{ secrets.FOXYCART_STORE_ID }}
+      RELEASE_ASSETS_DIR: ${{ github.workspace }}/release_assets
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Determine TAG_NAME for both release and manual runs
+      - name: Set TAG_NAME variable
+        id: set_tag
+        run: |
+          if [ "${{ github.event.release.tag_name }}" != "" ]; then
+            echo "tag_name=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          else
+            TAG=$(git tag --sort=-creatordate | head -n 1)
+            if [ -z "$TAG" ]; then
+              echo "❌ No git tags found. Please create a release tag before running this workflow."
+              exit 1
+            fi
+            echo "tag_name=$TAG" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p "$RELEASE_ASSETS_DIR"
+          echo "Downloading assets for tag: ${{ steps.set_tag.outputs.tag_name }} to directory: $RELEASE_ASSETS_DIR"
+          gh release download "${{ steps.set_tag.outputs.tag_name }}" --dir "$RELEASE_ASSETS_DIR" --clobber
+          ls -al "$RELEASE_ASSETS_DIR"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Update FoxyCart downloadables
+        run: python scripts/update_foxycart_downloadables.py
+        env:
+          GITHUB_RELEASE_TAG: ${{ steps.set_tag.outputs.tag_name }}
+          RELEASE_ASSETS_DIR: ${{ env.RELEASE_ASSETS_DIR }}

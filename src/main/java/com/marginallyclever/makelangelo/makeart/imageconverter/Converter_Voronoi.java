@@ -175,9 +175,11 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
             double stepSize = getStepSize(maxy, miny, xDiff);
 
             for(double y=miny;y<maxy;y+=stepSize) {
+                // all hulls are convex.  find the left and right edges at this y
                 double x0 = findLeftEdge(hull,factory,y,minx,maxx,stepSize);
                 double x1 = findRightEdge(hull,factory,y,minx,maxx,stepSize);
                 for (double x = x0; x <= x1; x+=stepSize) {
+                    // scan between the edges
                     if(!image.canSampleAt(x,y)) continue;
                     double v = 255 - image.sample1x1Unchecked(x,y);
                     weight += v;
