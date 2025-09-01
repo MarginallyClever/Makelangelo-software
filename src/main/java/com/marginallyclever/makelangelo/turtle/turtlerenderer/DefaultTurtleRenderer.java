@@ -24,16 +24,13 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	public void start(Graphics2D g2) {
 		this.g2 = g2;
 
-		// set pen diameter
-		g2.setStroke(new BasicStroke(penDiameter));
-
-		isPenUp = true;
+        setPenUp();
 
 		// set pen diameter
 		g2.setStroke(new BasicStroke(penDiameter));
 	}
 
-	@Override
+    @Override
 	public void end() {}
 
 	@Override
@@ -49,12 +46,7 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 
 	@Override
 	public void travel(Point2d p0, Point2d p1) {
-		if(!isPenUp) {
-			isPenUp = true;
-			if(showTravel) {
-				g2.setColor(colorTravel);
-			}
-		}
+		if(!isPenUp) setPenUp();
 		if(!showTravel) return;
 
 		line.setLine(p0.x, p0.y, p1.x, p1.y);
@@ -92,4 +84,11 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	public void setShowTravel(boolean showTravel) {
 		this.showTravel = showTravel;
 	}
+
+    private void setPenUp() {
+        isPenUp = true;
+        if(showTravel) {
+            g2.setColor(colorTravel);
+        }
+    }
 }

@@ -37,7 +37,7 @@ public class CropTurtle {
 	 * @return a new turtle with the cropped layer
 	 */
 	private static StrokeLayer cropLayer(Rectangle2D.Double rectangle, StrokeLayer layer) {
-		StrokeLayer newLayer = new StrokeLayer(layer.getColor(),layer.getDiameter());
+		StrokeLayer newLayer = new StrokeLayer(layer.getName(),layer.getColor(),layer.getDiameter());
 
 		GeometryFactory gf = new GeometryFactory();
 		// limits we will need for rectangle

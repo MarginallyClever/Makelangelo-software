@@ -163,7 +163,8 @@ public class Turtle implements Cloneable {
 		}
 		this.color = color;
 		this.diameter = diameter;
-		strokeLayers.add(new StrokeLayer(this.color, this.diameter));
+        String name = Integer.toString(strokeLayers.size());
+		strokeLayers.add(new StrokeLayer(name, this.color, this.diameter));
 		if(!isUp) penDown();
 	}
 
@@ -487,7 +488,7 @@ public class Turtle implements Cloneable {
 		List<Turtle> result = new ArrayList<>();
 
 		for (var layer : strokeLayers) {
-			if(layer.isEmpty()) continue;
+			if(layer.isEmpty() || !layer.isVisible()) continue;
 			Turtle t = new Turtle();
 			t.strokeLayers.clear();
 			t.strokeLayers.add(layer);
@@ -657,4 +658,15 @@ public class Turtle implements Cloneable {
 	public List<StrokeLayer> getLayers() {
 		return strokeLayers;
 	}
+
+    public void trimEmptyLayers() {
+        ArrayList<StrokeLayer> toKeep = new ArrayList<>();
+        for(var layer : strokeLayers) {
+            if(!layer.isEmpty()) {
+                toKeep.add(layer);
+            }
+        }
+        strokeLayers.clear();
+        strokeLayers.addAll(toKeep);
+    }
 }

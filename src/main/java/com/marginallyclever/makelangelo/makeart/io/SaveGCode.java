@@ -107,7 +107,7 @@ public class SaveGCode implements TurtleSaver {
 		int i=0;
 		for( Turtle split : list ) {
 			++i;
-			String newFileName = fileWithoutExtension+"-"+Integer.toString(i)+ext;
+			String newFileName = fileWithoutExtension+"-"+ i + ext;
 			saveOneFile(newFileName,split,plotter);
 			filesCreated.add(newFileName);
 		}
@@ -115,7 +115,12 @@ public class SaveGCode implements TurtleSaver {
 	}
 
 	private int countTurtleToolChanges(Turtle turtle) {
-		return turtle.getLayers().size();
+        int sum=0;
+        for( var layer : turtle.getLayers() ) {
+            if(!layer.isVisible() || layer.isEmpty()) continue;
+            sum++;
+        }
+        return sum;
 	}
 
 	private String addExtension(String name, String [] extensions) {
