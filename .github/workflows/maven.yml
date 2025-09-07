@@ -56,7 +56,7 @@ jobs:
     if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev'
     steps:
       - name: Delete all assets from Nightly Builds release
-        uses: actions/github-script@v7.0.1
+        uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
