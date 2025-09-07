@@ -119,6 +119,7 @@ public class TurtleRenderFacade implements PreviewListener {
 
 	public void setRenderer(@Nonnull TurtleRenderer render) {
 		myRenderer = render;
+        turtleHash = -1;  // force a re-render next time
 	}
 
 	public @Nonnull TurtleRenderer getRenderer() {
