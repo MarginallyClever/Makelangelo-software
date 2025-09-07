@@ -81,15 +81,15 @@ public class Converter_SpiralPulseCMYK extends ImageConverter {
 		turtle = new Turtle();
 		turtle.setStroke(Color.BLACK, settings.getDouble(PlotterSettings.DIAMETER));
 
-		outputChannel(cmyk.getY(), Color.YELLOW);
-		outputChannel(cmyk.getC(), Color.CYAN);
-		outputChannel(cmyk.getM(), Color.MAGENTA);
-		outputChannel(cmyk.getK(), Color.BLACK);
+		outputChannel(0,cmyk.getY(), Color.YELLOW);
+		outputChannel(1,cmyk.getC(), Color.CYAN);
+		outputChannel(2,cmyk.getM(), Color.MAGENTA);
+		outputChannel(3,cmyk.getK(), Color.BLACK);
 
 		fireConversionFinished();
 	}
 
-	private void outputChannel(TransformedImage img,Color channel) {
+	private void outputChannel(int phaseOffset,TransformedImage img,Color channel) {
 		Turtle newTurtle = new Turtle();
 		newTurtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 
@@ -116,10 +116,11 @@ public class Converter_SpiralPulseCMYK extends ImageConverter {
 		double ringSize = spacing;
 
 		var wave = new WaveByIntensity(img,halfWaveHeight,sampleRate,zigDensity);
+        wave.setPhase(phaseOffset*15);
 
 		Point2d a = new Point2d();
 		Point2d b = new Point2d();
-
+        boolean isFirst=true;
 		a.set(Math.cos(0) * r, Math.sin(0) * r);
 
 		while (r > toolDiameter*2) {
@@ -132,15 +133,18 @@ public class Converter_SpiralPulseCMYK extends ImageConverter {
 				double r2 = r - ringSize * (float)i / circumference;
 				double f = Math.PI * 2.0f * (float)i / circumference;
 				b.set(Math.cos(f) * r2, Math.sin(f) * r2);
-
-				newTurtle.add(wave.lineToWave(a,b));
-				a.set(b);
+                if(a.distanceSquared(b)>=toolDiameter) {
+                    wave.lineToWave(newTurtle, a, b, isFirst);
+                    isFirst = false;
+                    a.set(b);
+                }
 			}
 			r -= ringSize;
 		}
 
 		for(var layer : newTurtle.getLayers()) {
 			layer.setColor(channel);
+            layer.setName("0x"+Integer.toHexString(channel.getRGB()).substring(2).toUpperCase());
 		}
 
 		CropTurtle.run(newTurtle, myPaper.getMarginRectangle());

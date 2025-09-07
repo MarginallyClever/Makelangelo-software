@@ -36,7 +36,7 @@ public class ColorTurtle extends Node {
         } else if( allLayers.size() > 1 ) {
             // many layers merge into one, provided they are the same diameter
             // TODO check for diameter changes
-            StrokeLayer newLayer = new StrokeLayer(c, allLayers.getFirst().getDiameter());
+            StrokeLayer newLayer = new StrokeLayer("0",c, allLayers.getFirst().getDiameter());
             for( var layer : allLayers ) {
                 newLayer.addAll(layer.getAllLines());
             }

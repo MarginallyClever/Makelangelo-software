@@ -1,33 +1,19 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle;
 
-import com.marginallyclever.donatello.Donatello;
-import com.marginallyclever.donatello.ports.InputBoolean;
-import com.marginallyclever.donatello.ports.InputColor;
 import com.marginallyclever.donatello.ports.InputInt;
 import com.marginallyclever.donatello.ports.InputOneOfMany;
 import com.marginallyclever.makelangelo.MainFrame;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
-import com.marginallyclever.makelangelo.makeart.turtlegenerator.Generator_AnalogClock;
-import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorFactory;
-import com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight.GenerateClockHands;
-import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangelo.turtle.PolylineBuilder;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleToBufferedImageHelper;
-import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderFacade;
 import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderFactory;
-import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderer;
 import com.marginallyclever.nodegraphcore.Node;
 import com.marginallyclever.nodegraphcore.PrintWithGraphics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * <p>Print the {@link Turtle}'s path behind the {@link Node}s.</p>

@@ -56,6 +56,7 @@ public class MainFrame extends JFrame {
     private final AboutPanel aboutPanel = new AboutPanel(MakelangeloVersion.VERSION, MakelangeloVersion.DETAILED_VERSION);
     private final NodeFactoryPanel nodeFactoryPanel = new NodeFactoryPanel();
     private final DockableEditNodePanel editNodePanel = new DockableEditNodePanel();
+    private final LayerViewPanel layerViewPanel = new LayerViewPanel(this);
 
     private Turtle myTurtle = new Turtle();
 
@@ -256,8 +257,12 @@ public class MainFrame extends JFrame {
     }
 
     public void setTurtle(Turtle turtle) {
+        // trim empty layers
+        turtle.trimEmptyLayers();
+
         myTurtle = turtle;
         previewPanel.setTurtle(turtle);
+        layerViewPanel.setTurtle(turtle);
     }
 
     public Turtle getTurtle() {
@@ -292,6 +297,7 @@ public class MainFrame extends JFrame {
         addDockingPanel("AddNode","Add Node", nodeFactoryPanel);
         addDockingPanel("About","About",aboutPanel);
         addDockingPanel("EditNode","Edit Node",editNodePanel);
+        addDockingPanel("Layers","Layers",layerViewPanel);
     }
 
     private void setupDropTarget() {

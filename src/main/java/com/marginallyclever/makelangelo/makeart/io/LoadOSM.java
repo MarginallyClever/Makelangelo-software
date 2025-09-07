@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
 import com.marginallyclever.makelangelo.makeart.turtletool.CropTurtle;
+import com.marginallyclever.makelangelo.turtle.StrokeLayer;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,16 +128,17 @@ public class LoadOSM implements TurtleLoader {
         double scale = 1000.0 / Math.max(dLat, dLon); // target ~1000 units max dimension
 
         // Layers by color
-        LinkedHashMap<Integer, Turtle> layers = new LinkedHashMap<>();
+        LinkedHashMap<String, Turtle> layers = new LinkedHashMap<>();
 
         for (OSMWay w : ways) {
             String layerName = layerNameForTags(w.tags);
             int color = pickColor(w.tags);
-            Turtle layer = layers.get(color);
+            Turtle layer = layers.get(layerName);
             if (layer == null) {
+                // this is only logged once but the layer is used for all subsequent lines of this name
                 logger.info("New layer: {} (#{}).", layerName, String.format("%06X", color));
                 layer = new Turtle(new Color(color));
-                layers.put(color, layer);
+                layers.put(layerName, layer);
             }
 
             // Build polyline
@@ -170,8 +172,10 @@ public class LoadOSM implements TurtleLoader {
 
         // Merge layers into master turtle (preserving insertion order)
         Turtle master = new Turtle();
-        for (Map.Entry<Integer, Turtle> e : layers.entrySet()) {
-            master.add(e.getValue());
+        for (Map.Entry<String, Turtle> e : layers.entrySet()) {
+            StrokeLayer layer = e.getValue().getLayers().getFirst();
+            layer.setName(e.getKey());
+            master.getLayers().add(layer);
         }
 
         if(hasBounds) {
