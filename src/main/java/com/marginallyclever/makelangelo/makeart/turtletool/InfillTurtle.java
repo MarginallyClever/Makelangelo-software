@@ -3,12 +3,19 @@ package com.marginallyclever.makelangelo.makeart.turtletool;
 import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.linecollection.LineCollection;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.operation.polygonize.Polygonizer;
 
 import javax.vecmath.Point2d;
 import javax.vecmath.Vector2d;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -63,41 +70,107 @@ public class InfillTurtle {
 		Rectangle2D.Double bounds = addPaddingToBounds(input.getBounds(), 2.0);
 		LineCollection results = new LineCollection();
 
-		// do this once here instead of once per line.
-		LineCollection convertedPath = input.getAsLineCollection();
-		// working variable
-		LineSegment2D line = new LineSegment2D(new Point2d(), new Point2d(), input.getColor());
+		LineCollection originalPaths = input.getAsLineCollection();
+        LineCollection rawInfill = buildInfillLines(bounds,input.getColor());
 
-		double size = Math.max(bounds.getHeight(), bounds.getWidth());
-		Vector2d majorDir = new Vector2d(Math.cos(Math.toRadians(angle   )), Math.sin(Math.toRadians(angle   )));
-        Vector2d minorDir = new Vector2d(majorDir.y, -majorDir.x); // perpendicular
+        GeometryFactory gf = new GeometryFactory();
 
-        Vector2d majorStart = new Vector2d();
-        Vector2d majorEnd = new Vector2d();
+        try {
+            // A. Convert convertedPath to polygons
+            List<LineString> jtsLines = new ArrayList<>();
+            for (LineSegment2D seg : originalPaths) {
+                Coordinate[] coords = {
+                        new Coordinate(seg.start.x, seg.start.y),
+                        new Coordinate(seg.end.x, seg.end.y)
+                };
+                jtsLines.add(gf.createLineString(coords));
+            }
+            Polygonizer polygonizer = new Polygonizer();
+            polygonizer.add(jtsLines);
+            Collection polygons = polygonizer.getPolygons();
+            // union all polygons into one geometry
+            Geometry unioned = null;
+            for (Object poly : polygons) {
+                if (unioned == null) {
+                    unioned = (Polygon) poly;
+                } else {
+                    unioned = unioned.union((Polygon) poly);
+                }
+            }
 
-		Vector2d minorStart = new Vector2d(bounds.getCenterX(),bounds.getCenterY());
-		minorStart.scaleAdd(-size/2,minorDir,minorStart);
+            // B. Build infill lines as JTS LineStrings
+            List<LineString> infillLines = new ArrayList<>();
+            for (LineSegment2D seg : rawInfill) {
+                Coordinate[] coords = {
+                        new Coordinate(seg.start.x, seg.start.y),
+                        new Coordinate(seg.end.x, seg.end.y)
+                };
+                infillLines.add(gf.createLineString(coords));
+            }
 
-		for(double i=0; i<size; i+=penDiameter) {
-            // move the start point along the minor axis.
-			majorStart.scaleAdd(-size/2,majorDir,minorStart);
-            // move the end point along the minor axis.
-			majorEnd.scaleAdd(size/2,majorDir,minorStart);
+            // C. Clip infill lines against polygons
+            List<Geometry> clippedInfill = new ArrayList<>();
+            for (LineString infill : infillLines) {
+                Geometry clipped = infill.intersection(unioned);
+                if (!clipped.isEmpty()) {
+                    clippedInfill.add(clipped);
+                }
+            }
 
-			line.start.set(majorStart);
-			line.end.set(majorEnd);
+            // D. Convert clipped infill back to LineCollection
+            for (Geometry g : clippedInfill) {
+                if (g instanceof LineString) {
+                    LineString ls = (LineString) g;
+                    Coordinate[] coords = ls.getCoordinates();
+                    if (coords.length >= 2) {
+                        for (int i = 0; i < coords.length - 1; i++) {
+                            Point2d start = new Point2d(coords[i].x, coords[i].y);
+                            Point2d end = new Point2d(coords[i + 1].x, coords[i + 1].y);
+                            results.add(new LineSegment2D(start, end, input.getColor()));
+                        }
+                    }
+                }
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
 
-            //results.add(new LineSegment2D(line.start, line.end, line.color));
-            results.addAll(trimLineToPath(line, convertedPath));
-
-            // increment the minor axis position.
-			minorStart.scaleAdd(penDiameter,minorDir,minorStart);
-		}
-
-		return results;
+        return results;
 	}
 
-	/**
+    /**
+     * Build a set of parallel lines that cover the given bounding box.
+     * The lines are spaced by penDiameter, and drawn at the given angle.
+     * @param bounds The bounding box to cover
+     * @param color Color to assign to lines
+     * @return A {@link LineCollection} of parallel lines
+     */
+    private LineCollection buildInfillLines(Rectangle2D.Double bounds, Color color) {
+        LineCollection results = new LineCollection();
+
+        LineSegment2D line = new LineSegment2D(new Point2d(), new Point2d(), color);
+        double size = Math.max(bounds.getHeight(), bounds.getWidth());
+        Vector2d majorDir = new Vector2d(Math.cos(Math.toRadians(angle)), Math.sin(Math.toRadians(angle)));
+        Vector2d minorDir = new Vector2d(majorDir.y, -majorDir.x); // orthogonal
+        Point2d majorStart = new Point2d();
+        Point2d majorEnd = new Point2d();
+        Vector2d minorStart = new Vector2d(bounds.getCenterX(),bounds.getCenterY());
+        minorStart.scaleAdd(-size/2,minorDir,minorStart);
+
+        for(double i=0; i<size; i+=penDiameter) {
+            // move the start point along the minor axis.
+            majorStart.scaleAdd(-size/2,majorDir,minorStart);
+            // move the end point along the minor axis.
+            majorEnd.scaleAdd(size/2,majorDir,minorStart);
+
+            results.add(new LineSegment2D(majorStart, majorEnd, line.color));
+            // increment the minor axis position.
+            minorStart.scaleAdd(penDiameter,minorDir,minorStart);
+        }
+        return results;
+    }
+
+    /**
 	 * Add padding to a {@link Rectangle2D.Double} bounding rectangle.
 	 * 
 	 * @param before the original rectangle
