@@ -89,7 +89,7 @@ public class TransformedImage {
 		return ((y / scaleY) - translateY);
 	}
 
-	class Box {
+    class Box {
 		public double left, top, right, bottom;
 
 		public Box(double left, double top, double right, double bottom) {
