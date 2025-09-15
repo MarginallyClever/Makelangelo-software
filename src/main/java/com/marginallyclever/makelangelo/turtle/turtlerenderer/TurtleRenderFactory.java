@@ -14,6 +14,12 @@ public class TurtleRenderFactory {
 	public static final int MARLIN_SIMULATION = 4;
 	public static final int NUM_RENDERERS = 5;
 
+	private static final BarberPoleTurtleRenderer myBarberPoleTurtleRenderer = new BarberPoleTurtleRenderer();
+	private static final SeparateLoopTurtleRenderer mySeparateLoopTurtleRenderer = new SeparateLoopTurtleRenderer();
+	private static final DirectionLoopTurtleRenderer myDirectionLoopTurtleRenderer = new DirectionLoopTurtleRenderer();
+	private static final MarlinSimulationVisualizer myMarlinSimulationVisualizer = new MarlinSimulationVisualizer();
+    private static final DefaultTurtleRenderer myDefaultTurtleRenderer = new DefaultTurtleRenderer();
+
 	public static String [] getNames() {
 		return new String [] {
 				"Default",
@@ -26,11 +32,11 @@ public class TurtleRenderFactory {
 
 	public static TurtleRenderer getTurtleRenderer(int index) {
 		return switch(index) {
-			case 1 -> new BarberPoleTurtleRenderer();
-			case 2 -> new SeparateLoopTurtleRenderer();
-			case 3 -> new DirectionLoopTurtleRenderer();
-			case 4 -> new MarlinSimulationVisualizer();
-			default -> new DefaultTurtleRenderer();
+			case BARBER_POLE -> myBarberPoleTurtleRenderer;
+			case SEPARATE_LOOPS -> mySeparateLoopTurtleRenderer;
+			case DIRECTION_LOOPS -> myDirectionLoopTurtleRenderer;
+			case MARLIN_SIMULATION -> myMarlinSimulationVisualizer;
+			default -> myDefaultTurtleRenderer;
 		};
 	}
 }

@@ -41,20 +41,19 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 	}
 
 	private void drawPoints() {
-		if(!points.isEmpty()) {
-			int size = points.size();
+		if(points.isEmpty()) return;
 
-			for(int i=0;i<size;i+=2) {
-				Point2d p0 = points.get(i);
-				Point2d p1 = points.get(i+1);
-				double r = (double)i/(double)size;
-				double b = 1.0 - r;
-				gl2.setColor(new Color((int)(r*255),0,(int)(b*255)));
-				line.setLine(p0.x, p0.y, p1.x, p1.y);
-				gl2.draw(line);
-			}
-			points.clear();
-		}
+        int size = points.size();
+        for(int i=0;i<size;i+=2) {
+            Point2d p0 = points.get(i);
+            Point2d p1 = points.get(i+1);
+            double r = (double)i/(double)size;
+            double b = 1.0 - r;
+            gl2.setColor(new Color((int)(r*255),0,(int)(b*255)));
+            line.setLine(p0.x, p0.y, p1.x, p1.y);
+            gl2.draw(line);
+        }
+        points.clear();
 	}
 
 	@Override

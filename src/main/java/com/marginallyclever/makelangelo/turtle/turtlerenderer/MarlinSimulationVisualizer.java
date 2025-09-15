@@ -5,6 +5,7 @@ import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulatio
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulationBlock;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Line2d;
+import com.marginallyclever.makelangelo.turtle.StrokeLayer;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Point2d;
@@ -25,12 +26,12 @@ import java.util.ArrayList;
  */
 public class MarlinSimulationVisualizer implements TurtleRenderer {
 	static private class ColorPoint {
-		public Vector3d c;
-		public Vector3d p;
+		public Vector3d color;
+		public Vector3d point;
 
 		public ColorPoint(Vector3d cc, Vector3d pp) {
-			c=cc;
-			p=pp;
+			color = cc;
+			point = pp;
 		}
 	};
 
@@ -55,15 +56,14 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 			ColorPoint b = buffer.get(i + 1);
 
 			GradientPaint gradient = new GradientPaint(
-					0,0, new Color((float)a.c.x, (float)a.c.y, (float)a.c.z),
-					0,0, new Color((float)b.c.x, (float)b.c.y, (float)b.c.z)
+					0,0, new Color((float)a.color.x, (float)a.color.y, (float)a.color.z),
+					0,0, new Color((float)b.color.x, (float)b.color.y, (float)b.color.z)
 			);
 
 			gl2.setPaint(gradient);
-			line.setLine(a.p.x, a.p.y, b.p.x, b.p.y);
+			line.setLine(a.point.x, a.point.y, b.point.x, b.point.y);
 			gl2.draw(line);
 		}
-
 	}
 
 	private void recalculateBuffer(Turtle turtleToRender, final PlotterSettings settings) {
@@ -84,13 +84,12 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	}
 
 	private void renderAlternatingBlocks(MarlinSimulationBlock block) {
-		Vector3d c;
-		switch(block.id % 3) {
-		case 0 : c=new Vector3d(1,0,0); break;
-		case 1 : c=new Vector3d(0,1,0); break;
-		default: c=new Vector3d(0,0,1); break;
-		}
-		buffer.add(new ColorPoint(c,block.start));
+		Vector3d c = switch (block.id % 3) {
+            case 0 -> new Vector3d(1, 0, 0);
+            case 1 -> new Vector3d(0, 1, 0);
+            default -> new Vector3d(0, 0, 1);
+        };
+        buffer.add(new ColorPoint(c,block.start));
 		buffer.add(new ColorPoint(c,block.end));
 	}
 
@@ -201,18 +200,24 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	@Override
 	public void start(Graphics2D gl2) {
 		this.gl2 = gl2;
+        previousTurtle = null;
 		myTurtle.getLayers().clear();
+        myTurtle.getLayers().add(new StrokeLayer("Marlin", Color.BLACK, mySettings.getDouble(PlotterSettings.DIAMETER)));
 	}
 
 	@Override
 	public void draw(Point2d p0, Point2d p1) {
-		myTurtle.getLayers().getLast().getAllPoints().add(p0);
+        var lastLayer = myTurtle.getLayers().getLast();
+        if(lastLayer.isEmpty()) {
+            lastLayer.add(new Line2d());
+        }
+        lastLayer.getLast().add(p0);
 	}
 
 	@Override
 	public void travel(Point2d p0, Point2d p1) {
-		myTurtle.getLayers().getLast().add(new Line2d());
-		myTurtle.getLayers().getLast().getAllPoints().add(p0);
+        myTurtle.getLayers().getLast().add(new Line2d());
+        myTurtle.getLayers().getLast().getLast().add(p0);
 	}
 
 	@Override

@@ -361,6 +361,7 @@ public class MainFrame extends JFrame {
 
     public void setTurtleRenderer(TurtleRenderer turtleRenderer) {
         previewPanel.setTurtleRenderer(turtleRenderer);
+        previewPanel.onPlotterSettingsUpdate(getPlotterSettingsManager().getLastSelectedProfile());
     }
 
     public PlotterSettingsManager getPlotterSettingsManager() {

@@ -30,6 +30,9 @@ public class ListOfLines extends ArrayList<Line2d> implements ListOfPoints {
         return isEmpty();
     }
 
+    /**
+     * @return A copy of all the points in all the lines.
+     */
     @Override
     public @NotNull List<Point2d> getAllPoints() {
         List<Point2d> points = new ArrayList<>();
