@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 import javax.vecmath.Point2d;
 import java.awt.geom.Rectangle2D;
 
+/**
+ * Crop a turtle to a rectangle.  This uses the JTS library to do the actual cropping.
+ */
 public class CropTurtle {
 	private static final Logger logger = LoggerFactory.getLogger(CropTurtle.class);
 	private static final double EPSILON = 1e-8;
