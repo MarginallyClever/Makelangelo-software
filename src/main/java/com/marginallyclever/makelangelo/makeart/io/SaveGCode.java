@@ -48,8 +48,16 @@ public class SaveGCode implements TurtleSaver {
 		fc.setCurrentDirectory((lastDir==null?null : new File(lastDir)));
 	}
 
-	// TODO why is this dialog all the way down in the SaveGCode class?
-	// it should be in SaveFileAction, maybe.
+    /**
+     * <p>Run the save dialog and save the file if the user approves.</p>
+     * <p>TODO why is this dialog all the way down in the SaveGCode class?  it should be in SaveFileAction, maybe.</p>
+     * @param turtle the turtle to save
+     * @param plotter the plotter that will translate the turtle to gcode.
+     * @param parent the parent frame for the file dialog.
+     * @param trimHead number of points to trim from the start of the turtle.
+     * @param trimTail number of points to trim from the end of the turtle.
+     * @throws Exception if saving the file fails.
+     */
 	public void run(Turtle turtle, Plotter plotter, JFrame parent, int trimHead, int trimTail) throws Exception {
 		if (fc.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
@@ -242,5 +250,16 @@ public class SaveGCode implements TurtleSaver {
 		out.write(settings.getString(PlotterSettings.START_GCODE));
 		out.write("\n;End of user gcode\n");
 		out.write(settings.getFindHomeString() + "\n");  // go home
+
+        // Add acceleration and feedrate.
+        // These values will not be saved to firmware because M500 is not used.
+        // They will be reset on power cycle and only apply to this print.
+        double accel = settings.getDouble(PlotterSettings.MAX_ACCELERATION);
+        out.write("M201 X" + accel + " Y" + accel + "\n"); // set max acceleration
+        double feedrate = settings.getMaxFeedrate();
+        out.write("M203 X" + feedrate + " Y" + feedrate + "\n"); // set max feedrate
+        out.write("M204 S" + accel + "\n"); // set start acceleration
+        int jerk = settings.getInteger(PlotterSettings.JERK);
+        out.write("M205 X" + jerk + " Y" + jerk + "\n"); // set jerk
 	}
 }

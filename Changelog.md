@@ -10,11 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - This changelog.
 - Open source button to README.md.
+- GCode headers now include M201, M203, M204, and M205 for speed tuning.
+- English for "Jerk" in plotter settings tab.
 ### Changed
 ### Deprecated
 ### Removed
 ### Fixed
 - English label for "Acceleration" in plotter settings tab.
+- Calculation for meters of timing belt needed on each side of Makelangelo 5 and HUGE.
 ### Security
 
 ## [7.76.1] - 2025-08-29
