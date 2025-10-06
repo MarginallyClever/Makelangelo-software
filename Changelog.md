@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GCode headers now include M201, M203, M204, and M205 for speed tuning.
 - English for "Jerk" in plotter settings tab.
 ### Changed
+- Size of "upload firmware" dialog should now be large enough to see all text.
 ### Deprecated
 ### Removed
 ### Fixed
