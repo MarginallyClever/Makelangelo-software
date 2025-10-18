@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - English for "Jerk" in plotter settings tab.
 ### Changed
 - Size of "upload firmware" dialog should now be large enough to see all text.
+- Bumped Jogamp to 2.6.0.
 ### Deprecated
 ### Removed
 ### Fixed
