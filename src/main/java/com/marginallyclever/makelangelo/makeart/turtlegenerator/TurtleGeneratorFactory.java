@@ -58,6 +58,7 @@ public class TurtleGeneratorFactory {
                     new TurtleGeneratorLeaf(new Generator_HilbertCurve()),
                     new TurtleGeneratorLeaf(new Generator_KochCurve()),
                     new TurtleGeneratorLeaf(new Generator_LSystemTree()),
+                    new TurtleGeneratorLeaf(new Generator_PeanoCurve()),
 					new TurtleGeneratorLeaf(new Generator_SierpinskiTriangle()),
             }),
 			new TurtleGeneratorLeaf(Translator.get("MenuGenerate.Grids"), new TurtleGeneratorLeaf[]{
