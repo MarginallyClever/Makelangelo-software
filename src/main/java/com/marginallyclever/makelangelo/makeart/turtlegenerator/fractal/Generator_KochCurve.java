@@ -1,13 +1,11 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal;
 
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeart.turtletool.ResizeTurtleToPaperAction;
-import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.donatello.select.SelectReadOnlyText;
 import com.marginallyclever.donatello.select.SelectSlider;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
+import com.marginallyclever.makelangelo.makeart.turtletool.ResizeTurtleToPaperAction;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-
-import java.awt.geom.Rectangle2D;
 
 /**
  * Koch Curve fractal
@@ -46,27 +44,9 @@ public class Generator_KochCurve extends TurtleGenerator {
 
 	@Override
 	public void generate() {
-		Rectangle2D.Double rect = myPaper.getMarginRectangle();
-		double v = Math.min(rect.getWidth(),rect.getHeight());
-		double xMin = -v;
-		double yMin = -v;
-
 		Turtle turtle = new Turtle();
-		
-		double xx = v - xMin;
-		double yy = v - yMin;
-		double maxSize = Math.max(xx, yy);
-		
-		// move to starting position
-		if(myPaper.getPaperWidth() > myPaper.getPaperHeight()) {
-			turtle.moveTo(-v,0);
-		} else {
-			turtle.moveTo(0,-v);
-			turtle.turn(90);
-		}
-		
 		turtle.penDown();
-		drawTriangle(turtle,order, maxSize);
+		drawTriangle(turtle,order);
 
 		// scale turtle to fit paper
 		ResizeTurtleToPaperAction action = new ResizeTurtleToPaperAction(myPaper,false,null);
@@ -77,21 +57,24 @@ public class Generator_KochCurve extends TurtleGenerator {
 
 
 	// L System tree
-	private void drawTriangle(Turtle turtle,int n, double distance) {
-		if (n == 0) {
-			turtle.forward(distance);
-			return;
-		}
-		drawTriangle(turtle,n-1,distance/3.0f);
-		if(n>1) {
-			turtle.turn(-60);
-			drawTriangle(turtle,n-1,distance/3.0f);
-			turtle.turn(120);
-			drawTriangle(turtle,n-1,distance/3.0f);
-			turtle.turn(-60);
-		} else {
-			turtle.forward(distance/3.0f);
-		}
-		drawTriangle(turtle,n-1,distance/3.0f);
+	private void drawTriangle(Turtle turtle,int n) {
+        if (n == 0) {
+            turtle.forward(1);
+            return;
+        }
+
+        LSystem system = new LSystem();
+        //system.addRule("F","F+F-F-F+F");
+        system.addRule("F","F+F--F+F");
+
+        String result = system.generate("F", n);
+        for(char command : result.toCharArray()) {
+            switch(command) {
+                case 'F': turtle.forward(1); break;
+                case '+': turtle.turn(60); break;
+                case '-': turtle.turn(-60); break;
+                // Ignore other characters
+            }
+        }
 	}
 }

@@ -1,14 +1,13 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal;
 
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeart.turtletool.ResizeTurtleToPaperAction;
-import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.donatello.select.SelectRandomSeed;
 import com.marginallyclever.donatello.select.SelectReadOnlyText;
 import com.marginallyclever.donatello.select.SelectSlider;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
+import com.marginallyclever.makelangelo.makeart.turtletool.ResizeTurtleToPaperAction;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
-import java.awt.geom.Rectangle2D;
 import java.util.Random;
 
 /**
@@ -82,13 +81,9 @@ public class Generator_LSystemTree extends TurtleGenerator {
 
 	@Override
 	public void generate() {
-		Turtle turtle = new Turtle();
-
 		random.setSeed(seed);
-		Rectangle2D.Double rect = myPaper.getMarginRectangle();
-		// move to starting position
-		turtle.moveTo(0,-rect.getHeight()/2);
-		turtle.turn(90);
+
+        Turtle turtle = new Turtle();
 		turtle.penDown();
 		// do the curve
 		lSystemTree(turtle,order, 10);

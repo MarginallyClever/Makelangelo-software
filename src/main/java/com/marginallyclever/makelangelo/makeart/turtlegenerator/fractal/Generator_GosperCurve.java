@@ -1,13 +1,11 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal;
 
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeart.turtletool.ResizeTurtleToPaperAction;
-import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.donatello.select.SelectReadOnlyText;
 import com.marginallyclever.donatello.select.SelectSlider;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
+import com.marginallyclever.makelangelo.makeart.turtletool.ResizeTurtleToPaperAction;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-
-import java.awt.geom.Rectangle2D;
 
 /**
  * Gosper curve fractal.
@@ -47,33 +45,9 @@ public class Generator_GosperCurve extends TurtleGenerator {
 
 	@Override
 	public void generate() {
-		Rectangle2D.Double rect = myPaper.getMarginRectangle();
-		double v = Math.min(rect.getWidth(),rect.getHeight());
-
 		Turtle turtle = new Turtle();
-		turtle.jumpTo(myPaper.getCenterX(),myPaper.getCenterY());
+        turtle.penDown();
 		gosperA(turtle,order);
-
-		// scale the image to fit on the paper
-		Rectangle2D.Double dims = turtle.getBounds();
-		double tw = dims.getWidth();
-		double th = dims.getHeight();
-		if(tw>v) {
-			double s = v/tw;
-			turtle.scale(s,s);
-			th *= s;
-			tw *= s;
-		}
-		if(th>v) {
-			double s = v/th;
-			turtle.scale(s,s);
-			th *= s;
-			tw *= s;
-		}
-		double tx = dims.getX();
-		double ty = dims.getY();
-		
-		turtle.translate(-tx-tw/2, -ty-th/2);
 
 		// scale turtle to fit paper
 		ResizeTurtleToPaperAction action = new ResizeTurtleToPaperAction(myPaper,false,null);
@@ -86,52 +60,21 @@ public class Generator_GosperCurve extends TurtleGenerator {
 	// Gosper curve A = A-B--B+A++AA+B-
 	private void gosperA(Turtle turtle,int n) {
 		if (n == 0) {
-			gosperForward(turtle);
+			turtle.forward(1);
 			return;
 		}
-		gosperA(turtle,n-1);
-		turtle.turn(-60);
-		gosperB(turtle,n-1);
-		turtle.turn(-60);
-		turtle.turn(-60);
-		gosperB(turtle,n-1);
-		turtle.turn(60);
-		gosperA(turtle,n-1);
-		turtle.turn(60);
-		turtle.turn(60);
-		gosperA(turtle,n-1);
-		gosperA(turtle,n-1);
-		turtle.turn(60);
-		gosperB(turtle,n-1);
-		turtle.turn(-60);
-	}
-
-
-	// Gosper curve B = +A-BB--B-A++A+B
-	public void gosperB(Turtle turtle,int n) {
-		if (n == 0) {
-			gosperForward(turtle);
-			return;
-		}
-		turtle.turn(60);
-		gosperA(turtle,n-1);
-		turtle.turn(-60);
-		gosperB(turtle,n-1);
-		gosperB(turtle,n-1);
-		turtle.turn(-60);
-		turtle.turn(-60);
-		gosperB(turtle,n-1);
-		turtle.turn(-60);
-		gosperA(turtle,n-1);
-		turtle.turn(60);
-		turtle.turn(60);
-		gosperA(turtle,n-1);
-		turtle.turn(60);
-		gosperB(turtle,n-1);
-	}
-
-
-	public void gosperForward(Turtle turtle) {
-		turtle.forward(1.0);
+        LSystem system = new LSystem();
+        system.addRule("A","A-B--B+A++AA+B-");
+        system.addRule("B","+A-BB--B-A++A+B");
+        String result = system.generate("A",order);
+        for(char command : result.toCharArray()) {
+            switch(command) {
+                case 'A':
+                case 'B': turtle.forward(1); break;
+                case '+': turtle.turn(60); break;
+                case '-': turtle.turn(-60); break;
+                // Ignore other characters
+            }
+        }
 	}
 }

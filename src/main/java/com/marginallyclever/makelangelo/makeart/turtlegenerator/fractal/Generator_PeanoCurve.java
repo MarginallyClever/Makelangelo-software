@@ -7,15 +7,12 @@ import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeart.turtletool.ResizeTurtleToPaperAction;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
-import java.awt.geom.Rectangle2D;
-
 /**
  * Hilbert Curve fractal.
  * @author Dan Royer
  */
 @Deprecated(since = "7.68.0")
 public class Generator_PeanoCurve extends TurtleGenerator {
-	private float turtleStep = 10.0f;
 	private static int order = 4; // controls complexity of curve
 
 	public Generator_PeanoCurve() {
@@ -45,18 +42,8 @@ public class Generator_PeanoCurve extends TurtleGenerator {
 
 	@Override
 	public void generate() {
-		Rectangle2D.Double rect = myPaper.getMarginRectangle();
-		double v = Math.min(rect.getWidth(),rect.getHeight());
-		double xMin = -v;
-
 		Turtle turtle = new Turtle();
-		turtleStep = (float) ((v - xMin) / (Math.pow(2, order)));
-
-		// move to starting position
-		turtle.jumpTo(
-				-v + turtleStep / 2,
-				-v + turtleStep / 2);
-		turtle.penDown();
+        turtle.penDown();
 		peano(turtle,order);
 
 		// scale turtle to fit paper
@@ -78,15 +65,9 @@ public class Generator_PeanoCurve extends TurtleGenerator {
 
         for(char command : result.toCharArray()) {
             switch(command) {
-                case 'F':
-                    turtle.forward(turtleStep);
-                    break;
-                case '+':
-                    turtle.turn(90);
-                    break;
-                case '−':
-                    turtle.turn(-90);
-                    break;
+                case 'F': turtle.forward(1); break;
+                case '+': turtle.turn(90); break;
+                case '−': turtle.turn(-90); break;
                 // Ignore other characters
             }
         }

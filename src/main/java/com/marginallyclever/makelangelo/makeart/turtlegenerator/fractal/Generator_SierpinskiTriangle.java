@@ -1,12 +1,11 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal;
 
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.donatello.select.SelectReadOnlyText;
 import com.marginallyclever.donatello.select.SelectSlider;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
+import com.marginallyclever.makelangelo.makeart.turtletool.ResizeTurtleToPaperAction;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-
-import java.awt.geom.Rectangle2D;
 
 /**
  * See <a href="https://en.wikipedia.org/wiki/Sierpi%C5%84ski_arrowhead_curve">Wikipedia</a>
@@ -45,51 +44,37 @@ public class Generator_SierpinskiTriangle extends TurtleGenerator {
 
 	@Override
 	public void generate() {
-		Rectangle2D.Double rect = myPaper.getMarginRectangle();
-		double xMax = rect.getWidth() / 2.0f;
-		double yMax = rect.getHeight() / 2.0f;
-		double xMin = -xMax;
-		double yMin = -yMax;
-
 		Turtle turtle = new Turtle();
-		
-		double xx = xMax - xMin;
-		double yy = yMax - yMin;
-		double maxSize = Math.tan(Math.toRadians(30)) * (Math.min(xx, yy)) * 2;
-		double jj = Math.asin(Math.toRadians(30)) * (Math.min(xx, yy));
+        turtle.penDown();
+        drawCurve(turtle,order,120);
 
-		// move to starting position
-		if(xMax > yMax) {
-			turtle.moveTo(-jj, yMin);
-		} else {
-			turtle.moveTo(xMax,-jj);
-			turtle.turn(90);
-		}
-		turtle.penDown();
-		// do the curve
-		if( (order&1) == 0 ) {
-			drawCurve(turtle,order, maxSize,-60);
-		} else {
-			turtle.turn(60);
-			drawCurve(turtle,order, maxSize,-60);
-		}
-
-		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
+        // scale turtle to fit paper
+        ResizeTurtleToPaperAction action = new ResizeTurtleToPaperAction(myPaper,false,null);
+        turtle = action.run(turtle);
 
 		notifyListeners(turtle);
 	}
 
 
-	private void drawCurve(Turtle turtle,int n, double distance,double angle) {
+	private void drawCurve(Turtle turtle,int n,double angle) {
 		if (n == 0) {
-			turtle.forward(distance);
+			turtle.forward(1);
 			return;
 		}
-		
-		drawCurve(turtle,n-1,distance/2.0f,-angle);
-		turtle.turn(angle);
-		drawCurve(turtle,n-1,distance/2.0f,angle);
-		turtle.turn(angle);
-		drawCurve(turtle,n-1,distance/2.0f,-angle);
+
+        LSystem system = new LSystem();
+        system.addRule("F","F-G+F+G-F");
+        system.addRule("G","GG");
+        String result = system.generate("F-G-G",n);
+
+        for(char c : result.toCharArray()) {
+            switch (c) {
+                case 'F':
+                case 'G': turtle.forward(1); break;
+                case '+': turtle.turn(angle); break;
+                case '-': turtle.turn(-angle); break;
+                // Ignore other characters
+            }
+        }
 	}
 }

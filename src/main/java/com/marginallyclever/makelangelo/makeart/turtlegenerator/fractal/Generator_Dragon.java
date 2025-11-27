@@ -1,15 +1,11 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal;
 
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeart.turtletool.ResizeTurtleToPaperAction;
-import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.donatello.select.SelectReadOnlyText;
 import com.marginallyclever.donatello.select.SelectSlider;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
+import com.marginallyclever.makelangelo.makeart.turtletool.ResizeTurtleToPaperAction;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Dragon fractal
@@ -19,8 +15,6 @@ import java.util.List;
 public class Generator_Dragon extends TurtleGenerator {
 	private static int order = 12; // controls complexity of curve
 	private final SelectSlider fieldOrder;
-
-	private final List<Integer> sequence = new ArrayList<>();
 
 	public Generator_Dragon() {
 		super();
@@ -49,26 +43,21 @@ public class Generator_Dragon extends TurtleGenerator {
 	@Override
 	public void generate() {
 		Turtle turtle = new Turtle();
-
-		// create the sequence of moves
-        sequence.clear();
-        for (int i = 0; i < order; i++) {
-            List<Integer> copy = new ArrayList<>(sequence);
-            Collections.reverse(copy);
-            sequence.add(1);
-            for (Integer turn : copy) {
-                sequence.add(-turn);
-            }
-        }
-        
-		// move to starting position
-		turtle.jumpTo(myPaper.getCenterX(),myPaper.getCenterY());
-
         turtle.penDown();
-		// draw the fractal
-        for (Integer turn : sequence) {
-            turtle.turn(turn * 90);
-            turtle.forward(1);
+
+        LSystem system = new LSystem();
+        system.addRule("F","F+G");
+        system.addRule("G","F-G");
+        String result = system.generate("F",order);
+
+        for(char command : result.toCharArray()) {
+            switch(command) {
+                case 'G':
+                case 'F': turtle.forward(1); break;
+                case '+': turtle.turn(90); break;
+                case '-': turtle.turn(-90); break;
+                // Ignore other characters
+            }
         }
 
 		// scale turtle to fit paper
