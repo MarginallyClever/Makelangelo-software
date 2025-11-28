@@ -25,13 +25,14 @@ public class PlotterSettingsPanel extends JPanel {
 	private final PlotterSettings settings;
 	private SelectOneOfMany visualStyle;
 	private SelectDouble machineWidth, machineHeight;
-	private SelectDouble totalBeltNeeded;
+	private SelectDouble totalBeltNeeded;  // per-side
 	private SelectDouble totalServoNeeded;
 	private SelectDouble totalStepperNeeded;
 	private SelectDouble acceleration;
 	private SelectDouble penDiameter;
 	private SelectDouble travelFeedRate;
 	private SelectDouble drawFeedRate;
+    private SelectInteger jerk;
 	private SelectDouble penUpAngle;
 	private SelectDouble penDownAngle;
 	private SelectDouble penRaiseRate;
@@ -132,16 +133,17 @@ public class PlotterSettingsPanel extends JPanel {
 
 	private SelectPanel rebuildTabPen() {
 		var panel = new SelectPanel();
-		addToPanel(panel,penDiameter 		 = new SelectDouble("diameter",		 Translator.get("PlotterSettingsPanel.penToolDiameter"		),settings.getDouble(PlotterSettings.DIAMETER)));
-		addToPanel(panel,travelFeedRate 	 = new SelectDouble("feedrate",		 Translator.get("PlotterSettingsPanel.penToolMaxFeedRate"	),settings.getDouble(PlotterSettings.FEED_RATE_TRAVEL)));
-		addToPanel(panel,drawFeedRate 		 = new SelectDouble("speed",		 Translator.get("PlotterSettingsPanel.Speed"				),settings.getDouble(PlotterSettings.FEED_RATE_DRAW)));
-		addToPanel(panel,acceleration 		 = new SelectDouble("acceleration",	 Translator.get("PlotterSettingsPanel.AdjustAcceleration"	),settings.getDouble(PlotterSettings.MAX_ACCELERATION)));
-		addToPanel(panel,penRaiseRate        = new SelectDouble("liftSpeed",	 Translator.get("PlotterSettingsPanel.penToolLiftSpeed"		),settings.getDouble(PlotterSettings.PEN_ANGLE_UP_TIME)));
-		addToPanel(panel,penLowerRate        = new SelectDouble("lowerSpeed",	 Translator.get("PlotterSettingsPanel.penToolLowerSpeed"	),settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME)));
-		addToPanel(panel,penUpAngle 		 = new SelectDouble("up",			 Translator.get("PlotterSettingsPanel.penToolUp"			),settings.getDouble(PlotterSettings.PEN_ANGLE_UP)));
-		addToPanel(panel,penDownAngle 		 = new SelectDouble("down",			 Translator.get("PlotterSettingsPanel.penToolDown"			),settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN)));
-		addToPanel(panel,selectPenUpColor 	 = new SelectColor("colorUp",		 Translator.get("PlotterSettingsPanel.penUpColor"			),settings.getColor(PlotterSettings.PEN_UP_COLOR),this));
-		addToPanel(panel,selectPenDownColor  = new SelectColor("colorDown",		 Translator.get("PlotterSettingsPanel.penDownColor"		),settings.getColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT),this));
+		addToPanel(panel,penDiameter 		 = new SelectDouble("diameter",		Translator.get("PlotterSettingsPanel.penToolDiameter"		 ), settings.getDouble(PlotterSettings.DIAMETER)));
+		addToPanel(panel,travelFeedRate 	 = new SelectDouble("feedrate",		Translator.get("PlotterSettingsPanel.penToolMaxFeedRate"	 ), settings.getDouble(PlotterSettings.FEED_RATE_TRAVEL)));
+		addToPanel(panel,drawFeedRate 		 = new SelectDouble("speed",		    Translator.get("PlotterSettingsPanel.Speed"				     ), settings.getDouble(PlotterSettings.FEED_RATE_DRAW)));
+		addToPanel(panel,acceleration 		 = new SelectDouble("acceleration",	Translator.get("PlotterSettingsPanel.AdjustAcceleration"	 ), settings.getDouble(PlotterSettings.MAX_ACCELERATION)));
+        addToPanel(panel,jerk                = new SelectInteger("jerk",           Translator.get("PlotterSettingsPanel.Jerk"                   ), settings.getInteger(PlotterSettings.JERK)));
+		addToPanel(panel,penRaiseRate        = new SelectDouble("liftSpeed",	    Translator.get("PlotterSettingsPanel.penToolLiftSpeed"		 ), settings.getDouble(PlotterSettings.PEN_ANGLE_UP_TIME)));
+		addToPanel(panel,penLowerRate        = new SelectDouble("lowerSpeed",	    Translator.get("PlotterSettingsPanel.penToolLowerSpeed"	     ), settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME)));
+		addToPanel(panel,penUpAngle 		 = new SelectDouble("up",			    Translator.get("PlotterSettingsPanel.penToolUp"			     ), settings.getDouble(PlotterSettings.PEN_ANGLE_UP)));
+		addToPanel(panel,penDownAngle 		 = new SelectDouble("down",			Translator.get("PlotterSettingsPanel.penToolDown"			 ), settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN)));
+		addToPanel(panel,selectPenUpColor 	 = new SelectColor("colorUp",		    Translator.get("PlotterSettingsPanel.penUpColor"			 ), settings.getColor(PlotterSettings.PEN_UP_COLOR),this));
+		addToPanel(panel,selectPenDownColor  = new SelectColor("colorDown",		Translator.get("PlotterSettingsPanel.penDownColor"		     ), settings.getColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT),this));
 
 		return panel;
 	}
@@ -197,6 +199,7 @@ public class PlotterSettingsPanel extends JPanel {
 		settings.setDouble(PlotterSettings.FEED_RATE_TRAVEL,travelFeedRate.getValue());
 		settings.setDouble(PlotterSettings.FEED_RATE_DRAW,drawFeedRate.getValue());
 		settings.setDouble(PlotterSettings.MAX_ACCELERATION,acceleration.getValue());
+        settings.setInteger(PlotterSettings.JERK,jerk.getValue());
 		settings.setDouble(PlotterSettings.PEN_ANGLE_UP_TIME,penRaiseRate.getValue());
 		settings.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,penLowerRate.getValue());
 		settings.setDouble(PlotterSettings.PEN_ANGLE_UP,penUpAngle.getValue());
@@ -239,24 +242,39 @@ public class PlotterSettingsPanel extends JPanel {
 
 	/**
 	 * Calculate length of belt and cables needed based on machine dimensions.
+     * The main control board is in the top center.
+     * The stepper wires much reach the top corners.
+     * The servo wire must reach the pen at the bottom right corner while also looping over the left motor.
+     * The belts much reach over each pulley (uses 35mm)
+     * The belts must reach down to the pen holder in the bottom center of the work area.
+     * The pen holder has 10cm arms that add to the reach of the belt.
 	 */
 	private void updateLengthNeeded() {
 		double w = machineWidth.getValue();
 		double h = machineHeight.getValue();
-		double SAFETY_MARGIN=100;
+        double SAFETY_MARGIN = 100; // 10cm safety margin
+        double PULLEY_WRAP = 35;    // 35mm over each pulley
+        double PEN_HOLDER_ARM = 100; // 10cm arms
+        double STEPPER_WIRE_MINIMUM_LENGTH = 30*10;
 
-		double mmBeltNeeded=(Math.sqrt(w*w+h*h)+SAFETY_MARGIN); // 10cm safety margin
-		double beltNeeded = Math.ceil(mmBeltNeeded*0.001);
-		totalBeltNeeded.setValue((float)beltNeeded);
+        // Stepper wire: from top center to each top corner (half width)
+        double mmStepperNeeded = (w / 2.0) + SAFETY_MARGIN - STEPPER_WIRE_MINIMUM_LENGTH;
+        double stepperNeeded = Math.ceil(mmStepperNeeded * 0.001); // mm to m, round up
+        totalStepperNeeded.setValue((float) stepperNeeded);
 
-		double mmServoNeeded = (Math.sqrt(w*w+h*h)+SAFETY_MARGIN) + w/2.0; // 10cm safety margin
-		double servoNeeded = Math.ceil(mmServoNeeded*0.001);
-		totalServoNeeded.setValue((float)servoNeeded);
+        // Servo wire: top center -> top left -> bottom right
+        double topCenterToTopLeft = w / 2.0;
+        double topLeftToBottomRight = Math.sqrt(w * w + h * h);
+        double mmServoNeeded = topCenterToTopLeft + topLeftToBottomRight + SAFETY_MARGIN;
+        double servoNeeded = Math.ceil(mmServoNeeded * 0.001);
+        totalServoNeeded.setValue((float) servoNeeded);
 
-		double mmStepperNeeded = w/2.0+SAFETY_MARGIN; // 10cm safety margin
-		double stepperNeeded = Math.ceil(mmStepperNeeded*0.001);
-		totalStepperNeeded.setValue((float)stepperNeeded);
-	}
+        // Belt: two belts, each from top pulley (corner) down to bottom center, plus pulley wrap and pen holder arm
+        double diagonal = Math.sqrt((w / 2.0) * (w / 2.0) + h * h);
+        double mmBeltPerSide = diagonal + PULLEY_WRAP - PEN_HOLDER_ARM;
+        double beltNeeded = Math.ceil(mmBeltPerSide * 0.001);
+        totalBeltNeeded.setValue((float) beltNeeded);
+    }
 
 	public void addListener(PlotterSettingsListener listener) {
 		this.listener = listener;

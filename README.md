@@ -1,5 +1,6 @@
 ﻿# Makelangelo Software
 
+[![Open Source](https://badges.frapsoft.com/os/v3/open-source.svg?v=103)](https://opensource.org/)
 ![workflow](https://github.com/MarginallyClever/Makelangelo-software/actions/workflows/maven.yml/badge.svg) 
 [![Crowdin](https://badges.crowdin.net/makelangelo-software/localized.svg)](https://crowdin.com/project/makelangelo-software)
 [![Discord](https://img.shields.io/discord/521753686238560256?label=Discord)](https://discord.gg/QtvHqAv8yp)

@@ -4,6 +4,7 @@ import com.marginallyclever.makelangelo.MainFrame;
 import com.marginallyclever.makelangelo.firmwareuploader.FirmwareUploaderPanel;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -25,6 +26,7 @@ public class UpdateFirmwareAction extends AbstractAction {
         dialog.add(new FirmwareUploaderPanel());
         dialog.pack();
         dialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(frame));
+        dialog.setSize(new Dimension(600, 400));
 
         frame.enableMenuBar(false);
         dialog.addWindowListener(new WindowAdapter() {

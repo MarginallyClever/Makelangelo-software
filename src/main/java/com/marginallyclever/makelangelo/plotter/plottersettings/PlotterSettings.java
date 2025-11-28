@@ -150,7 +150,9 @@ public class PlotterSettings {
 	public static final String PEN_DOWN_GCODE = "PEN_DOWN";
 	public static final String DEFAULT_PEN_DOWN_GCODE = "M280 P0 S%1 T%2";
 
-	private final JSONObject json = new JSONObject();
+    public static final String JERK = "JERK";
+
+    private final JSONObject json = new JSONObject();
 	private String robotUID = "0";
 
 	public PlotterSettings() {
@@ -192,6 +194,7 @@ public class PlotterSettings {
 		json.put(MAX_JERK,           		"[10,10,3]");
 		json.put(PEN_UP_GCODE, 				DEFAULT_PEN_UP_GCODE);
 		json.put(PEN_DOWN_GCODE, 			DEFAULT_PEN_DOWN_GCODE);
+        json.put(JERK,                      10);
 	}
 
 	public PlotterSettings(String UID) {
@@ -385,6 +388,7 @@ public class PlotterSettings {
 		json.put(MAX_JERK,           		thisMachineNode.get(MAX_JERK,"[10,10,3]"));
 		json.put(PEN_UP_GCODE, 				thisMachineNode.get(PEN_UP_GCODE, DEFAULT_PEN_UP_GCODE));
 		json.put(PEN_DOWN_GCODE, 			thisMachineNode.get(PEN_DOWN_GCODE, DEFAULT_PEN_DOWN_GCODE));
+        json.put(JERK,                      thisMachineNode.getInt(JERK,10));
 	}
 
 	/**
@@ -429,6 +433,7 @@ public class PlotterSettings {
 		thisMachineNode.put(MAX_JERK, 						json.getString(MAX_JERK));
 		thisMachineNode.put(PEN_UP_GCODE, 					json.getString(PEN_UP_GCODE));
 		thisMachineNode.put(PEN_DOWN_GCODE, 				json.getString(PEN_DOWN_GCODE));
+        thisMachineNode.putInt(JERK,                        json.getInt(JERK));
 	}
 
 	/**
@@ -560,4 +565,13 @@ public class PlotterSettings {
 	public String getFindHomeString() {
 		return getString(FIND_HOME_GCODE);
 	}
+
+    /**
+     * @return the maximum of travel and draw feedrates in mm/min
+     */
+    public double getMaxFeedrate() {
+        double frTravel = getDouble(PlotterSettings.FEED_RATE_TRAVEL);
+        double frDraw = getDouble(PlotterSettings.FEED_RATE_DRAW);
+        return Math.max(frTravel,frDraw);
+    }
 }
