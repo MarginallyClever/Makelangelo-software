@@ -27,6 +27,8 @@ public class Generator_LSystem extends TurtleGenerator {
             "Ice fractal",
             "Koch",
             "Koch snowflake",
+            "McWorter",
+            "McWorter 2",
             "Peano",
             "Sierpinski",
             "Sierpinski 2" };
@@ -72,6 +74,8 @@ public class Generator_LSystem extends TurtleGenerator {
             case "Ice fractal":     ice(turtle);               break;
             case "Koch":            koch(turtle);              break;
             case "Koch snowflake":  kochSnowflake(turtle);     break;
+            case "McWorter":        mcWorter(turtle);          break;
+            case "McWorter 2":      mcWorter2(turtle);          break;
             case "Peano":           peano(turtle);             break;
             case "Sierpinski":      sierpinski(turtle);        break;
             case "Sierpinski 2":    sierpinski2(turtle);       break;
@@ -85,37 +89,40 @@ public class Generator_LSystem extends TurtleGenerator {
         notifyListeners(turtle);
     }
 
-    private void dragon(Turtle turtle) {
-        LSystem system = new LSystem();
-        system.addRule("F","F+G");
-        system.addRule("G","F-G");
-        String result = system.generate("F",order);
-
-        for(char command : result.toCharArray()) {
+    /**
+     * Walk the turtle according to the given commands.
+     * + turn right
+     * - turn left
+     * F forward
+     * @param turtle the turtle being moved
+     * @param commands the string of commands
+     * @param turnAngle the angle to turn on + or -
+     */
+    private void walk(Turtle turtle, String commands, double turnAngle) {
+        for(char command : commands.toCharArray()) {
             switch(command) {
-                case 'G':
                 case 'F': turtle.forward(1); break;
-                case '+': turtle.turn(90); break;
-                case '-': turtle.turn(-90); break;
+                case '+': turtle.turn(turnAngle); break;
+                case '-': turtle.turn(-turnAngle); break;
                 // Ignore other characters
             }
         }
     }
 
+    private void dragon(Turtle turtle) {
+        LSystem system = new LSystem();
+        system.addRule("X","X+YF+");
+        system.addRule("Y","-FX-Y");
+        String result = system.generate("X",order);
+        walk(turtle,result,90);
+    }
+
     private void gosper(Turtle turtle) {
         LSystem system = new LSystem();
-        system.addRule("A","A-B--B+A++AA+B-");
-        system.addRule("B","+A-BB--B-A++A+B");
-        String result = system.generate("A",order);
-        for(char command : result.toCharArray()) {
-            switch(command) {
-                case 'A':
-                case 'B': turtle.forward(1); break;
-                case '+': turtle.turn(60); break;
-                case '-': turtle.turn(-60); break;
-                // Ignore other characters
-            }
-        }
+        system.addRule("X","X+YF++YF-FX--FXFX-YF+");
+        system.addRule("Y","-FX+YFYF++YF+FX--FX-Y");
+        String result = system.generate("X",order);
+        walk(turtle,result,60);
     }
 
     // Hilbert curve
@@ -124,76 +131,53 @@ public class Generator_LSystem extends TurtleGenerator {
         system.addRule("A","+BF-AFA-FB+");
         system.addRule("B","-AF+BFB+FA-");
         String result = system.generate("A", order);
-
-        for(char command : result.toCharArray()) {
-            switch(command) {
-                case 'F': turtle.forward(1); break;
-                case '+': turtle.turn(90); break;
-                case '-': turtle.turn(-90); break;
-                // Ignore other characters
-            }
-        }
+        walk(turtle,result,90);
     }
 
     private void ice(Turtle turtle) {
         LSystem system = new LSystem();
         system.addRule("F","FF+F++F+F");
         String result = system.generate("F+F+F+F", order);
-        for(char command : result.toCharArray()) {
-            switch(command) {
-                case 'F': turtle.forward(1); break;
-                case '+': turtle.turn(90); break;
-                case '-': turtle.turn(-90); break;
-                // Ignore other characters
-            }
-        }
+        walk(turtle,result,90);
     }
 
     private void koch(Turtle turtle) {
         LSystem system = new LSystem();
         //system.addRule("F","F+F-F-F+F");
         system.addRule("F","F+F--F+F");
-
         String result = system.generate("F", order);
-        for(char command : result.toCharArray()) {
-            switch(command) {
-                case 'F': turtle.forward(1); break;
-                case '+': turtle.turn(60); break;
-                case '-': turtle.turn(-60); break;
-                // Ignore other characters
-            }
-        }
+        walk(turtle,result,60);
     }
 
     private void kochSnowflake(Turtle turtle) {
         LSystem system = new LSystem();
         system.addRule("F","F+F--F+F");
-
         String result = system.generate("F--F--F", order);
-        for(char command : result.toCharArray()) {
-            switch(command) {
-                case 'F': turtle.forward(1); break;
-                case '+': turtle.turn(60); break;
-                case '-': turtle.turn(-60); break;
-                // Ignore other characters
-            }
-        }
+        walk(turtle,result,60);
+    }
+
+    private void mcWorter(Turtle turtle) {
+        LSystem system = new LSystem();
+        system.addRule("X","FY+FYFY-FY");
+        system.addRule("Y","FX-FXFX+FX");
+        String result = system.generate("X", order);
+        walk(turtle,result,120);
+    }
+
+    private void mcWorter2(Turtle turtle) {
+        LSystem system = new LSystem();
+        system.addRule("X","FX+FX+FXFYFX+FXFY-FY-FY-");
+        system.addRule("Y","+FX+FX+FXFY-FYFXFY-FY-FY");
+        String result = system.generate("X", order);
+        walk(turtle,result,90);
     }
 
     private void peano(Turtle turtle) {
         LSystem lSystem = new LSystem();
-        lSystem.addRule("X", "XFYFX+F+YFXFY−F−XFYFX");
-        lSystem.addRule("Y", "YFXFY−F−XFYFX+F+YFXFY");
+        lSystem.addRule("X", "XFYFX+F+YFXFY-F-XFYFX");
+        lSystem.addRule("Y", "YFXFY-F-XFYFX+F+YFXFY");
         String result = lSystem.generate("X", order);
-
-        for(char command : result.toCharArray()) {
-            switch(command) {
-                case 'F': turtle.forward(1); break;
-                case '+': turtle.turn(90); break;
-                case '−': turtle.turn(-90); break;
-                // Ignore other characters
-            }
-        }
+        walk(turtle,result,90);
     }
 
     private void sierpinski(Turtle turtle) {
@@ -201,16 +185,7 @@ public class Generator_LSystem extends TurtleGenerator {
         system.addRule("F","F-G+F+G-F");
         system.addRule("G","GG");
         String result = system.generate("F-G-G",order);
-
-        for(char c : result.toCharArray()) {
-            switch (c) {
-                case 'F':
-                case 'G': turtle.forward(1); break;
-                case '+': turtle.turn(120); break;
-                case '-': turtle.turn(-120); break;
-                // Ignore other characters
-            }
-        }
+        walk(turtle,result,120);
     }
 
     private void sierpinski2(Turtle turtle) {
@@ -218,14 +193,6 @@ public class Generator_LSystem extends TurtleGenerator {
         system.addRule("X","YF+XF+Y");
         system.addRule("Y","XF-YF-X");
         String result = system.generate("YF",order);
-
-        for(char c : result.toCharArray()) {
-            switch (c) {
-                case 'F': turtle.forward(1); break;
-                case '+': turtle.turn(60); break;
-                case '-': turtle.turn(-60); break;
-                // Ignore other characters
-            }
-        }
+        walk(turtle,result,60);
     }
 }
