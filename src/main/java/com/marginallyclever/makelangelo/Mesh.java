@@ -11,6 +11,8 @@ import javax.vecmath.Vector2d;
 import javax.vecmath.Vector3d;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -142,7 +144,8 @@ public class Mesh {
 		if(hasTextures) setupArray(gl,3,2,numVertexes,textureArray);
 
 		if(hasIndexes) {
-			IntBuffer data = IntBuffer.allocate(indexArray.size());
+            ByteBuffer bb = ByteBuffer.allocateDirect(indexArray.size() * Integer.BYTES).order(ByteOrder.nativeOrder());
+			IntBuffer data = bb.asIntBuffer();
 			for (Integer integer : indexArray) data.put(integer);
 			data.rewind();
 
@@ -182,7 +185,8 @@ public class Mesh {
 	}
 
 	private void setupArray(GL3 gl, int attribIndex, int size, long numVertexes,List<Float> list) {
-		FloatBuffer data = FloatBuffer.allocate(list.size());
+        ByteBuffer bb = ByteBuffer.allocateDirect(list.size()*Float.BYTES).order(ByteOrder.nativeOrder());
+		FloatBuffer data = bb.asFloatBuffer();
 		for( Float f : list ) data.put(f);
 		data.rewind();
 		bindArray(gl,attribIndex,size);

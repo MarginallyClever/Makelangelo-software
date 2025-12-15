@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import javax.vecmath.Matrix4d;
 import javax.vecmath.Vector3d;
 import java.awt.*;
-import java.nio.FloatBuffer;
 import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +22,7 @@ public class ShaderProgram {
     private final int vertexShaderId;
     private final int fragmentShaderId;
     private final Map<String, Integer> uniformLocations = new HashMap<>();
-    private final FloatBuffer matrixBuffer = FloatBuffer.allocate(16);
+    private final float [] matrixBuffer = new float[16];
 
     public ShaderProgram(GL3 gl, String[] vertexCode, String[] fragmentCode) {
         super();
@@ -141,28 +140,27 @@ public class ShaderProgram {
         OpenGLHelper.checkGLError(gl,logger);
     }
 
-    private FloatBuffer matrixToFloatBuffer(Matrix4d m) {
-        matrixBuffer.put( (float)m.m00 );
-        matrixBuffer.put( (float)m.m01 );
-        matrixBuffer.put( (float)m.m02 );
-        matrixBuffer.put( (float)m.m03 );
+    private float [] matrixToFloatBuffer(Matrix4d m) {
+        int i = 0;
+        matrixBuffer[i++] = (float)m.m00;
+        matrixBuffer[i++] = (float)m.m01;
+        matrixBuffer[i++] = (float)m.m02;
+        matrixBuffer[i++] = (float)m.m03;
 
-        matrixBuffer.put( (float)m.m10 );
-        matrixBuffer.put( (float)m.m11 );
-        matrixBuffer.put( (float)m.m12 );
-        matrixBuffer.put( (float)m.m13 );
+        matrixBuffer[i++] = (float)m.m10;
+        matrixBuffer[i++] = (float)m.m11;
+        matrixBuffer[i++] = (float)m.m12;
+        matrixBuffer[i++] = (float)m.m13;
 
-        matrixBuffer.put( (float)m.m20 );
-        matrixBuffer.put( (float)m.m21 );
-        matrixBuffer.put( (float)m.m22 );
-        matrixBuffer.put( (float)m.m23 );
+        matrixBuffer[i++] = (float)m.m20;
+        matrixBuffer[i++] = (float)m.m21;
+        matrixBuffer[i++] = (float)m.m22;
+        matrixBuffer[i++] = (float)m.m23;
 
-        matrixBuffer.put( (float)m.m30 );
-        matrixBuffer.put( (float)m.m31 );
-        matrixBuffer.put( (float)m.m32 );
-        matrixBuffer.put( (float)m.m33 );
-        matrixBuffer.rewind();
-
+        matrixBuffer[i++] = (float)m.m30;
+        matrixBuffer[i++] = (float)m.m31;
+        matrixBuffer[i++] = (float)m.m32;
+        matrixBuffer[i++] = (float)m.m33;
         return matrixBuffer;
     }
 
@@ -175,7 +173,7 @@ public class ShaderProgram {
      * @param value the matrix to set
      */
     public void setMatrix4d(GL3 gl, String name, Matrix4d value) {
-        gl.glUniformMatrix4fv(getUniformLocation(gl, name), 1, true, matrixToFloatBuffer(value));
+        gl.glUniformMatrix4fv(getUniformLocation(gl, name), 1, true, matrixToFloatBuffer(value),0);
         OpenGLHelper.checkGLError(gl,logger);
     }
 
