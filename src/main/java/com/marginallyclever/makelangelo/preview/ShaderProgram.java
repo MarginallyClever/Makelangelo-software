@@ -40,36 +40,18 @@ public class ShaderProgram {
         gl.glAttachShader(programId, vertexShaderId);
         gl.glAttachShader(programId, fragmentShaderId);
         gl.glLinkProgram(programId);
-        if (!checkStatus(gl, programId, GL3.GL_LINK_STATUS)) {
-            throw new IllegalStateException("Failed to link shader program.");
-        }
-        gl.glValidateProgram(programId);
-        if (!checkStatus(gl, programId, GL3.GL_VALIDATE_STATUS)) {
-            throw new IllegalStateException("Failed to validate shader program.");
-        }
-    }
+        ensureStatus(gl, programId, GL3.GL_LINK_STATUS, "program link", false);
 
-    private void showProgramError(GL3 gl, String message) {
-        int[] logLength = new int[1];
-        gl.glGetProgramiv(programId, GL3.GL_INFO_LOG_LENGTH, logLength, 0);
-        byte[] log = new byte[logLength[0]];
-        gl.glGetProgramInfoLog(programId, logLength[0], null, 0, log, 0);
-        logger.error(message + new String(log));
+        gl.glValidateProgram(programId);
+        ensureStatus(gl, programId, GL3.GL_VALIDATE_STATUS, "program validate", false);
     }
 
     private int loadShader(GL3 gl, int type, String[] shaderCode, String name) {
         int shaderId = gl.glCreateShader(type);
         gl.glShaderSource(shaderId, shaderCode.length, shaderCode, null, 0);
         gl.glCompileShader(shaderId);
-        if (!checkStatus(gl, shaderId, GL3.GL_COMPILE_STATUS)) {
-            int[] logLength = new int[1];
-            gl.glGetShaderiv(shaderId, GL3.GL_INFO_LOG_LENGTH, logLength, 0);
-
-            byte[] log = new byte[logLength[0]];
-            gl.glGetShaderInfoLog(shaderId, logLength[0], null, 0, log, 0);
-
-            logger.error("Failed to compile "+name+" shader code: " + new String(log));
-        }
+        // ensure compile succeeded or throw with the shader log
+        ensureStatus(gl, shaderId, GL3.GL_COMPILE_STATUS, "shader compile: " + name, true);
         return shaderId;
     }
 
@@ -89,6 +71,35 @@ public class ShaderProgram {
             gl.glGetProgramiv(id, param, result, 0);
         }
         return result[0] != GL3.GL_FALSE;
+    }
+
+    /**
+     * Ensure the given shader/program status is OK.  If not, retrieve and log the info log and throw an exception.
+     * @param gl GL context
+     * @param id shader or program id
+     * @param param status to check (e.g. GL_COMPILE_STATUS, GL_LINK_STATUS)
+     * @param name human friendly name to use in the log/exception
+     * @param isShader whether id is a shader (true) or a program (false)
+     */
+    private void ensureStatus(GL3 gl, int id, int param, String name, boolean isShader) {
+        if (checkStatus(gl,id,param)) return;
+        int[] logLength = new int[1];
+        if (isShader) {
+            gl.glGetShaderiv(id, GL3.GL_INFO_LOG_LENGTH, logLength, 0);
+            if(logLength[0] > 0) {
+                byte[] log = new byte[logLength[0]];
+                gl.glGetShaderInfoLog(id, logLength[0], null, 0, log, 0);
+                logger.error("{} failed: {}", name, new String(log));
+            }
+        } else {
+            gl.glGetProgramiv(id, GL3.GL_INFO_LOG_LENGTH, logLength, 0);
+            if(logLength[0] > 0) {
+                byte[] log = new byte[logLength[0]];
+                gl.glGetProgramInfoLog(id, logLength[0], null, 0, log, 0);
+                logger.error("{} failed: {}", name, new String(log));
+            }
+        }
+        throw new IllegalStateException(name + " failed");
     }
 
     public void use(GL3 gl) {
@@ -140,27 +151,27 @@ public class ShaderProgram {
         OpenGLHelper.checkGLError(gl,logger);
     }
 
-    private float [] matrixToFloatBuffer(Matrix4d m) {
-        int i = 0;
-        matrixBuffer[i++] = (float)m.m00;
-        matrixBuffer[i++] = (float)m.m01;
-        matrixBuffer[i++] = (float)m.m02;
-        matrixBuffer[i++] = (float)m.m03;
+    private float [] matrixToFloatArray(Matrix4d m) {
+        // Fill explicitly by index to avoid analyzer warnings about post-increment usage
+        matrixBuffer[0] = (float)m.m00;
+        matrixBuffer[1] = (float)m.m01;
+        matrixBuffer[2] = (float)m.m02;
+        matrixBuffer[3] = (float)m.m03;
 
-        matrixBuffer[i++] = (float)m.m10;
-        matrixBuffer[i++] = (float)m.m11;
-        matrixBuffer[i++] = (float)m.m12;
-        matrixBuffer[i++] = (float)m.m13;
+        matrixBuffer[4] = (float)m.m10;
+        matrixBuffer[5] = (float)m.m11;
+        matrixBuffer[6] = (float)m.m12;
+        matrixBuffer[7] = (float)m.m13;
 
-        matrixBuffer[i++] = (float)m.m20;
-        matrixBuffer[i++] = (float)m.m21;
-        matrixBuffer[i++] = (float)m.m22;
-        matrixBuffer[i++] = (float)m.m23;
+        matrixBuffer[8] = (float)m.m20;
+        matrixBuffer[9] = (float)m.m21;
+        matrixBuffer[10] = (float)m.m22;
+        matrixBuffer[11] = (float)m.m23;
 
-        matrixBuffer[i++] = (float)m.m30;
-        matrixBuffer[i++] = (float)m.m31;
-        matrixBuffer[i++] = (float)m.m32;
-        matrixBuffer[i++] = (float)m.m33;
+        matrixBuffer[12] = (float)m.m30;
+        matrixBuffer[13] = (float)m.m31;
+        matrixBuffer[14] = (float)m.m32;
+        matrixBuffer[15] = (float)m.m33;
         return matrixBuffer;
     }
 
@@ -173,7 +184,7 @@ public class ShaderProgram {
      * @param value the matrix to set
      */
     public void setMatrix4d(GL3 gl, String name, Matrix4d value) {
-        gl.glUniformMatrix4fv(getUniformLocation(gl, name), 1, true, matrixToFloatBuffer(value),0);
+        gl.glUniformMatrix4fv(getUniformLocation(gl, name), 1, true, matrixToFloatArray(value),0);
         OpenGLHelper.checkGLError(gl,logger);
     }
 
