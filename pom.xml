@@ -509,7 +509,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
         <dependency>
             <groupId>io.github.classgraph</groupId>
             <artifactId>classgraph</artifactId>
-            <version>4.8.171</version>
+            <version>4.8.184</version>
         </dependency>
 		<dependency>
 			<groupId>org.reflections</groupId>
