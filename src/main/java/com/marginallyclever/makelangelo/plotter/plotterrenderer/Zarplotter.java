@@ -43,7 +43,7 @@ public class Zarplotter implements PlotterRenderer {
 
 		// plotter
 		Mesh plotter = new Mesh();
-		plotter.setRenderStyle(GL3.GL_QUADS);
+		plotter.setRenderStyle(GL3.GL_TRIANGLE_FAN);
 		plotter.addColor(0,0,0,0.5f);
 
 		plotter.addVertex(gx-ZAR_PLOTTER_OUTER_SIZE/2, gy-ZAR_PLOTTER_OUTER_SIZE/2, 0);
@@ -102,7 +102,7 @@ public class Zarplotter implements PlotterRenderer {
 
 		// motor
 		Mesh motor = new Mesh();
-		motor.setRenderStyle(GL3.GL_QUADS);
+		motor.setRenderStyle(GL3.GL_TRIANGLE_FAN);
 		motor.addColor(0, 0, 0, 1.0f);  motor.addVertex(0                  , 0                  ,0);
 		motor.addColor(0, 0, 0, 1.0f);  motor.addVertex(0                  , ZAR_MOTOR_BODY_SIZE,0);
 		motor.addColor(0, 0, 0, 1.0f);  motor.addVertex(ZAR_MOTOR_BODY_SIZE, ZAR_MOTOR_BODY_SIZE,0);
@@ -116,7 +116,7 @@ public class Zarplotter implements PlotterRenderer {
 		float cx = 0;
 
 		Mesh mesh = new Mesh();
-		mesh.setRenderStyle(GL3.GL_QUADS);
+		mesh.setRenderStyle(GL3.GL_TRIANGLE_FAN);
 		// mounting plate for PCB
 		mesh.addColor(1,0.8f,0.5f,1.0f);  mesh.addVertex(cx-80, cy+50,0);
 		mesh.addColor(1,0.8f,0.5f,1.0f);  mesh.addVertex(cx+80, cy+50,0);

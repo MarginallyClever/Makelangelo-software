@@ -71,7 +71,7 @@ public class DrawingHelper {
      */
     public static void drawRectangle(GL3 gl, double top, double right, double bottom, double left, Color color) {
         Mesh mesh = new Mesh();
-        mesh.setRenderStyle(GL3.GL_QUADS);
+        mesh.setRenderStyle(GL3.GL_TRIANGLE_FAN);
         mesh.addVertex((float)left, (float)top,0);
         mesh.addVertex((float)right, (float)top,0);
         mesh.addVertex((float)right, (float)bottom,0);
@@ -94,18 +94,16 @@ public class DrawingHelper {
      */
     public static void paintTexture(ShaderProgram shader, GL3 gl, TextureWithMetadata texture, double x, double y, double width, double height) {
         texture.bind(gl);
-        gl.glEnable(GL3.GL_TEXTURE_2D);
         shader.set1i(gl,"useTexture", 1);
 
         Mesh mesh = new Mesh();
-        mesh.setRenderStyle(GL3.GL_QUADS);
+        mesh.setRenderStyle(GL3.GL_TRIANGLE_FAN);
         mesh.addColor(1, 1, 1, 1);  mesh.addTexCoord(0, 0);  mesh.addVertex((float)(x        ), (float)(y         ), 0);
         mesh.addColor(1, 1, 1, 1);  mesh.addTexCoord(1, 0);  mesh.addVertex((float)(x + width), (float)(y         ), 0);
         mesh.addColor(1, 1, 1, 1);  mesh.addTexCoord(1, 1);  mesh.addVertex((float)(x + width), (float)(y + height), 0);
         mesh.addColor(1, 1, 1, 1);  mesh.addTexCoord(0, 1);  mesh.addVertex((float)(x        ), (float)(y + height), 0);
         mesh.render(gl);
 
-        gl.glDisable(GL3.GL_TEXTURE_2D);
         shader.set1i(gl,"useTexture", 0);
     }
 }

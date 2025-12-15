@@ -112,7 +112,6 @@ public class QuadGraph {
             }
         } else {/*
             gl2.glColor3f(1, 0, 1);
-            gl2.glLineWidth(1);
             gl2.glBegin(GL3.GL_LINE_LOOP);
             gl2.glVertex2d(bounds.getMinX(), bounds.getMinY());
             gl2.glVertex2d(bounds.getMinX(), bounds.getMaxY());

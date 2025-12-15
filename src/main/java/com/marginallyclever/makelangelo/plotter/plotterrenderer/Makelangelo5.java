@@ -230,7 +230,7 @@ public class Makelangelo5 implements PlotterRenderer {
 		gl2.glTranslated(right-650.0/2.0,0,0);
 
 		gl2.glColor3d(0.9, 0.9, 0.9);
-		gl2.glBegin(GL3.GL_QUADS);
+		gl2.glBegin(GL3.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(-w, h);
 		gl2.glVertex2d(+w, h);
 		gl2.glVertex2d(+w, -h);
@@ -284,7 +284,7 @@ public class Makelangelo5 implements PlotterRenderer {
 	private void drawFrame(GL3 gl2, double left, double right, double top) {/*
 		final float FRAME_SIZE = 50f; // mm
 		gl2.glColor3d(1, 0.8f, 0.5f);
-		gl2.glBegin(GL3.GL_QUADS);
+		gl2.glBegin(GL3.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(left - FRAME_SIZE, top + FRAME_SIZE);
 		gl2.glVertex2d(right + FRAME_SIZE, top + FRAME_SIZE);
 		gl2.glVertex2d(right + FRAME_SIZE, top - FRAME_SIZE);
@@ -311,7 +311,7 @@ public class Makelangelo5 implements PlotterRenderer {
 		float w = 150f / 2;
 		float h = 56f / 2;
 		gl2.glColor3f(0.8f, 0.0f, 0.0f);
-		gl2.glBegin(GL3.GL_QUADS);
+		gl2.glBegin(GL3.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(-w, h);
 		gl2.glVertex2d(+w, h);
 		gl2.glVertex2d(+w, -h);
@@ -325,7 +325,7 @@ public class Makelangelo5 implements PlotterRenderer {
 		w = 98f / 2;
 		h = 60f / 2;
 		gl2.glColor3f(0, 0.6f, 0.0f);
-		gl2.glBegin(GL3.GL_QUADS);
+		gl2.glBegin(GL3.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(-w, h);
 		gl2.glVertex2d(+w, h);
 		gl2.glVertex2d(+w, -h);
@@ -335,7 +335,7 @@ public class Makelangelo5 implements PlotterRenderer {
 		// LCD black
 		h = 40f / 2;
 		gl2.glColor3f(0, 0, 0);
-		gl2.glBegin(GL3.GL_QUADS);
+		gl2.glBegin(GL3.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(-w, h);
 		gl2.glVertex2d(+w, h);
 		gl2.glVertex2d(+w, -h);
@@ -346,7 +346,7 @@ public class Makelangelo5 implements PlotterRenderer {
 		h = 25f / 2;
 		w = 75f / 2;
 		gl2.glColor3f(0, 0, 0.7f);
-		gl2.glBegin(GL3.GL_QUADS);
+		gl2.glBegin(GL3.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(-w, h);
 		gl2.glVertex2d(+w, h);
 		gl2.glVertex2d(+w, -h);

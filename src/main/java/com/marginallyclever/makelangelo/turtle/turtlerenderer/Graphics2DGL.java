@@ -31,7 +31,6 @@ public class Graphics2DGL extends Graphics2D {
     private static final Logger logger = LoggerFactory.getLogger(Graphics2DGL.class);
 
     private GL3 gl;
-    private final float[] lineWidthBuf = new float[1];
     private Paint paint = null;
     private AtomicBoolean isDisposed = new AtomicBoolean(false);
     private Color currentColor = Color.BLACK;
@@ -44,9 +43,6 @@ public class Graphics2DGL extends Graphics2D {
     public void renderBegin(GL3 gl2) {
         this.gl = gl2;
 
-        // save the line width
-        gl2.glGetFloatv(GL3.GL_LINE_WIDTH, lineWidthBuf, 0);
-
         // start drawing lines
         mesh.clear();
         mesh.setRenderStyle(GL3.GL_LINES);
@@ -58,8 +54,6 @@ public class Graphics2DGL extends Graphics2D {
     public void renderFinish() {
         // end drawing lines
         mesh.render(gl);
-        // restore pen diameter
-        gl.glLineWidth(lineWidthBuf[0]);
     }
 
     @Override
@@ -277,7 +271,7 @@ public class Graphics2DGL extends Graphics2D {
     @Override
     public void fillRect(int x, int y, int width, int height) {
         /*
-        gl2.glBegin(GL3.GL_QUADS);
+        gl2.glBegin(GL3.GL_TRIANGLE_FAN);
         gl2.glVertex2i(x, y);
         gl2.glVertex2i(x + width, y);
         gl2.glVertex2i(x + width, y + height);
@@ -450,9 +444,8 @@ public class Graphics2DGL extends Graphics2D {
     @Override
     public void setStroke(Stroke s) {
         // OpenGL does not handle Stroke directly
-        if(s instanceof BasicStroke bs) {
-            gl.glLineWidth(bs.getLineWidth());
-        }
+        // used to be if(s instanceof BasicStroke bs) gl.glLineWidth(bs.getLineWidth());
+        // but modern implementations don't support glLineWidth
     }
 
     @Override

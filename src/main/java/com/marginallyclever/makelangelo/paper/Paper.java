@@ -66,7 +66,6 @@ public class Paper implements PreviewListener {
 	 * @param gl the render context
 	 */
 	private void renderMargin(GL3 gl) {
-		gl.glLineWidth(1);
 		Rectangle2D.Double rect = getMarginRectangle();
 		double yMin = rect.getMinY();
 		double yMax = rect.getMaxY();
@@ -93,7 +92,7 @@ public class Paper implements PreviewListener {
 		float b = (float)paperColor.getBlue() / 255.0f;
 
 		marginMesh.clear();
-		marginMesh.setRenderStyle(GL3.GL_QUADS);
+		marginMesh.setRenderStyle(GL3.GL_TRIANGLE_FAN);
 		marginMesh.addColor(r, g, b,1.0f);  marginMesh.addVertex( (float)(centerX+getPaperLeft()), (float)(centerY+getPaperTop()), 0);
 		marginMesh.addColor(r, g, b,1.0f);  marginMesh.addVertex( (float)(centerX+getPaperRight()), (float)(centerY+getPaperTop()), 0);
 		marginMesh.addColor(r, g, b,1.0f);  marginMesh.addVertex( (float)(centerX+getPaperRight()), (float)(centerY+getPaperBottom()), 0);

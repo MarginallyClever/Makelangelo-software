@@ -183,8 +183,6 @@ public class Plotter implements PreviewListener, Cloneable {
 		gl.glGetFloatv(GL3.GL_LINE_WIDTH, lineWidthBuf, 0);
 
 		drawPhysicalLimits(gl);
-		
-		gl.glLineWidth(lineWidthBuf[0]);
 	}	
 	
 	/**
@@ -192,7 +190,6 @@ public class Plotter implements PreviewListener, Cloneable {
 	 * @param gl
 	 */
 	private void drawPhysicalLimits(GL3 gl) {
-		gl.glLineWidth(1);
 		borderMesh.clear();
 		borderMesh.setRenderStyle(GL3.GL_LINE_LOOP);
 		borderMesh.addColor(0.9f, 0.9f, 0.9f,1.0f);  borderMesh.addVertex( (float)settings.getDouble(PlotterSettings.LIMIT_LEFT), (float)settings.getDouble(PlotterSettings.LIMIT_TOP), 0);

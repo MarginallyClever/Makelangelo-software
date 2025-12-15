@@ -30,7 +30,7 @@ public class Cartesian implements PlotterRenderer {
 		double left = plotter.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 		double right = plotter.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
 
-		gl2.glBegin(GL3.GL_QUADS);
+		gl2.glBegin(GL3.GL_TRIANGLE_FAN);
 		gl2.glColor3f(1, 0.8f, 0.5f);
 		// left side Y
 		gl2.glVertex2d(left,top);
@@ -84,7 +84,7 @@ public class Cartesian implements PlotterRenderer {
 	private void paintOneMotor(GL3 gl2) {/*
 		// motor
 		gl2.glColor3f(0, 0, 0);
-		gl2.glBegin(GL3.GL_QUADS);
+		gl2.glBegin(GL3.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(0                  , 0                  );
 		gl2.glVertex2d(0                  , ZAR_MOTOR_BODY_SIZE);
 		gl2.glVertex2d(ZAR_MOTOR_BODY_SIZE, ZAR_MOTOR_BODY_SIZE);
@@ -109,7 +109,7 @@ public class Cartesian implements PlotterRenderer {
 		
 		// mounting plate for PCB
 		gl2.glColor3f(1,0.8f,0.5f);
-		gl2.glBegin(GL3.GL_QUADS);
+		gl2.glBegin(GL3.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(-8, 5);
 		gl2.glVertex2d(+8, 5);
 		gl2.glVertex2d(+8, -5);
@@ -120,7 +120,7 @@ public class Cartesian implements PlotterRenderer {
 		float h = 7.5f/2;
 		float w = 13.5f/2;
 		gl2.glColor3d(0.9,0.9,0.9);
-		gl2.glBegin(GL3.GL_QUADS);
+		gl2.glBegin(GL3.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(-w, h);
 		gl2.glVertex2d(+w, h);
 		gl2.glVertex2d(+w, -h);

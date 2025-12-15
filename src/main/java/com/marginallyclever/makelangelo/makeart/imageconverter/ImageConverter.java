@@ -73,10 +73,8 @@ public abstract class ImageConverter {
 		if(texture!=null) {
 			double w = myImage.getSourceImage().getWidth() * myImage.getScaleX();
 			double h = myImage.getSourceImage().getHeight() * myImage.getScaleY();
-			gl.glEnable(GL3.GL_TEXTURE_2D);
 			gl.glEnable(GL3.GL_BLEND);
 			gl.glBlendFunc(GL3.GL_SRC_ALPHA, GL3.GL_ONE_MINUS_SRC_ALPHA);
-			gl.glDisable(GL3.GL_COLOR);
 			texture.bind(gl);
 			Mesh mesh = new Mesh();
 			mesh.setRenderStyle(GL3.GL_TRIANGLE_FAN);
@@ -86,9 +84,7 @@ public abstract class ImageConverter {
 			mesh.addTexCoord(1, 1);	mesh.addVertex((float) w/2, (float) h/2,0);
 			mesh.addTexCoord(0, 1);	mesh.addVertex((float)-w/2, (float) h/2,0);
 			mesh.render(gl);
-			gl.glDisable(GL3.GL_TEXTURE_2D);
 			gl.glDisable(GL3.GL_BLEND);
-			gl.glEnable(GL3.GL_COLOR);
 		}	
 	}
 	
