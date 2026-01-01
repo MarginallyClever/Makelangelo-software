@@ -33,6 +33,7 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 	// Use debug pipeline?
 	private static boolean DEBUG_GL_ON = true;
 	private static boolean TRACE_GL_ON = true;
+    private final int fsaaSamples = 2;
 	private GLJPanel glCanvas;
 	private int canvasWidth,canvasHeight;
 
@@ -66,11 +67,11 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 
 	public OpenGLPanel() {
 		super(new BorderLayout());
-		
+
+        logger.info("availability="+ GLProfile.glAvailabilityToString());
+        GLCapabilities capabilities = getCapabilities();
+        logger.info("create canvas");
 		try {
-			logger.info("availability="+ GLProfile.glAvailabilityToString());
-			GLCapabilities capabilities = getCapabilities();
-			logger.info("create canvas");
 			glCanvas = new GLJPanel(capabilities);
 		} catch(GLException e) {
 			logger.error("I failed the very first call to OpenGL.  Are your native libraries missing?", e);
@@ -165,6 +166,7 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 	 * @throws GLException if the OpenGL profile is below minimum requirements
 	 */
 	private GLCapabilities getCapabilities() throws GLException {
+        GLProfile.initSingleton();
 		GLProfile profile = GLProfile.getMaxProgrammable(true);
 		GLCapabilities capabilities = new GLCapabilities(profile);
 		capabilities.setHardwareAccelerated(true);
@@ -172,8 +174,12 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 		capabilities.setDoubleBuffered(true);
 		capabilities.setStencilBits(8);
 		capabilities.setDepthBits(32);  // 32 bit depth buffer is floating point
+        //capabilities.setSampleBuffers(true);
+        //capabilities.setNumSamples(1<<fsaaSamples);
+
 		StringBuilder sb = new StringBuilder();
 		capabilities.toString(sb);
+        logger.info("Profile="+profile.getName());
 		logger.info("capabilities="+sb);
 		if(!profile.isGL3()) throw new GLException("OpenGL 3.0 or higher is required.");
 		return capabilities;
@@ -198,6 +204,8 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 	}
 
 	public Vector2d getMousePositionInWorld() {
+        if(camera==null) return new Vector2d(0,0);
+
 		double w2 = camera.getWidth()/2.0;
 		double h2 = camera.getHeight()/2.0;
 		double z = camera.getZoom();
@@ -284,8 +292,10 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 		// draw the world
 		var gl = glAutoDrawable.getGL().getGL3();
 
-		camera.setWidth(canvasWidth);
-		camera.setHeight(canvasHeight);
+        if(camera!=null) {
+            camera.setWidth(canvasWidth);
+            camera.setHeight(canvasHeight);
+        }
 
 		// set some render quality options
 		Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
@@ -308,7 +318,9 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 		paintBackground(gl);
 
 		gl.glDisable(GL3.GL_DEPTH_TEST);
-		paintCamera(gl);
+        if(camera!=null) {
+            paintCamera(gl);
+        }
 
 		for( PreviewListener p : previewListeners ) {
 			p.render(shaderProgram,gl);
