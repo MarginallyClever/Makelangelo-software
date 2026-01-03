@@ -45,7 +45,6 @@ public class OpenGLPanel extends JPanel implements MouseWheelListener, MouseList
 
 	public OpenGLPanel() {
 		super(new BorderLayout());
-
         this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -149,6 +148,8 @@ public class OpenGLPanel extends JPanel implements MouseWheelListener, MouseList
 	}
 
 	public Vector2d getMousePositionInWorld() {
+        if(camera==null) return new Vector2d(0,0);
+
 		double w2 = camera.getWidth()/2.0;
 		double h2 = camera.getHeight()/2.0;
 		double z = camera.getZoom();
