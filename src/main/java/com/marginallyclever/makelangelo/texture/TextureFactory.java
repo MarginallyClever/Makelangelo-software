@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.texture;
 
-import com.jogamp.opengl.GL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,9 +18,9 @@ public class TextureFactory {
     /**
      * The OpenGL context has just died.  release all Textures.
      */
-    public static void dispose(GL gl) {
+    public static void dispose() {
         for (TextureWithMetadata tex : textures) {
-            tex.dispose(gl);
+            tex.dispose();
         }
     }
 

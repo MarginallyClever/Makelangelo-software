@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
@@ -66,11 +66,15 @@ public class FirmwareDownloader {
      * @throws IOException if the file cannot be downloaded
      */
     private void downloadHexFile(String url, String outputPath, String updatedAt) throws IOException {
-        URL website = new URL(url);
-        try(ReadableByteChannel rbc = Channels.newChannel(website.openStream())) {
-            try (FileOutputStream fos = new FileOutputStream(outputPath)) {
-                fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+        try {
+            var website = new URI(url);
+            try (ReadableByteChannel rbc = Channels.newChannel(website.toURL().openStream())) {
+                try (FileOutputStream fos = new FileOutputStream(outputPath)) {
+                    fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+                }
             }
+        } catch (Exception e) {
+            throw new IOException("Error downloading file: " + e.getMessage());
         }
 
         // Parse the updated_at timestamp into a FileTime

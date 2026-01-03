@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 
-import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.preview.ShaderProgram;
+
+import java.awt.*;
 
 public class Cartesian implements PlotterRenderer {
 	final public double ZAR_MOTOR_MOUNT_SIZE=45; //cm
@@ -12,13 +12,13 @@ public class Cartesian implements PlotterRenderer {
 	final public double ZAR_MOTOR_BODY_SIZE=42; //cm
 	
 	@Override
-	public void render(ShaderProgram shader, GL3 gl, Plotter robot) {
-		paintGantryAndHead(shader,gl,robot);
-		paintMotors(shader,gl,robot);
-		paintControlBox(shader,gl,robot);
+	public void render(Graphics graphics, Plotter robot) {
+		paintGantryAndHead(graphics,robot);
+		paintMotors(graphics,robot);
+		paintControlBox(graphics,robot);
 	}
 	
-	private void paintGantryAndHead(ShaderProgram shader, GL3 gl, Plotter plotter) {/*
+	private void paintGantryAndHead(Graphics graphics, Plotter plotter) {/*
 		//double dx, dy;
 		Point2d pos = plotter.getPos();
 		double gx = pos.x;
@@ -64,7 +64,7 @@ public class Cartesian implements PlotterRenderer {
 		gl2.glEnd();*/
 	}
 	
-	protected void paintMotors(ShaderProgram shader, GL3 gl,Plotter plotter) {/*
+	protected void paintMotors(Graphics graphics,Plotter plotter) {/*
 		double top = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double right = plotter.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
 		double left = plotter.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
@@ -81,7 +81,7 @@ public class Cartesian implements PlotterRenderer {
 		gl2.glPopMatrix();*/
 	}
 
-	private void paintOneMotor(GL3 gl2) {/*
+	private void paintOneMotor(Graphics2D g2d) {/*
 		// motor
 		gl2.glColor3f(0, 0, 0);
 		gl2.glBegin(GL3.GL_TRIANGLE_FAN);
@@ -95,10 +95,10 @@ public class Cartesian implements PlotterRenderer {
 	
 	/**
 	 * paint the controller and the LCD panel
-	 * @param shader the render context
+	 * @param graphics the render context
 	 * @param plotter the plotter reference for generating the gcode.
 	 */
-	private void paintControlBox(ShaderProgram shader, GL3 gl,Plotter plotter) {/*
+	private void paintControlBox(Graphics graphics,Plotter plotter) {/*
 		double cy = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double cx = 0;
 
