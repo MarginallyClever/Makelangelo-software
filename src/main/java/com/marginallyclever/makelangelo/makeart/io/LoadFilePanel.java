@@ -1,13 +1,11 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
-import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imageconverter.SelectImageConverterPanel;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
-import com.marginallyclever.makelangelo.preview.ShaderProgram;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,8 +102,8 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 	}
 
 	@Override
-	public void render(ShaderProgram shader, GL3 gl) {
-		if(mySubPreviewListener!=null) mySubPreviewListener.render(shader,gl);
+	public void render(Graphics graphics) {
+		if(mySubPreviewListener!=null) mySubPreviewListener.render(graphics);
 	}
 
 	public void setParent(JDialog parent) {

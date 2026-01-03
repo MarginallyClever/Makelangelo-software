@@ -1,14 +1,14 @@
 package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 
-import com.jogamp.opengl.GL3;
-import com.marginallyclever.makelangelo.Mesh;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
-import com.marginallyclever.makelangelo.preview.ShaderProgram;
 
 import javax.vecmath.Point2d;
+import java.awt.*;
 
 /**
+ * Zarplotter is four motors, one on each corner of a rectangle, pulling a belt to a central pen holder.
+ * Effectively two makelangelos put together.  This class draws a representation of the Zarplotter in the preview window.
  * @author Dan Royer
  */
 public class Zarplotter implements PlotterRenderer {
@@ -19,16 +19,17 @@ public class Zarplotter implements PlotterRenderer {
 	final public float ZAR_MOTOR_BODY_SIZE=42; //cm
 	
 	@Override
-	public void render(ShaderProgram shader, GL3 gl, Plotter robot) {
-		paintMotors(shader,gl,robot);
-		paintControlBox(shader,gl,robot);
+	public void render(Graphics graphics, Plotter robot) {
+		paintMotors(graphics,robot);
+		paintControlBox(graphics,robot);
 		if(robot.getDidFindHome()) 
-			paintPenHolderToCounterweights(shader,gl,robot);
+			paintPenHolderToCounterweights(graphics,robot);
 	}
 
-	private void paintPenHolderToCounterweights(ShaderProgram shader, GL3 gl, Plotter robot) {
+	private void paintPenHolderToCounterweights(Graphics graphics, Plotter robot) {
+        Graphics2D g2d = (Graphics2D) graphics;
+
 		PlotterSettings settings = robot.getSettings();
-		//double dx, dy;
 		Point2d pos = robot.getPos();
 		float gx = (float)pos.x;
 		float gy = (float)pos.y;
@@ -38,44 +39,40 @@ public class Zarplotter implements PlotterRenderer {
 		float left = (float)settings.getDouble(PlotterSettings.LIMIT_LEFT);
 		float right = (float)settings.getDouble(PlotterSettings.LIMIT_RIGHT);
 
-		gl.glEnable(GL3.GL_BLEND);
-		gl.glBlendFunc(GL3.GL_SRC_ALPHA,GL3.GL_ONE_MINUS_SRC_ALPHA);
+        g2d.setColor(Color.BLACK);
 
-		// plotter
-		Mesh plotter = new Mesh();
+        /*
+        TODO figure out what this zarplotter code was trying to draw
+        float a = ZAR_PLOTTER_OUTER_SIZE/2;
+        float b = ZAR_PLOTTER_HOLE_SIZE/2;
 		plotter.setRenderStyle(GL3.GL_TRIANGLE_FAN);
-		plotter.addColor(0,0,0,0.5f);
+		plotter.addVertex(gx-a, gy-a, 0);
+		plotter.addVertex(gx-a, gy-b, 0);
+		plotter.addVertex(gx+a, gy-b, 0);
+		plotter.addVertex(gx+a, gy-a, 0);
+		plotter.addVertex(gx+b, gy-b, 0);
+		plotter.addVertex(gx+b, gy+b, 0);
+		plotter.addVertex(gx+a, gy+b, 0);
+		plotter.addVertex(gx+a, gy-b, 0);
 
-		plotter.addVertex(gx-ZAR_PLOTTER_OUTER_SIZE/2, gy-ZAR_PLOTTER_OUTER_SIZE/2, 0);
-		plotter.addVertex(gx-ZAR_PLOTTER_OUTER_SIZE/2, gy-ZAR_PLOTTER_HOLE_SIZE/2, 0);
-		plotter.addVertex(gx+ZAR_PLOTTER_OUTER_SIZE/2, gy-ZAR_PLOTTER_HOLE_SIZE/2, 0);
-		plotter.addVertex(gx+ZAR_PLOTTER_OUTER_SIZE/2, gy-ZAR_PLOTTER_OUTER_SIZE/2, 0);
-		plotter.addVertex(gx+ZAR_PLOTTER_HOLE_SIZE/2, gy-ZAR_PLOTTER_HOLE_SIZE/2, 0);
-		plotter.addVertex(gx+ZAR_PLOTTER_HOLE_SIZE/2, gy+ZAR_PLOTTER_HOLE_SIZE/2, 0);
-		plotter.addVertex(gx+ZAR_PLOTTER_OUTER_SIZE/2, gy+ZAR_PLOTTER_HOLE_SIZE/2, 0);
-		plotter.addVertex(gx+ZAR_PLOTTER_OUTER_SIZE/2, gy-ZAR_PLOTTER_HOLE_SIZE/2, 0);
-		plotter.addVertex(gx-ZAR_PLOTTER_OUTER_SIZE/2, gy-ZAR_PLOTTER_HOLE_SIZE/2, 0);
-		plotter.addVertex(gx-ZAR_PLOTTER_OUTER_SIZE/2, gy+ZAR_PLOTTER_HOLE_SIZE/2, 0);
-		plotter.addVertex(gx-ZAR_PLOTTER_HOLE_SIZE/2, gy+ZAR_PLOTTER_HOLE_SIZE/2, 0);
-		plotter.addVertex(gx-ZAR_PLOTTER_HOLE_SIZE/2, gy-ZAR_PLOTTER_HOLE_SIZE/2, 0);
-		plotter.addVertex(gx-ZAR_PLOTTER_OUTER_SIZE/2, gy+ZAR_PLOTTER_HOLE_SIZE/2, 0);
-		plotter.addVertex(gx-ZAR_PLOTTER_OUTER_SIZE/2, gy+ZAR_PLOTTER_OUTER_SIZE/2, 0);
-		plotter.addVertex(gx+ZAR_PLOTTER_OUTER_SIZE/2, gy+ZAR_PLOTTER_OUTER_SIZE/2, 0);
-		plotter.addVertex(gx+ZAR_PLOTTER_OUTER_SIZE/2, gy+ZAR_PLOTTER_HOLE_SIZE/2, 0);
-		plotter.render(gl);
+		plotter.addVertex(gx-a, gy-b, 0);
+		plotter.addVertex(gx-a, gy+b, 0);
+		plotter.addVertex(gx-b, gy+b, 0);
+		plotter.addVertex(gx-b, gy-b, 0);
+		plotter.addVertex(gx-a, gy+b, 0);
+		plotter.addVertex(gx-a, gy+a, 0);
+		plotter.addVertex(gx+a, gy+a, 0);
+		plotter.addVertex(gx+a, gy+b, 0);
+		*/
 
-		// belt from motors to plotter
-		Mesh belt = new Mesh();
-		belt.setRenderStyle(GL3.GL_LINES);
-
-		belt.addVertex(gx+left +ZAR_MOTOR_MOUNT_SIZE, gy+top   -ZAR_MOTOR_MOUNT_SIZE,0);	belt.addVertex(gx-ZAR_PLOTTER_SIZE/2, gy+ZAR_PLOTTER_SIZE/2,0);
-		belt.addVertex(gx+right-ZAR_MOTOR_MOUNT_SIZE, gy+top   -ZAR_MOTOR_MOUNT_SIZE,0);	belt.addVertex(gx+ZAR_PLOTTER_SIZE/2, gy+ZAR_PLOTTER_SIZE/2,0);
-		belt.addVertex(gx+left +ZAR_MOTOR_MOUNT_SIZE, gy+bottom+ZAR_MOTOR_MOUNT_SIZE,0);	belt.addVertex(gx-ZAR_PLOTTER_SIZE/2, gy-ZAR_PLOTTER_SIZE/2,0);
-		belt.addVertex(gx+right-ZAR_MOTOR_MOUNT_SIZE, gy+bottom+ZAR_MOTOR_MOUNT_SIZE,0);	belt.addVertex(gx+ZAR_PLOTTER_SIZE/2, gy-ZAR_PLOTTER_SIZE/2,0);
-		belt.render(gl);
+		// belt from 4 motors to plotter
+		g2d.drawLine((int)(gx+left +ZAR_MOTOR_MOUNT_SIZE), (int)(gy+top   -ZAR_MOTOR_MOUNT_SIZE), (int)(gx-ZAR_PLOTTER_SIZE/2), (int)(gy+ZAR_PLOTTER_SIZE/2));
+		g2d.drawLine((int)(gx+right-ZAR_MOTOR_MOUNT_SIZE), (int)(gy+top   -ZAR_MOTOR_MOUNT_SIZE), (int)(gx+ZAR_PLOTTER_SIZE/2), (int)(gy+ZAR_PLOTTER_SIZE/2));
+		g2d.drawLine((int)(gx+left +ZAR_MOTOR_MOUNT_SIZE), (int)(gy+bottom+ZAR_MOTOR_MOUNT_SIZE), (int)(gx-ZAR_PLOTTER_SIZE/2), (int)(gy-ZAR_PLOTTER_SIZE/2));
+		g2d.drawLine((int)(gx+right-ZAR_MOTOR_MOUNT_SIZE), (int)(gy+bottom+ZAR_MOTOR_MOUNT_SIZE), (int)(gx+ZAR_PLOTTER_SIZE/2), (int)(gy-ZAR_PLOTTER_SIZE/2));
 	}
 
-	private void paintMotors(ShaderProgram shader, GL3 gl,Plotter plotter) {
+	private void paintMotors(Graphics graphics,Plotter plotter) {
 		/*
 		float top = (float)plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		float bottom = (float)plotter.getSettings().getDouble(PlotterSettings.LIMIT_BOTTOM);
@@ -89,45 +86,27 @@ public class Zarplotter implements PlotterRenderer {
 		*/
 	}
 
-	private void paintOneMotor(GL3 gl) {
+	private void paintOneMotor(Graphics graphics) {
 		// frame
-		Mesh frame = new Mesh();
-		frame.setRenderStyle(GL3.GL_TRIANGLE_FAN);
-		frame.addColor(1, 0.8f, 0.5f,1.0f);  frame.addVertex(0                   , 0                   ,0);
-		frame.addColor(1, 0.8f, 0.5f,1.0f);  frame.addVertex(0                   , ZAR_MOTOR_MOUNT_SIZE,0);
-		frame.addColor(1, 0.8f, 0.5f,1.0f);  frame.addVertex(ZAR_MOTOR_MOUNT_SIZE, ZAR_MOTOR_MOUNT_SIZE,0);
-		frame.addColor(1, 0.8f, 0.5f,1.0f);  frame.addVertex(ZAR_MOTOR_MOUNT_SIZE, 0                   ,0);
-		frame.addColor(1, 0.8f, 0.5f,1.0f);  frame.addVertex(0                   , 0                   ,0);
-		frame.render(gl);
+        Graphics2D g2d = (Graphics2D) graphics;
+        g2d.setColor(new Color(255,204,128,1.0f));
+        g2d.fillRect(0,0,(int)ZAR_MOTOR_MOUNT_SIZE,(int)ZAR_MOTOR_MOUNT_SIZE);
 
 		// motor
-		Mesh motor = new Mesh();
-		motor.setRenderStyle(GL3.GL_TRIANGLE_FAN);
-		motor.addColor(0, 0, 0, 1.0f);  motor.addVertex(0                  , 0                  ,0);
-		motor.addColor(0, 0, 0, 1.0f);  motor.addVertex(0                  , ZAR_MOTOR_BODY_SIZE,0);
-		motor.addColor(0, 0, 0, 1.0f);  motor.addVertex(ZAR_MOTOR_BODY_SIZE, ZAR_MOTOR_BODY_SIZE,0);
-		motor.addColor(0, 0, 0, 1.0f);  motor.addVertex(ZAR_MOTOR_BODY_SIZE, 0                  ,0);
-		motor.addColor(0, 0, 0, 1.0f);  motor.addVertex(0                  , 0                  ,0);
-		motor.render(gl);
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(0,0,(int)ZAR_MOTOR_BODY_SIZE,(int)ZAR_MOTOR_BODY_SIZE);
 	}
 	
-	private void paintControlBox(ShaderProgram shader, GL3 gl,Plotter plotter) {
-		float cy = (float)plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
+	private void paintControlBox(Graphics graphics,Plotter plotter) {
+		float cy = -(float)plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		float cx = 0;
 
-		Mesh mesh = new Mesh();
-		mesh.setRenderStyle(GL3.GL_TRIANGLE_FAN);
 		// mounting plate for PCB
-		mesh.addColor(1,0.8f,0.5f,1.0f);  mesh.addVertex(cx-80, cy+50,0);
-		mesh.addColor(1,0.8f,0.5f,1.0f);  mesh.addVertex(cx+80, cy+50,0);
-		mesh.addColor(1,0.8f,0.5f,1.0f);  mesh.addVertex(cx+80, cy-50,0);
-		mesh.addColor(1,0.8f,0.5f,1.0f);  mesh.addVertex(cx-80, cy-50,0);
+        Graphics2D g2d = (Graphics2D) graphics;
+        g2d.setColor(new Color(255,204,128,255));
+        g2d.fillRect((int)(cx-80), (int)(cy-50), 160, 100);
 		// RUMBA in v3 (135mm*75mm)
-		mesh.addColor(0.9f,0.9f,0.9f,1.0f);  mesh.addVertex(cx-67.5f, cy+37.5f, 0);
-		mesh.addColor(0.9f,0.9f,0.9f,1.0f);  mesh.addVertex(cx+67.5f, cy+37.5f, 0);
-		mesh.addColor(0.9f,0.9f,0.9f,1.0f);  mesh.addVertex(cx+67.5f, cy-37.5f, 0);
-		mesh.addColor(0.9f,0.9f,0.9f,1.0f);  mesh.addVertex(cx-67.5f, cy-37.5f, 0);
-
-		mesh.render(gl);
+        g2d.setColor(new Color(229,229,229,255));
+        g2d.fillRect((int)(cx-67.5f), (int)(cy-37.5f), 135, 75);
 	}
 }

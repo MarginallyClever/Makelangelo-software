@@ -1,14 +1,14 @@
 package com.marginallyclever.communications.tcp;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
-
 import com.marginallyclever.communications.NetworkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 
 
 /**
@@ -62,7 +62,8 @@ public final class TCPConnection extends NetworkSession implements Runnable {
 			ipAddress = ipAddress.substring(7);
 		}
 
-		URL a = new URL("http://"+ipAddress);
+        // validate the address
+		var a = new URI("http://"+ipAddress);
 		String host = a.getHost();
 		int port = a.getPort();
 		if(port==-1) port = DEFAULT_TCP_PORT;

@@ -1,8 +1,6 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
-import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
-import com.marginallyclever.makelangelo.preview.ShaderProgram;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,24 +27,18 @@ public class TurtleRenderFacade implements PreviewListener {
 	private Color penUpColor = Color.GREEN;
 	private double penDiameter = 0.8;
 	private boolean showTravel;
-	private final Graphics2DGL g2gl = new Graphics2DGL();
 	private int turtleHash = 0;
 
 	@Override
-	public void render(@Nonnull ShaderProgram shader, GL3 gl) {
-		if(turtleHash != myTurtle.hashCode()) {
+	public void render(Graphics graphics) {
+		//if(turtleHash != myTurtle.hashCode())
+        {
 			turtleHash = myTurtle.hashCode();
-			g2gl.renderBegin(gl);
-			render(g2gl);
+			render((Graphics2D) graphics);
 		}
-
-		g2gl.renderFinish();
 	}
 
-	@Override
 	public void dispose() {
-		PreviewListener.super.dispose();
-		g2gl.dispose();
 		turtleHash = -1;  // force a re-render next time
 	}
 

@@ -1,14 +1,12 @@
 package com.marginallyclever.makelangelo.plotter;
 
-import com.jogamp.opengl.GL3;
-import com.marginallyclever.makelangelo.Mesh;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.preview.OpenGLPanel;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
-import com.marginallyclever.makelangelo.preview.ShaderProgram;
 
 import javax.vecmath.Point2d;
+import java.awt.*;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 
@@ -29,8 +27,7 @@ public class Plotter implements PreviewListener, Cloneable {
 	private boolean penIsUp = false;
 	// current pen position
 	private Point2d pos = new Point2d(0,0);
-	private final Mesh borderMesh = new Mesh();
-	
+
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		Plotter b = (Plotter)super.clone();
@@ -175,28 +172,27 @@ public class Plotter implements PreviewListener, Cloneable {
 	/**
 	 * Callback from {@link OpenGLPanel} that it is time to render to the WYSIWYG display.
 	 *
-	 * @param shader the render context
+	 * @param graphics the render context
 	 */
 	@Override
-	public void render(ShaderProgram shader, GL3 gl) {
+	public void render(Graphics graphics) {
 		float[] lineWidthBuf = new float[1];
-		gl.glGetFloatv(GL3.GL_LINE_WIDTH, lineWidthBuf, 0);
 
-		drawPhysicalLimits(gl);
+		drawPhysicalLimits(graphics);
 	}	
 	
 	/**
 	 * Outline the drawing limits
-	 * @param gl
+	 * @param graphics the render context
 	 */
-	private void drawPhysicalLimits(GL3 gl) {
-		borderMesh.clear();
-		borderMesh.setRenderStyle(GL3.GL_LINE_LOOP);
-		borderMesh.addColor(0.9f, 0.9f, 0.9f,1.0f);  borderMesh.addVertex( (float)settings.getDouble(PlotterSettings.LIMIT_LEFT), (float)settings.getDouble(PlotterSettings.LIMIT_TOP), 0);
-		borderMesh.addColor(0.9f, 0.9f, 0.9f,1.0f);  borderMesh.addVertex( (float)settings.getDouble(PlotterSettings.LIMIT_RIGHT), (float)settings.getDouble(PlotterSettings.LIMIT_TOP), 0);
-		borderMesh.addColor(0.9f, 0.9f, 0.9f,1.0f);  borderMesh.addVertex( (float)settings.getDouble(PlotterSettings.LIMIT_RIGHT), (float)settings.getDouble(PlotterSettings.LIMIT_BOTTOM), 0);
-		borderMesh.addColor(0.9f, 0.9f, 0.9f,1.0f);  borderMesh.addVertex( (float)settings.getDouble(PlotterSettings.LIMIT_LEFT), (float)settings.getDouble(PlotterSettings.LIMIT_BOTTOM), 0);
-
-		borderMesh.render(gl);
+	private void drawPhysicalLimits(Graphics graphics) {
+        Graphics2D g2d = (Graphics2D) graphics;
+        g2d.setColor(new Color(229, 229, 229));
+        g2d.drawRect(
+                (int)settings.getDouble(PlotterSettings.LIMIT_LEFT   ),
+                (int)settings.getDouble(PlotterSettings.LIMIT_TOP    ),
+                (int)(settings.getDouble(PlotterSettings.LIMIT_RIGHT )-settings.getDouble(PlotterSettings.LIMIT_LEFT)),
+                (int)(settings.getDouble(PlotterSettings.LIMIT_BOTTOM)-settings.getDouble(PlotterSettings.LIMIT_TOP ))
+        );
 	}
 }

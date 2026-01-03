@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.net.URL;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -186,27 +186,32 @@ public class AVRDudeDownloader {
 
     private static File downloadFileToTemp(String urlStr) throws IOException {
         logger.info("download from: " + urlStr);
-        URL url = new URL(urlStr);
-        String fileExtension = getFileExtension(url.getPath());
-        File toDeleteLater = File.createTempFile("download", fileExtension);
-        toDeleteLater.deleteOnExit();
-        Path tempFile = toDeleteLater.toPath();
-        logger.info("temp file: " + tempFile);
+        try {
+            var url = new URI(urlStr);
+            String fileExtension = getFileExtension(url.getPath());
+            File toDeleteLater = File.createTempFile("download", fileExtension);
+            toDeleteLater.deleteOnExit();
+            Path tempFile = toDeleteLater.toPath();
+            logger.info("temp file: " + tempFile);
 
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpGet httpGet = new HttpGet(urlStr);
-            try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
-                try (InputStream inputStream = response.getEntity().getContent();
-                     OutputStream outputStream = new FileOutputStream(tempFile.toFile())) {
-                    byte[] buffer = new byte[4096];
-                    int len;
-                    while ((len = inputStream.read(buffer)) != -1) {
-                        outputStream.write(buffer, 0, len);
+            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+                HttpGet httpGet = new HttpGet(urlStr);
+                try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
+                    try (InputStream inputStream = response.getEntity().getContent();
+                         OutputStream outputStream = new FileOutputStream(tempFile.toFile())) {
+                        byte[] buffer = new byte[4096];
+                        int len;
+                        while ((len = inputStream.read(buffer)) != -1) {
+                            outputStream.write(buffer, 0, len);
+                        }
                     }
                 }
             }
+            return toDeleteLater;
         }
-        return toDeleteLater;
+        catch (Exception e) {
+            throw new IOException("Error downloading file: " + e.getMessage());
+        }
     }
 
     /**

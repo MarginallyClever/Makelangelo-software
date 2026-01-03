@@ -1,9 +1,6 @@
 package com.marginallyclever.makelangelo.paper;
 
-import com.jogamp.opengl.GL3;
-import com.marginallyclever.makelangelo.Mesh;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
-import com.marginallyclever.makelangelo.preview.ShaderProgram;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,58 +44,44 @@ public class Paper implements PreviewListener {
 	private double centerY=0.0d;
 	private Color paperColor = Color.WHITE;
 
-	private final Mesh paperMesh = new Mesh();
-	private final Mesh marginMesh = new Mesh();
-
 	public Paper() {
 		super();
 		setPaperSize(DEFAULT_WIDTH, DEFAULT_HEIGHT, 0, 0);
 	}
 	
 	@Override
-	public void render(ShaderProgram shader, GL3 gl) {
-		renderPaper(gl);
-		renderMargin(gl);
+	public void render(Graphics graphics) {
+		renderPaper(graphics);
+		renderMargin(graphics);
 	}
 	
 	/**
 	 * Render the paper margin rectangle.
-	 * @param gl the render context
+	 * @param graphics the render context
 	 */
-	private void renderMargin(GL3 gl) {
+	private void renderMargin(Graphics graphics) {
 		Rectangle2D.Double rect = getMarginRectangle();
 		double yMin = rect.getMinY();
 		double yMax = rect.getMaxY();
 		double xMin = rect.getMinX();
 		double xMax = rect.getMaxX();
 
-		marginMesh.clear();
-		marginMesh.setRenderStyle(GL3.GL_LINE_LOOP);
-		marginMesh.addColor(0.9f, 0.9f, 0.9f,1.0f);  marginMesh.addVertex( (float)(centerX+xMin), (float)(centerY+yMax), 0);
-		marginMesh.addColor(0.9f, 0.9f, 0.9f,1.0f);  marginMesh.addVertex( (float)(centerX+xMax), (float)(centerY+yMax), 0);
-		marginMesh.addColor(0.9f, 0.9f, 0.9f,1.0f);  marginMesh.addVertex( (float)(centerX+xMax), (float)(centerY+yMin), 0);
-		marginMesh.addColor(0.9f, 0.9f, 0.9f,1.0f);  marginMesh.addVertex( (float)(centerX+xMin), (float)(centerY+yMin), 0);
-
-		marginMesh.render(gl);
+        Graphics2D g2d = (Graphics2D) graphics;
+        g2d.setColor(new Color(229,229,229));
+        g2d.drawRect((int)(centerX+xMin), (int)(centerY+yMin), (int)(xMax-xMin), (int)(yMax-yMin));
 	}
 
 	/**
 	 * Draw paper as a rectangle.
-	 * @param gl the render context
+	 * @param graphics the render context
 	 */
-	private void renderPaper(GL3 gl) {
-		float r = (float)paperColor.getRed() / 255.0f;
-		float g = (float)paperColor.getGreen() / 255.0f;
-		float b = (float)paperColor.getBlue() / 255.0f;
-
-		marginMesh.clear();
-		marginMesh.setRenderStyle(GL3.GL_TRIANGLE_FAN);
-		marginMesh.addColor(r, g, b,1.0f);  marginMesh.addVertex( (float)(centerX+getPaperLeft()), (float)(centerY+getPaperTop()), 0);
-		marginMesh.addColor(r, g, b,1.0f);  marginMesh.addVertex( (float)(centerX+getPaperRight()), (float)(centerY+getPaperTop()), 0);
-		marginMesh.addColor(r, g, b,1.0f);  marginMesh.addVertex( (float)(centerX+getPaperRight()), (float)(centerY+getPaperBottom()), 0);
-		marginMesh.addColor(r, g, b,1.0f);  marginMesh.addVertex( (float)(centerX+getPaperLeft()), (float)(centerY+getPaperBottom()), 0);
-
-		marginMesh.render(gl);
+	private void renderPaper(Graphics graphics) {
+        Graphics2D g2d = (Graphics2D) graphics;
+        g2d.setColor(paperColor);
+        g2d.fillRect((int)(centerX+getPaperLeft()),
+                (int)(centerY-getPaperTop()),
+                (int)(getPaperWidth()),
+                (int)(getPaperHeight()));
 	}
 
 	/**

@@ -1,20 +1,17 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import com.jogamp.opengl.GL3;
 import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
-import com.marginallyclever.makelangelo.Mesh;
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
-import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.donatello.select.SelectBoolean;
 import com.marginallyclever.donatello.select.SelectInteger;
 import com.marginallyclever.donatello.select.SelectRandomSeed;
 import com.marginallyclever.donatello.select.SelectSlider;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.TransformedImage;
+import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
+import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.preview.OpenGLPanel;
-import com.marginallyclever.makelangelo.preview.ShaderProgram;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.Point;
@@ -254,11 +251,12 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
         writeOutCells();
     }
 
-    protected void renderEdges(ShaderProgram shader, GL3 gl) {
+    protected void renderEdges(Graphics graphics) {
         double cx = myPaper.getCenterX();
         double cy = myPaper.getCenterY();
 
-        Mesh mesh = new Mesh(GL3.GL_LINES);
+        Graphics2D g2d = (Graphics2D)graphics;
+        g2d.setColor(new Color(229,229,229));
 
         for(int i=0;i<voronoiDiagram.getNumHulls();++i) {
             Polygon poly = voronoiDiagram.getHull(i);
@@ -266,14 +264,12 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
             for(int j=0;j<list.length;++j) {
                 Coordinate p0 = list[j];
                 Coordinate p1 = list[(j+1)%list.length];
-                mesh.addColor(0.9f,0.9f,0.9f,1);
-                mesh.addVertex((float)(p0.x+cx), (float)(p0.y+cy), 0);
-                mesh.addColor(0.9f,0.9f,0.9f,1);
-                mesh.addVertex((float)(p1.x+cx), (float)(p1.y+cy), 0);
+                g2d.drawLine(
+                        (int)(p0.x+cx),(int)(p0.y+cy),
+                        (int)(p1.x+cx),(int)(p1.y+cy)
+                );
             }
         }
-
-        mesh.render(gl);
     }
 
     public void setNumCells(int value) {
@@ -310,10 +306,10 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
     /**
      * Callback from {@link OpenGLPanel} that it is time to render to the WYSIWYG display.
      *
-     * @param shader the render context
+     * @param graphics the render context
      */
     @Override
-    public void render(ShaderProgram shader, GL3 gl) {
+    public void render(Graphics graphics) {
         ImageConverterThread thread = getThread();
         if(thread==null) return;
 
@@ -321,7 +317,7 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
 
         lock.lock();
         try {
-            renderEdges(shader,gl);
+            renderEdges(graphics);
         }
         finally {
             lock.unlock();

@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 
-import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.preview.ShaderProgram;
+
+import java.awt.*;
 
 /**
  * Deprecated because it cannot find home.
@@ -12,19 +12,19 @@ import com.marginallyclever.makelangelo.preview.ShaderProgram;
 public class Makelangelo3 implements PlotterRenderer {
 
 	@Override
-	public void render(ShaderProgram shader, GL3 gl, Plotter robot) {
-		paintControlBox(shader,gl,robot);
-		Polargraph.paintMotors(shader,gl,robot);
+	public void render(Graphics graphics, Plotter robot) {
+		paintControlBox(graphics,robot);
+		Polargraph.paintMotors(graphics,robot);
 		if(robot.getDidFindHome()) 
-			Polargraph.paintPenHolderToCounterweights(shader,gl,robot);
+			Polargraph.paintPenHolderToCounterweights(graphics,robot);
 	}
 
 	/**
 	 * paint the controller and the LCD panel
-	 * @param shader the shader to use for rendering
+	 * @param graphics the shader to use for rendering
 	 * @param plotter the plotter to render
 	 */
-	private void paintControlBox(ShaderProgram shader, GL3 gl,Plotter plotter) {/*
+	private void paintControlBox(Graphics graphics,Plotter plotter) {/*
 		double cy = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double left = plotter.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 		double right = plotter.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
@@ -76,7 +76,7 @@ public class Makelangelo3 implements PlotterRenderer {
 		gl2.glPopMatrix();*/
 	}
 	
-	private void renderLCD(GL3 gl2) {/*
+	private void renderLCD(Graphics gl2) {/*
 		// position
 		gl2.glPushMatrix();
 		gl2.glTranslated(-180, 0, 0);

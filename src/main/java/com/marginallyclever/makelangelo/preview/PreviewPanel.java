@@ -44,9 +44,9 @@ public class PreviewPanel extends JPanel {
         setOpaque(true);
 
         openGLPanel.setCamera(camera);
-        openGLPanel.addListener(myPaper);
-        openGLPanel.addListener(myPlotter);
-        openGLPanel.addListener(myTurtleRenderer);
+        openGLPanel.addPreviewListener(myPaper);
+        openGLPanel.addPreviewListener(myPlotter);
+        openGLPanel.addPreviewListener(myTurtleRenderer);
         addPlotterRendererToPreviewPanel();
 
         add(openGLPanel, BorderLayout.CENTER);
@@ -143,19 +143,18 @@ public class PreviewPanel extends JPanel {
     }
 
     private void addPlotterRendererToPreviewPanel() {
-        openGLPanel.addListener((shader, gl)->{
+        openGLPanel.addPreviewListener((g)->{
             if(myPlotterRenderer!=null) {
                 myTurtleRenderer.setShowTravel(GFXPreferences.getShowPenUp());
-                myPlotterRenderer.render(shader,gl, myPlotter);
+                myPlotterRenderer.render(g, myPlotter);
             }
         });
     }
 
     public void stop() {
-        openGLPanel.removeListener(myPlotter);
+        openGLPanel.removePreviewListener(myPlotter);
         myPlotter.getSettings().save();
         plotterSettingsManager.setLastSelectedProfile(myPlotter.getSettings().getUID());
-        openGLPanel.stop();
     }
 
     public Paper getPaper() {
@@ -196,10 +195,10 @@ public class PreviewPanel extends JPanel {
     }
 
     public void addListener(LoadFilePanel loader) {
-        openGLPanel.addListener(loader);
+        openGLPanel.addPreviewListener(loader);
     }
 
     public void removeListener(LoadFilePanel loader) {
-        openGLPanel.removeListener(loader);
+        openGLPanel.removePreviewListener(loader);
     }
 }

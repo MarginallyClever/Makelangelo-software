@@ -24,13 +24,9 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	public void start(Graphics2D g2) {
 		this.g2 = g2;
 
-		// set pen diameter
-		g2.setStroke(new BasicStroke(penDiameter));
-
 		isPenUp = true;
-
 		// set pen diameter
-		g2.setStroke(new BasicStroke(penDiameter));
+		g2.setStroke(new BasicStroke(penDiameter, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 	}
 
 	@Override
