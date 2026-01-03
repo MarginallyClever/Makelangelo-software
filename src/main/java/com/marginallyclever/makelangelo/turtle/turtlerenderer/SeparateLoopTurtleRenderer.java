@@ -27,7 +27,7 @@ public class SeparateLoopTurtleRenderer implements TurtleRenderer {
 		showTravel = GFXPreferences.getShowPenUp();
 
 		// set pen diameter
-		gl2.setStroke(new BasicStroke(penDiameter));
+		gl2.setStroke(new BasicStroke(penDiameter, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
 		moveCounter=0;
 	}

@@ -18,8 +18,10 @@ import java.awt.image.BufferedImage;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Use an image to mask a path.  Lay the path over the image and remove all parts of the path where the image is brighter
- * than a cutoff value.  The fine grain resolution (and the amount of testing) is controlled by the stepSize.
+ * Use an [BufferedImage] to mask a [Turtle] path.  Lay the path over the image and remove all parts of
+ * the path where the image is brighter than a cutoff value.  The fine grain resolution (and the amount of testing) is
+ * controlled by the stepSize.
+ * Another way to think of it is a union between the dark parts of the image and the path.
  * @author Dan Royer
  * @since 2022-03-08
  */

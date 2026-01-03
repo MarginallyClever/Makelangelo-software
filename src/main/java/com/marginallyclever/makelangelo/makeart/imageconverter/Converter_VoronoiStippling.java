@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import com.jogamp.opengl.GL3;
 import com.marginallyclever.convenience.helpers.DrawingHelper;
 import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.donatello.select.SelectSlider;
@@ -9,7 +8,6 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.turtletool.InfillTurtle;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
-import com.marginallyclever.makelangelo.preview.ShaderProgram;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import java.awt.*;
@@ -57,8 +55,8 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 	}
 
 	@Override
-	public void render(ShaderProgram shader, GL3 gl) {
-		super.render(shader, gl);
+	public void render(Graphics graphics) {
+		super.render(graphics);
 
 		ImageConverterThread thread = getThread();
 		if(thread==null || thread.getPaused()) return;
@@ -68,14 +66,14 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 
 		lock.lock();
 		try {
-			renderDots(shader,gl,cx,cy);
+			renderDots(graphics,cx,cy);
 		}
 		finally {
 			lock.unlock();
 		}
 	}
 
-	private void renderDots(ShaderProgram shader,GL3 gl,float sx,float sy) {
+	private void renderDots(Graphics graphics,float sx,float sy) {
 		int lpc = getLowpassCutoff();
 		float scale = (float)(maxDotSize-minDotSize)/255.0f;
 		float cx = (float)myPaper.getCenterX()+sx;
@@ -87,7 +85,7 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 			float x = (float)c.center.x;
 			float y = (float)c.center.y;
 			float cBounded = (float)Math.clamp(c.change,0,1);
-			DrawingHelper.drawCircle(gl, cx+x, cy+y, r, new Color(cBounded,0,0));
+			DrawingHelper.drawCircle(graphics, cx+x, cy+y, r, new Color(cBounded,0,0));
 		}
 	}
 

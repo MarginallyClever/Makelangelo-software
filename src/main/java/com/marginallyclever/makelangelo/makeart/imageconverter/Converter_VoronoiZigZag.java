@@ -1,13 +1,11 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import com.jogamp.opengl.GL3;
 import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.donatello.select.SelectToggleButton;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
-import com.marginallyclever.makelangelo.preview.ShaderProgram;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,8 +83,8 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 	public void resume() {}
 
 	@Override
-	public void render(ShaderProgram shader, GL3 gl) {
-		super.render(shader,gl);/*
+	public void render(Graphics graphics) {
+		super.render(graphics);/*
 		if(getThread().getPaused()) return;
 
 		gl.glPushMatrix();
@@ -104,7 +102,7 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 		gl.glPopMatrix();*/
 	}
 
-	private void renderPoints(GL3 gl2) {/*
+	private void renderPoints(Graphics2D g2d) {/*
 		int lpc = getLowpassCutoff();
 
 		lock.lock();
@@ -125,7 +123,7 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 		}*/
 	}
 
-	private void drawTour(GL3 gl2) {/*
+	private void drawTour(Graphics2D g2d) {/*
 		int lpc = getLowpassCutoff();
 
 		lock.lock();

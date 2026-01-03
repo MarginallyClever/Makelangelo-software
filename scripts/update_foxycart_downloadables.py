@@ -80,11 +80,14 @@ def update_downloadable(token, downloadable, asset_path):
     headers = {
         "FOXY-API-VERSION": "1",
         "Authorization": f"Bearer {token}",
-        "Content-Type": "application/octet-stream",
+        #"Content-Type": "application/octet-stream",
         "Accept": "application/json",
+        'X-HTTP-Method-Override': 'PATCH',
     }
-    with open(asset_path, "rb") as f:
-        resp = requests.patch(upload_url, headers=headers, data=f)
+    files = {
+        "file": (asset_path, open(asset_path, "rb"))
+    }
+    resp = requests.post(upload_url, headers=headers, files=files)
     resp.raise_for_status()
     print(f"Updated {downloadable.get('name')} ({downloadable.get('code')}) with {asset_path}")
 

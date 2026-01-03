@@ -1,8 +1,7 @@
 package com.marginallyclever.convenience;
 
-import com.jogamp.opengl.GL3;
-
 import javax.vecmath.Point2d;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -105,14 +104,13 @@ public class QuadGraph {
         return bestFound;
     }
 
-    public void render(GL3 gl2) {
+    public void render(Graphics2D g2d) {
         if (children != null) {
             for (int i = 0; i < 4; ++i) {
-                children[i].render(gl2);
+                children[i].render(g2d);
             }
         } else {/*
             gl2.glColor3f(1, 0, 1);
-            gl2.glLineWidth(1);
             gl2.glBegin(GL3.GL_LINE_LOOP);
             gl2.glVertex2d(bounds.getMinX(), bounds.getMinY());
             gl2.glVertex2d(bounds.getMinX(), bounds.getMaxY());

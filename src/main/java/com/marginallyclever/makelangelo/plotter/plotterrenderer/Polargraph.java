@@ -1,11 +1,8 @@
 package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 
-import com.jogamp.opengl.GL3;
 import com.marginallyclever.convenience.helpers.DrawingHelper;
-import com.marginallyclever.makelangelo.Mesh;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
-import com.marginallyclever.makelangelo.preview.ShaderProgram;
 
 import javax.vecmath.Point2d;
 import java.awt.*;
@@ -65,27 +62,27 @@ public abstract class Polargraph implements PlotterRenderer {
 	}
 
 	@Override
-	public void render(ShaderProgram shader, GL3 gl, Plotter robot) {
-		paintMotors(shader, gl, robot);
-		paintControlBox(shader, gl, robot);
+	public void render(Graphics graphics, Plotter robot) {
+		paintMotors(graphics, robot);
+		paintControlBox(graphics, robot);
 		if(robot.getDidFindHome()) {
-			paintPenHolderToCounterweights(shader, gl, robot);
+			paintPenHolderToCounterweights(graphics, robot);
 		}
 	}
 
-	static public void paintMotors(ShaderProgram shader, GL3 gl,Plotter robot) {
+	static public void paintMotors(Graphics graphics,Plotter robot) {
 		float top = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		float right = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
 		float left = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 
 		// left motor
 		var c = new Color(0, 0, 0);
-		DrawingHelper.drawRectangle(gl,top+MOTOR_SIZE, left+MOTOR_SIZE, top-MOTOR_SIZE,left-MOTOR_SIZE, c);
+		DrawingHelper.drawRectangle(graphics,top+MOTOR_SIZE, left+MOTOR_SIZE, top-MOTOR_SIZE,left-MOTOR_SIZE, c);
 		// right motor
-		DrawingHelper.drawRectangle(gl,top+MOTOR_SIZE, right+MOTOR_SIZE, top-MOTOR_SIZE,right-MOTOR_SIZE, c);
+		DrawingHelper.drawRectangle(graphics,top+MOTOR_SIZE, right+MOTOR_SIZE, top-MOTOR_SIZE,right-MOTOR_SIZE, c);
 	}
 
-	private void paintControlBox(ShaderProgram shader, GL3 gl, Plotter robot) {
+	private void paintControlBox(Graphics graphics, Plotter robot) {
 		float cy = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		float left = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 		float right = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
@@ -93,31 +90,30 @@ public abstract class Polargraph implements PlotterRenderer {
 
 		// mounting plate for PCB
 		var c = new Color(1, 0.8f, 0.5f);
-		DrawingHelper.drawRectangle(gl, cy+50, cx+80, cy-50, cx-80, c);
+		DrawingHelper.drawRectangle(graphics, cy+50, cx+80, cy-50, cx-80, c);
 
 		// wires to each motor
-		Mesh wires = new Mesh();
-		wires.setRenderStyle(GL3.GL_LINES);
+        Graphics2D g2d = (Graphics2D) graphics;
+
 		float SPACING=2f;
 		float y=SPACING*-1.5f;
-		wires.addColor(1, 0, 0,1);  wires.addVertex(cx, cy+y,0);	wires.addColor(1, 0, 0,1);  wires.addVertex(cx+left, cy+y,0);  y+=SPACING;
-		wires.addColor(0, 1, 0,1);  wires.addVertex(cx, cy+y,0);	wires.addColor(0, 1, 0,1);  wires.addVertex(cx+left, cy+y,0);  y+=SPACING;
-		wires.addColor(0, 0, 1,1);  wires.addVertex(cx, cy+y,0);	wires.addColor(0, 0, 1,1);  wires.addVertex(cx+left, cy+y,0);  y+=SPACING;
-		wires.addColor(1, 1, 0,1);  wires.addVertex(cx, cy+y,0);	wires.addColor(1, 1, 0,1);  wires.addVertex(cx+left, cy+y,0);  y+=SPACING;
+        g2d.setColor(Color.RED   );    g2d.drawLine((int)cx, (int)(cy+y), (int)(cx+left), (int)(cy+y) );  y+=SPACING;
+        g2d.setColor(Color.GREEN );    g2d.drawLine((int)cx, (int)(cy+y), (int)(cx+left), (int)(cy+y) );  y+=SPACING;
+        g2d.setColor(Color.BLUE  );    g2d.drawLine((int)cx, (int)(cy+y), (int)(cx+left), (int)(cy+y) );  y+=SPACING;
+        g2d.setColor(Color.YELLOW);    g2d.drawLine((int)cx, (int)(cy+y), (int)(cx+left), (int)(cy+y) );  y+=SPACING;
 
 		y=SPACING*-1.5f;
-		wires.addColor(1, 0, 0,1);  wires.addVertex(cx, cy+y,0);	wires.addColor(1, 0, 0,1);  wires.addVertex(cx+right, cy+y,0);  y+=SPACING;
-		wires.addColor(0, 1, 0,1);  wires.addVertex(cx, cy+y,0);	wires.addColor(0, 1, 0,1);  wires.addVertex(cx+right, cy+y,0);  y+=SPACING;
-		wires.addColor(0, 0, 1,1);  wires.addVertex(cx, cy+y,0);	wires.addColor(0, 0, 1,1);  wires.addVertex(cx+right, cy+y,0);  y+=SPACING;
-		wires.addColor(1, 1, 0,1);  wires.addVertex(cx, cy+y,0);	wires.addColor(1, 1, 0,1);  wires.addVertex(cx+right, cy+y,0);  y+=SPACING;
-		wires.render(gl);
+        g2d.setColor(Color.RED   );    g2d.drawLine((int)cx, (int)(cy+y), (int)(cx+right), (int)(cy+y) );  y+=SPACING;
+        g2d.setColor(Color.GREEN );    g2d.drawLine((int)cx, (int)(cy+y), (int)(cx+right), (int)(cy+y) );  y+=SPACING;
+        g2d.setColor(Color.BLUE  );    g2d.drawLine((int)cx, (int)(cy+y), (int)(cx+right), (int)(cy+y) );  y+=SPACING;
+        g2d.setColor(Color.YELLOW);    g2d.drawLine((int)cx, (int)(cy+y), (int)(cx+right), (int)(cy+y) );  y+=SPACING;
 
 		// UNO
 		var c2 = new Color(0, 0, 0.6f);
-		DrawingHelper.drawRectangle(gl,cy+30,cx+40,cy-30,cx-40,c2);
+		DrawingHelper.drawRectangle(graphics,cy+30,cx+40,cy-30,cx-40,c2);
 	}
 
-	static public void paintPenHolderToCounterweights(ShaderProgram shader, GL3 gl, Plotter robot) {
+	static public void paintPenHolderToCounterweights(Graphics graphics, Plotter robot) {
 		Point2d pos = robot.getPos();
 		float gx = (float)pos.x;
 		float gy = (float)pos.y;
@@ -143,45 +139,39 @@ public abstract class Polargraph implements PlotterRenderer {
 		float right_a = (float)Math.sqrt(dx * dx + dy * dy);
 		float right_b = (beltLength - right_a) / 2 + 55;
 
-		Mesh belts = new Mesh();
-		belts.setRenderStyle(GL3.GL_LINES);
 		var c = new Color(0.2f, 0.2f, 0.2f, 1.0f);
 
-		// belt from motor to pen holder left
-		belts.addVertex(left, top,0);
-		belts.addVertex(gx, gy,0);
-		// belt from motor to pen holder right
-		belts.addVertex(right, top,0);
-		belts.addVertex(gx, gy,0);
+
+        Graphics2D g2d = (Graphics2D) graphics;
+        g2d.drawLine((int)left ,(int)top,(int)gx,(int)gy);  // belt from motor to pen holder left
+        g2d.drawLine((int)right,(int)top,(int)gx,(int)gy);  // belt from motor to pen holder right
 /*
 		// belt from motor to counterweight left
-		paintBeltSide(belts,left,top,left_b);
+		paintBeltSide(g2d, left,top,left_b);
 		// belt from motor to counterweight right
-		paintBeltSide(belts,right,top,right_b);
+		paintBeltSide(g2d, right,top,right_b);
 */
-		paintGondola(gl,gx,gy,robot,c);
+		paintGondola(graphics,gx,gy,robot,c);
 
 		// left
-		paintCounterweight(shader,left,top-left_b);
+		paintCounterweight(graphics,left,top-left_b);
 		// right
-		paintCounterweight(shader,right,top-right_b);
+		paintCounterweight(graphics,right,top-right_b);
 	}
 
-	private static void paintBeltSide(Mesh mesh,float x, float y, float length) {
-		mesh.addVertex(x - 2, y, 0);
-		mesh.addVertex(x - 2, y - length, 0);
-		mesh.addVertex(x + 2, y, 0);
-		mesh.addVertex(x + 2, y - length, 0);
+	private static void paintBeltSide(Graphics2D g2d, float x, float y, float length) {
+		g2d.drawLine((int)(x - 2), (int)y,(int)(x - 2), (int)(y - length));
+		g2d.drawLine((int)(x + 2), (int)y,(int)(x + 2), (int)(y - length));
 	}
 
-	private static void paintGondola(GL3 gl, float gx, float gy,Plotter robot,Color color) {
-		DrawingHelper.drawCircle(gl, gx, gy, PEN_HOLDER_RADIUS_2, color);
+	private static void paintGondola(Graphics graphics, float gx, float gy, Plotter robot, Color color) {
+		DrawingHelper.drawCircle(graphics, gx, gy, PEN_HOLDER_RADIUS_2, color);
 		if (robot.getPenIsUp()) {
-			DrawingHelper.drawCircle(gl, gx, gy, PEN_HOLDER_RADIUS_2 + 5, color);
+			DrawingHelper.drawCircle(graphics, gx, gy, PEN_HOLDER_RADIUS_2 + 5, color);
 		}
 	}
 
-	static public void paintCounterweight(ShaderProgram shader,float x,float y) {/*
+	static public void paintCounterweight(Graphics graphics,float x,float y) {/*
 		gl2.glBegin(GL3.GL_LINE_LOOP);
 		gl2.glColor3f(0, 0, 1);
 		gl2.glVertex2d(x - COUNTERWEIGHT_HALF_WIDTH, y);
@@ -191,7 +181,7 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl2.glEnd();*/
 	}
 
-	static public void paintBottomClearanceArea(GL3 gl2, Plotter machine) {/*
+	static public void paintBottomClearanceArea(Graphics graphics, Plotter machine) {/*
 		// bottom clearance arcs
 		// right
 		float w = (float)machine.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT) - (float)machine.getSettings().getDouble(PlotterSettings.LIMIT_LEFT) + 2.1f;
@@ -223,21 +213,21 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl2.glEnd();*/
 	}
 
-	public static void paintSafeArea(ShaderProgram shader, GL3 gl, Plotter robot) {/*
+	public static void paintSafeArea(Graphics graphics, Plotter robot) {
+        var g2d = (Graphics2D) graphics;
+
 		PlotterSettings settings = robot.getSettings();
-		float top = (float)settings.getDouble(PlotterSettings.LIMIT_TOP);
-		float bottom = (float)settings.getDouble(PlotterSettings.LIMIT_BOTTOM);
-		float left = (float)settings.getDouble(PlotterSettings.LIMIT_LEFT);
+		float top = -(float)settings.getDouble(PlotterSettings.LIMIT_TOP);
+        float left = (float)settings.getDouble(PlotterSettings.LIMIT_LEFT);
+
+		float bottom = -(float)settings.getDouble(PlotterSettings.LIMIT_BOTTOM);
 		float right = (float)settings.getDouble(PlotterSettings.LIMIT_RIGHT);
 
-		// gl2.glColor4f(0.5f,0.5f,0.75f,0.75f); // #color Safe area
-		gl2.glColor4f(1, 1, 1, 1); // #color Safe area
-
-		gl2.glBegin(GL3.GL_LINE_LOOP);
-		gl2.glVertex2d(left - 70f, top + 70f);
-		gl2.glVertex2d(right + 70f, top + 70f);
-		gl2.glVertex2d(right + 70f, bottom);
-		gl2.glVertex2d(left - 70f, bottom);
-		gl2.glEnd();*/
+        g2d.setColor(Color.WHITE);
+        g2d.drawRect(
+                (int)left,
+                (int)top,
+                (int)Math.abs(right-left),
+                (int)Math.abs(top-bottom));
 	}
 }

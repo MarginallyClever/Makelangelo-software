@@ -6,7 +6,7 @@
 
 	<groupId>com.marginallyclever</groupId>
 	<artifactId>Makelangelo</artifactId>
-	<version>7.77.0</version>
+	<version>7.78.0</version>
 	<name>Makelangelo</name>
 	<description>Makelangelo Software is a Java program that prepares art for CNC plotters.  It is especially designed for the Makelangelo Robot.
 It pairs really well with Marlin-polargraph, the code in the brain of the robot that receives instructions and moves the motors.</description>
@@ -69,11 +69,6 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 	</pluginRepositories>
 
 	<repositories>
-		<repository>
-			<id>jogamp</id>
-			<name>JogAmp Repository</name>
-			<url>https://jogamp.org/deployment/maven/</url>
-		</repository>
 		<repository>
 			<id>maven_central</id>
 			<name>Maven Central</name>
@@ -369,20 +364,6 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<artifactId>jssc</artifactId>
 			<version>2.9.5</version>
 		</dependency>
-		<!-- opengl graphics -->
-		<!-- https://mvnrepository.com/artifact/org.jogamp.gluegen/gluegen-rt-main -->
-		<dependency>
-			<groupId>org.jogamp.gluegen</groupId>
-			<artifactId>gluegen-rt-main</artifactId>
-			<version>2.6.0</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.jogamp.jogl/jogl-all-main -->
-		<dependency>
-			<groupId>org.jogamp.jogl</groupId>
-			<artifactId>jogl-all-main</artifactId>
-			<version>2.6.0</version>
-		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
@@ -509,7 +490,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
         <dependency>
             <groupId>io.github.classgraph</groupId>
             <artifactId>classgraph</artifactId>
-            <version>4.8.171</version>
+            <version>4.8.184</version>
         </dependency>
 		<dependency>
 			<groupId>org.reflections</groupId>
