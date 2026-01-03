@@ -6,7 +6,7 @@ import com.marginallyclever.makelangelo.makeart.imagefilter.FilterContrastAdjust
 import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
-import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.preview.RenderListener;
 import com.marginallyclever.makelangelo.rangeslider.RangeSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
@@ -29,7 +29,7 @@ import java.util.prefs.Preferences;
 /**
  * This panel allows the user to select an image converter and set its parameters.
  */
-public class SelectImageConverterPanel extends JPanel implements PreviewListener, ImageConverterListener {
+public class SelectImageConverterPanel extends JPanel implements RenderListener, ImageConverterListener {
 	private static final Logger logger = LoggerFactory.getLogger(SelectImageConverterPanel.class);
 
 	/**
@@ -271,8 +271,8 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 
 	@Override
 	public void render(Graphics graphics) {
-		if( myConverter != null && myConverter instanceof PreviewListener ) {
-			((PreviewListener)myConverter).render(graphics);
+		if( myConverter != null && myConverter instanceof RenderListener) {
+			((RenderListener)myConverter).render(graphics);
 		}
 	}
 

@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
-import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.preview.RenderListener;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.vecmath.Point2d;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 /**
  * <p>{@link TurtleRenderFacade} for rendering a {@link com.marginallyclever.makelangelo.turtle.Turtle} using a
@@ -16,7 +17,7 @@ import java.awt.*;
  * for the client code to interact with.</p>
  * @author Dan Royer
  */
-public class TurtleRenderFacade implements PreviewListener {
+public class TurtleRenderFacade implements RenderListener {
 	private static final Logger logger = LoggerFactory.getLogger(TurtleRenderFacade.class);
 
 	private TurtleRenderer myRenderer = TurtleRenderFactory.getTurtleRenderer(TurtleRenderFactory.DEFAULT);
@@ -28,14 +29,26 @@ public class TurtleRenderFacade implements PreviewListener {
 	private double penDiameter = 0.8;
 	private boolean showTravel;
 	private int turtleHash = 0;
+    private BufferedImage backbuffer = null;
 
 	@Override
 	public void render(Graphics graphics) {
-		//if(turtleHash != myTurtle.hashCode())
-        {
+		if(turtleHash != myTurtle.hashCode()) {
 			turtleHash = myTurtle.hashCode();
 			render((Graphics2D) graphics);
 		}
+        if(backbuffer != null) {
+            graphics.drawImage(backbuffer,
+                    -backbuffer.getWidth()/20,
+                    -backbuffer.getHeight()/20,
+                    backbuffer.getWidth()/20,
+                    backbuffer.getHeight()/20,
+                    0,
+                    0,
+                    backbuffer.getWidth(),
+                    backbuffer.getHeight(),
+                    null);
+        }
 	}
 
 	public void dispose() {
@@ -46,7 +59,15 @@ public class TurtleRenderFacade implements PreviewListener {
 		if(myTurtle.isLocked()) return;
 		myTurtle.lock();
 		try {
-			renderLockedTurtle(g2d);
+            var bounds = myTurtle.getBounds();
+            backbuffer = new BufferedImage(
+                    (int)Math.max(1,Math.ceil(bounds.width))*10,
+                    (int)Math.max(1,Math.ceil(bounds.height))*10,
+                    BufferedImage.TYPE_INT_ARGB);
+            Graphics2D bg = backbuffer.createGraphics();
+            bg.scale(10,10);
+            bg.translate(-bounds.x, -bounds.y);
+            renderLockedTurtle(bg);
 		}
 		finally {
 			myTurtle.unlock();

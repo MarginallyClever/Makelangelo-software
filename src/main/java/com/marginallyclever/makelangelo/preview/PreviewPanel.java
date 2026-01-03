@@ -32,7 +32,7 @@ public class PreviewPanel extends JPanel {
     private final Plotter myPlotter = new Plotter();
     private final Paper myPaper = new Paper();
 
-    private final OpenGLPanel openGLPanel = new OpenGLPanel();
+    private final RenderPanel renderPanel = new RenderPanel();
     private final MakeleangeloRangeSlider rangeSlider = new MakeleangeloRangeSlider();
     private final Camera camera = new Camera();
     private final TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
@@ -43,13 +43,13 @@ public class PreviewPanel extends JPanel {
         super(new BorderLayout());
         setOpaque(true);
 
-        openGLPanel.setCamera(camera);
-        openGLPanel.addPreviewListener(myPaper);
-        openGLPanel.addPreviewListener(myPlotter);
-        openGLPanel.addPreviewListener(myTurtleRenderer);
+        renderPanel.setCamera(camera);
+        renderPanel.addRenderListener(myPaper);
+        renderPanel.addRenderListener(myPlotter);
+        renderPanel.addRenderListener(myTurtleRenderer);
         addPlotterRendererToPreviewPanel();
 
-        add(openGLPanel, BorderLayout.CENTER);
+        add(renderPanel, BorderLayout.CENTER);
         add(rangeSlider, BorderLayout.SOUTH);
 
         JToolBar toolBar = createToolBar();
@@ -139,11 +139,11 @@ public class PreviewPanel extends JPanel {
 
         updatePlotterRenderer();
 
-        if(openGLPanel != null) openGLPanel.repaint();
+        if(renderPanel != null) renderPanel.repaint();
     }
 
     private void addPlotterRendererToPreviewPanel() {
-        openGLPanel.addPreviewListener((g)->{
+        renderPanel.addRenderListener((g)->{
             if(myPlotterRenderer!=null) {
                 myTurtleRenderer.setShowTravel(GFXPreferences.getShowPenUp());
                 myPlotterRenderer.render(g, myPlotter);
@@ -152,7 +152,7 @@ public class PreviewPanel extends JPanel {
     }
 
     public void stop() {
-        openGLPanel.removePreviewListener(myPlotter);
+        renderPanel.removePreviewListener(myPlotter);
         myPlotter.getSettings().save();
         plotterSettingsManager.setLastSelectedProfile(myPlotter.getSettings().getUID());
     }
@@ -195,10 +195,10 @@ public class PreviewPanel extends JPanel {
     }
 
     public void addListener(LoadFilePanel loader) {
-        openGLPanel.addPreviewListener(loader);
+        renderPanel.addRenderListener(loader);
     }
 
     public void removeListener(LoadFilePanel loader) {
-        openGLPanel.removePreviewListener(loader);
+        renderPanel.removePreviewListener(loader);
     }
 }

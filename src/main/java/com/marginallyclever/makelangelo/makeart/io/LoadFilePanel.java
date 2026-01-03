@@ -5,7 +5,7 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imageconverter.SelectImageConverterPanel;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
-import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.preview.RenderListener;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.io.FileInputStream;
 
-public class LoadFilePanel extends JPanel implements PreviewListener {
+public class LoadFilePanel extends JPanel implements RenderListener {
 	private static final Logger logger = LoggerFactory.getLogger(LoadFilePanel.class);
 	public static final String COMMAND_TURTLE = "turtle";
 	private final Paper myPaper;
@@ -28,7 +28,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 	private final OpenFileChooser openFileChooser = new OpenFileChooser(this);
 	private final JLabel selectedFilename = new JLabel();
 	private SelectImageConverterPanel myConvertImage;
-	private PreviewListener mySubPreviewListener;
+	private RenderListener mySubRenderListener;
 	private JDialog parent;
 
 	/**
@@ -85,7 +85,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 				add(myConvertImage,BorderLayout.CENTER);
 
 				myConvertImage.run();
-				mySubPreviewListener = myConvertImage;
+				mySubRenderListener = myConvertImage;
 				return true;
 			} else {
 				Turtle t = TurtleFactory.load(filename);
@@ -103,7 +103,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 
 	@Override
 	public void render(Graphics graphics) {
-		if(mySubPreviewListener!=null) mySubPreviewListener.render(graphics);
+		if(mySubRenderListener !=null) mySubRenderListener.render(graphics);
 	}
 
 	public void setParent(JDialog parent) {

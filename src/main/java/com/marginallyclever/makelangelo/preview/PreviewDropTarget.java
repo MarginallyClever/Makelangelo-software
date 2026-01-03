@@ -14,7 +14,7 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Allows the user to drag and drop a file onto the {@link OpenGLPanel}.
+ * Allows the user to drag and drop a file onto the {@link RenderPanel}.
  */
 public class PreviewDropTarget extends DropTargetAdapter {
     private static final Logger logger = LoggerFactory.getLogger(PreviewDropTarget.class);

@@ -2,8 +2,8 @@ package com.marginallyclever.makelangelo.plotter;
 
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
-import com.marginallyclever.makelangelo.preview.OpenGLPanel;
-import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.preview.RenderPanel;
+import com.marginallyclever.makelangelo.preview.RenderListener;
 
 import javax.vecmath.Point2d;
 import java.awt.*;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * @author Dan
  * @since 7.2.10
  */
-public class Plotter implements PreviewListener, Cloneable {	
+public class Plotter implements RenderListener, Cloneable {
 	private PlotterSettings settings = new PlotterSettings("Makelangelo 5");
 
 	// are motors actively engaged?  when disengaged pen can drift and re-homing is required.
@@ -170,7 +170,7 @@ public class Plotter implements PreviewListener, Cloneable {
 	}
 	
 	/**
-	 * Callback from {@link OpenGLPanel} that it is time to render to the WYSIWYG display.
+	 * Callback from {@link RenderPanel} that it is time to render to the WYSIWYG display.
 	 *
 	 * @param graphics the render context
 	 */

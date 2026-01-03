@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.paper;
 
-import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.preview.RenderListener;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +9,7 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.prefs.Preferences;
 
-public class Paper implements PreviewListener {
+public class Paper implements RenderListener {
 	private static final Logger logger = LoggerFactory.getLogger(Paper.class);
 
 	public static final int DEFAULT_WIDTH = 420; // mm

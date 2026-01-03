@@ -4,7 +4,7 @@ import com.marginallyclever.donatello.select.SelectToggleButton;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.preview.RenderListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,11 +13,11 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Extends {@link ImageConverter} to run in an evolving, iterative process until it converges on some goal or the user pauses it.
- * Implements {@link PreviewListener} to draw progress while it runs.
+ * Implements {@link RenderListener} to draw progress while it runs.
  * @author Dan Royer
  * @since 7?
  */
-public abstract class ImageConverterIterative extends ImageConverter implements PreviewListener {
+public abstract class ImageConverterIterative extends ImageConverter implements RenderListener {
     private static final Logger logger = LoggerFactory.getLogger(ImageConverterIterative.class);
     private ImageConverterThread imageConverterThread;
     private final SelectToggleButton pauseButton;

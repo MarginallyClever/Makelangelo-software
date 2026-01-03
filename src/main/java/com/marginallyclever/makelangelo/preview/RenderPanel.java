@@ -14,14 +14,16 @@ import java.util.List;
 import static com.marginallyclever.donatello.graphview.GraphViewPanel.setHints;
 
 /**
- * OpenGL hardware accelerated WYSIWYG view.
+ * Software rendering WYSIWYG preview of the the {@link com.marginallyclever.makelangelo.paper.Paper}, the current
+ * {@link com.marginallyclever.makelangelo.turtle.Turtle}, and the
+ * {@link com.marginallyclever.makelangelo.plotter.Plotter} (in that order).
  */
-public class OpenGLPanel extends JPanel implements MouseWheelListener, MouseListener, MouseMotionListener {
-	private static final Logger logger = LoggerFactory.getLogger(OpenGLPanel.class);
+public class RenderPanel extends JPanel implements MouseWheelListener, MouseListener, MouseMotionListener {
+	private static final Logger logger = LoggerFactory.getLogger(RenderPanel.class);
 
-	private int canvasWidth,canvasHeight;
+	private int canvasWidth, canvasHeight;
 
-	private final List<PreviewListener> previewListeners = new ArrayList<>();
+	private final List<RenderListener> renderListeners = new ArrayList<>();
 	
 	private Camera camera;
 
@@ -43,7 +45,7 @@ public class OpenGLPanel extends JPanel implements MouseWheelListener, MouseList
 	 */
 	private int mouseLastZoomDirection = 0;
 
-	public OpenGLPanel() {
+	public RenderPanel() {
 		super(new BorderLayout());
         this.addComponentListener(new ComponentAdapter() {
             @Override
@@ -127,12 +129,12 @@ public class OpenGLPanel extends JPanel implements MouseWheelListener, MouseList
 		setTipXY();
 	}
 
-	public void addPreviewListener(PreviewListener arg0) {
-		previewListeners.add(arg0);
+	public void addRenderListener(RenderListener arg0) {
+		renderListeners.add(arg0);
 	}
 	
-	public void removePreviewListener(PreviewListener arg0) {
-		previewListeners.remove(arg0);
+	public void removePreviewListener(RenderListener arg0) {
+		renderListeners.remove(arg0);
 	}
 
 	/**
@@ -179,7 +181,7 @@ public class OpenGLPanel extends JPanel implements MouseWheelListener, MouseList
             applyCameraTransform(g2d);
             g2d.scale(1,-1);
 
-            for (PreviewListener p : previewListeners) {
+            for (RenderListener p : renderListeners) {
                 p.render(g2d);
             }
             g2d.scale(1,-1);

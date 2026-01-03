@@ -11,7 +11,7 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
-import com.marginallyclever.makelangelo.preview.OpenGLPanel;
+import com.marginallyclever.makelangelo.preview.RenderPanel;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.Point;
@@ -304,7 +304,7 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
     abstract void writeOutCells();
 
     /**
-     * Callback from {@link OpenGLPanel} that it is time to render to the WYSIWYG display.
+     * Callback from {@link RenderPanel} that it is time to render to the WYSIWYG display.
      *
      * @param graphics the render context
      */

@@ -5,11 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
 @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "headless environment")
-public class OpenGLPanelTest {
+public class RenderPanelTest {
     @Test
     public void testOpenGLPanelInitialization() {
         PreferencesHelper.start();
-        OpenGLPanel panel = new OpenGLPanel();
+        RenderPanel panel = new RenderPanel();
 
         // create and display a frame
         javax.swing.JFrame frame = new javax.swing.JFrame("OpenGLPanel Test");
