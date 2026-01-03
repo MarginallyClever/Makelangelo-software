@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 7.78.0
+
 ### Added
 - This changelog.
 - Open source button to README.md.
@@ -18,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bumped Jogamp to 2.6.0.
 ### Deprecated
 ### Removed
+- use of OpenGL and all hardware accelerated graphics
 ### Fixed
 - English label for "Acceleration" in plotter settings tab.
 - Calculation for meters of timing belt needed on each side of Makelangelo 5 and HUGE.

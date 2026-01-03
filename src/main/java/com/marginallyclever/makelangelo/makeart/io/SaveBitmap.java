@@ -52,7 +52,7 @@ public class SaveBitmap implements TurtleSaver {
 		for( var layer : myTurtle.getLayers() ) {
 			if(layer.isEmpty()) continue;
 			g.setColor(layer.getColor());
-			g.setStroke(new BasicStroke((int)layer.getDiameter()));
+			g.setStroke(new BasicStroke((int)layer.getDiameter(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 			for (var line : layer.getAllLines()) {
 				if(line.size()<2) continue;
 				var iter = line.getAllPoints().iterator();

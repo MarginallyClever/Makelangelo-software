@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 
-import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.preview.ShaderProgram;
+
+import java.awt.*;
 
 /**
  * Deprecated because it cannot find home.
@@ -12,19 +12,19 @@ import com.marginallyclever.makelangelo.preview.ShaderProgram;
 public class Makelangelo3 implements PlotterRenderer {
 
 	@Override
-	public void render(ShaderProgram shader, GL3 gl, Plotter robot) {
-		paintControlBox(shader,gl,robot);
-		Polargraph.paintMotors(shader,gl,robot);
+	public void render(Graphics graphics, Plotter robot) {
+		paintControlBox(graphics,robot);
+		Polargraph.paintMotors(graphics,robot);
 		if(robot.getDidFindHome()) 
-			Polargraph.paintPenHolderToCounterweights(shader,gl,robot);
+			Polargraph.paintPenHolderToCounterweights(graphics,robot);
 	}
 
 	/**
 	 * paint the controller and the LCD panel
-	 * @param shader the shader to use for rendering
+	 * @param graphics the shader to use for rendering
 	 * @param plotter the plotter to render
 	 */
-	private void paintControlBox(ShaderProgram shader, GL3 gl,Plotter plotter) {/*
+	private void paintControlBox(Graphics graphics,Plotter plotter) {/*
 		double cy = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double left = plotter.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 		double right = plotter.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
@@ -37,7 +37,7 @@ public class Makelangelo3 implements PlotterRenderer {
 		gl2.glColor3f(1,0.8f,0.5f);
 		float w =80;
 		float h = 50;
-		gl2.glBegin(GL3.GL_QUADS);
+		gl2.glBegin(GL3.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(-w, h);
 		gl2.glVertex2d(+w, h);
 		gl2.glVertex2d(+w, -h);
@@ -64,7 +64,7 @@ public class Makelangelo3 implements PlotterRenderer {
 		h = 75f/2;
 		w = 135f/2;
 		gl2.glColor3d(0.9,0.9,0.9);
-		gl2.glBegin(GL3.GL_QUADS);
+		gl2.glBegin(GL3.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(-w, h);
 		gl2.glVertex2d(+w, h);
 		gl2.glVertex2d(+w, -h);
@@ -76,7 +76,7 @@ public class Makelangelo3 implements PlotterRenderer {
 		gl2.glPopMatrix();*/
 	}
 	
-	private void renderLCD(GL3 gl2) {/*
+	private void renderLCD(Graphics gl2) {/*
 		// position
 		gl2.glPushMatrix();
 		gl2.glTranslated(-180, 0, 0);
@@ -85,7 +85,7 @@ public class Makelangelo3 implements PlotterRenderer {
 		float w = 80f;
 		float h = 50f;
 		gl2.glColor3f(1,0.8f,0.5f);
-		gl2.glBegin(GL3.GL_QUADS);
+		gl2.glBegin(GL3.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(-w, h);
 		gl2.glVertex2d(+w, h);
 		gl2.glVertex2d(+w, -h);
@@ -96,7 +96,7 @@ public class Makelangelo3 implements PlotterRenderer {
 		w = 150f/2;
 		h = 56f/2;
 		gl2.glColor3f(0.8f,0.0f,0.0f);
-		gl2.glBegin(GL3.GL_QUADS);
+		gl2.glBegin(GL3.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(-w, h);
 		gl2.glVertex2d(+w, h);
 		gl2.glVertex2d(+w, -h);
@@ -110,7 +110,7 @@ public class Makelangelo3 implements PlotterRenderer {
 		w = 98f/2;
 		h = 60f/2;
 		gl2.glColor3f(0,0.6f,0.0f);
-		gl2.glBegin(GL3.GL_QUADS);
+		gl2.glBegin(GL3.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(-w, h);
 		gl2.glVertex2d(+w, h);
 		gl2.glVertex2d(+w, -h);
@@ -120,7 +120,7 @@ public class Makelangelo3 implements PlotterRenderer {
 		// LCD black
 		h = 40f/2;
 		gl2.glColor3f(0,0,0);
-		gl2.glBegin(GL3.GL_QUADS);
+		gl2.glBegin(GL3.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(-w, h);
 		gl2.glVertex2d(+w, h);
 		gl2.glVertex2d(+w, -h);
@@ -131,7 +131,7 @@ public class Makelangelo3 implements PlotterRenderer {
 		h = 25f/2;
 		w = 75f/2;
 		gl2.glColor3f(0,0,0.7f);
-		gl2.glBegin(GL3.GL_QUADS);
+		gl2.glBegin(GL3.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(-w, h);
 		gl2.glVertex2d(+w, h);
 		gl2.glVertex2d(+w, -h);

@@ -1,18 +1,13 @@
 package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 
-import com.jogamp.opengl.GL3;
-import com.marginallyclever.makelangelo.Mesh;
-import com.marginallyclever.makelangelo.preview.ShaderProgram;
-import com.marginallyclever.makelangelo.texture.TextureFactory;
-import com.marginallyclever.makelangelo.texture.TextureWithMetadata;
+import com.marginallyclever.convenience.helpers.DrawingHelper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
+import com.marginallyclever.makelangelo.texture.TextureFactory;
+import com.marginallyclever.makelangelo.texture.TextureWithMetadata;
 
 import javax.vecmath.Point2d;
-
 import java.awt.*;
-
-import static com.marginallyclever.convenience.helpers.DrawingHelper.*;
 
 public class MakelangeloCustom implements PlotterRenderer {
 	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm
@@ -22,78 +17,76 @@ public class MakelangeloCustom implements PlotterRenderer {
 	public final static float MOTOR_WIDTH = 42;
 	private static TextureWithMetadata controlBoard;
 
+    public MakelangeloCustom() {
+        controlBoard = TextureFactory.loadTexture("/textures/rampsv14.png");
+    }
+
 	@Override
-	public void render(ShaderProgram shader, GL3 gl, Plotter robot) {
+	public void render(Graphics graphics, Plotter robot) {
 		PlotterSettings settings = robot.getSettings();
 
-		paintControlBox(shader, gl, settings);
-		paintMotors(shader, gl, settings);
+		paintControlBox(graphics, settings);
+		paintMotors(graphics, settings);
 		if(robot.getDidFindHome())
-			paintPenHolderToCounterweights(shader,gl,robot);
+			paintPenHolderToCounterweights(graphics,robot);
 	}
 
 	/**
 	 * paint the controller and the LCD panel
-	 * @param shader the render context
+	 * @param graphics the render context
 	 * @param settings plottersettings of the robot
 	 */
-	private void paintControlBox(ShaderProgram shader, GL3 gl, PlotterSettings settings) {
-		float cy = (float)settings.getDouble(PlotterSettings.LIMIT_TOP);
+	private void paintControlBox(Graphics graphics, PlotterSettings settings) {
 		float left = (float)settings.getDouble(PlotterSettings.LIMIT_LEFT);
 		float right = (float)settings.getDouble(PlotterSettings.LIMIT_RIGHT);
 		float top = (float)settings.getDouble(PlotterSettings.LIMIT_TOP);
-		float cx = 0;
 
 		// mounting plate for PCB
-		drawRectangle(gl, top+35f, right+30f, top-35f, left-30f,new Color(1,0.8f,0.5f));
+        DrawingHelper.drawRectangle(graphics, top+35f, right+30f, top-35f, left-30f,new Color(1,0.8f,0.5f));
 
 		// wires to each motor
-		Mesh wires = new Mesh();
-		wires.setRenderStyle(GL3.GL_LINES);
-		final float SPACING=2;
-		float y=SPACING*-1.5f;
-		wires.addColor(1, 0, 0,1);	wires.addVertex(cx+left , cy+y, 0);
-		wires.addColor(1, 0, 0,1);	wires.addVertex(cx+right, cy+y, 0);  y+=SPACING;
-		wires.addColor(0, 1, 0,1);	wires.addVertex(cx+left , cy+y, 0);
-		wires.addColor(0, 1, 0,1);	wires.addVertex(cx+right, cy+y, 0);  y+=SPACING;
-		wires.addColor(0, 0, 1,1);	wires.addVertex(cx+left , cy+y, 0);
-		wires.addColor(0, 0, 1,1);	wires.addVertex(cx+right, cy+y, 0);  y+=SPACING;
-		wires.addColor(1, 1, 0,1);	wires.addVertex(cx+left , cy+y, 0);
-		wires.addColor(1, 1, 0,1);	wires.addVertex(cx+right, cy+y, 0);
-		wires.render(gl);
+        Graphics2D g2d = (Graphics2D) graphics;
+        final float SPACING=2;
+        float y=SPACING*-1.5f;
+        float cy = top;
+        float cx = 0;
+        g2d.setColor(Color.RED   );  g2d.drawLine((int)(cx+left), (int)(cy+y), (int)(cx+right), (int)(cy+y));  y+=SPACING;
+        g2d.setColor(Color.GREEN );  g2d.drawLine((int)(cx+left), (int)(cy+y), (int)(cx+right), (int)(cy+y));  y+=SPACING;
+        g2d.setColor(Color.BLUE  );  g2d.drawLine((int)(cx+left), (int)(cy+y), (int)(cx+right), (int)(cy+y));  y+=SPACING;
+        g2d.setColor(Color.YELLOW);  g2d.drawLine((int)(cx+left), (int)(cy+y), (int)(cx+right), (int)(cy+y));  y+=SPACING;
 		
-		float shiftX = (float) right / 2;
-		if (controlBoard == null) controlBoard = TextureFactory.loadTexture("/textures/rampsv14.png");
+		float shiftX = right / 2;
         final double scale = 0.1;
         if (shiftX < 100) {
             shiftX = 45;
         }
 
-		paintTexture(shader, gl, controlBoard, cx+shiftX, cy-72, 1024 * scale, 1024 * scale);
-
-        renderLCD(shader, gl, settings);
+		DrawingHelper.paintTexture(graphics, controlBoard, cx+shiftX, top-72, 1024 * scale, 1024 * scale);
+        renderLCD(graphics, settings);
 	}
 
 	// draw left & right motor
-	private void paintMotors(ShaderProgram shader, GL3 gl, PlotterSettings settings) {
+	private void paintMotors(Graphics graphics, PlotterSettings settings) {
 		double top = settings.getDouble(PlotterSettings.LIMIT_TOP);
 		double right = settings.getDouble(PlotterSettings.LIMIT_RIGHT);
 		double left = settings.getDouble(PlotterSettings.LIMIT_LEFT);
 		var c = new Color(0.3f,0.3f,0.3f);
 
+        int w2 = (int)MOTOR_WIDTH/2;
+
 		// left motor
-		drawRectangle(gl, top+MOTOR_WIDTH/2, left+MOTOR_WIDTH/2, top-MOTOR_WIDTH/2, left-MOTOR_WIDTH/2, c);
+        DrawingHelper.drawRectangle(graphics, top+w2, left+w2, top-w2, left-w2, c);
 		// right motor
-		drawRectangle(gl, top+MOTOR_WIDTH/2, right+MOTOR_WIDTH/2, top-MOTOR_WIDTH/2, right-MOTOR_WIDTH/2, c);
+        DrawingHelper.drawRectangle(graphics, top+w2, right+w2, top-w2, right-w2, c);
 	}
 	
-	private void renderLCD(ShaderProgram shader, GL3 gl, PlotterSettings settings) {
+	private void renderLCD(Graphics graphics, PlotterSettings settings) {
 		float left = (float)settings.getDouble(PlotterSettings.LIMIT_LEFT);
 		float right = (float)settings.getDouble(PlotterSettings.LIMIT_RIGHT);
 		float top = (float)settings.getDouble(PlotterSettings.LIMIT_TOP);
 
 		// position
-		float shiftX = (float) left / 2;
+		float shiftX = left / 2;
 		if (shiftX > -100) {
 			shiftX = -75;
 		}
@@ -101,26 +94,26 @@ public class MakelangeloCustom implements PlotterRenderer {
 		// LCD red
 		float w = 150f/2;
 		float h = 56f/2;
-		drawRectangle(gl, top+h, shiftX+w, top-h, shiftX-w, new Color(1,0.8f,0.5f));
+        DrawingHelper.drawRectangle(graphics, top+h, shiftX+w, top-h, shiftX-w, new Color(1,0.8f,0.5f));
 
 		// LCD green
 		shiftX += -2.6f/2;
 		float shiftY = -0.771f;
 		w = 98f/2;
 		h = 60f/2;
-		drawRectangle(gl, top+shiftY+h, shiftX+w, top+shiftY-h, shiftX-w, new Color(0,0.6f,0.0f));
+        DrawingHelper.drawRectangle(graphics, top+shiftY+h, shiftX+w, top+shiftY-h, shiftX-w, new Color(0,0.6f,0.0f));
 
 		// LCD black
 		h = 40f/2;
-		drawRectangle(gl, top+shiftY+h, shiftX+w, top+shiftY-h, shiftX-w, new Color(0,0,0));
+        DrawingHelper.drawRectangle(graphics, top+shiftY+h, shiftX+w, top+shiftY-h, shiftX-w, new Color(0,0,0));
 
 		// LCD blue
 		h = 25f/2;
 		w = 75f/2;
-		drawRectangle(gl, top+shiftY+h, shiftX+w, top+shiftY-h, shiftX-w, new Color(0,0,0.7f));
+        DrawingHelper.drawRectangle(graphics, top+shiftY+h, shiftX+w, top+shiftY-h, shiftX-w, new Color(0,0,0.7f));
 	}
 
-	private void paintPenHolderToCounterweights(ShaderProgram shader, GL3 gl, Plotter robot ) {
+	private void paintPenHolderToCounterweights(Graphics graphics, Plotter robot ) {
 		PlotterSettings settings = robot.getSettings();
 		Point2d pos = robot.getPos();
 		float gx = (float)pos.x;
@@ -151,46 +144,45 @@ public class MakelangeloCustom implements PlotterRenderer {
 		float right_a = (float)Math.sqrt(dx*dx+dy*dy);
 		float right_b = (suggestedLength - right_a)/2;
 
-		paintPlotter(gl,gx,gy);
+		paintPlotter(graphics,gx,gy);
 
 		// belts
-		Mesh belts = new Mesh();
-		belts.setRenderStyle(GL3.GL_LINES);
+        Graphics2D g2d = (Graphics2D) graphics;
+        g2d.setColor(new Color(255*0.2f,255*0.2f,255*0.2f));
+
 		// belt from motor to pen holder left
-		belts.addColor(0.2f,0.2f,0.2f,1.0f);  belts.addVertex(left, top,0);
-		belts.addColor(0.2f,0.2f,0.2f,1.0f);  belts.addVertex(gx,gy,0);
+        g2d.drawLine((int)left, (int)top, (int)gx, (int)gy);
 		// belt from motor to pen holder right
-		belts.addColor(0.2f,0.2f,0.2f,1.0f);  belts.addVertex(right, top,0);
-		belts.addColor(0.2f,0.2f,0.2f,1.0f);  belts.addVertex(gx,gy,0);
+        g2d.drawLine((int)right, (int)top, (int)gx, (int)gy);
 		// belt from motor to counterweight left
-		belts.addColor(0.2f,0.2f,0.2f,1.0f);  belts.addVertex(left-bottleCenter-PULLEY_RADIUS, top-MOTOR_WIDTH/2,0);
-		belts.addColor(0.2f,0.2f,0.2f,1.0f);  belts.addVertex(left-bottleCenter-PULLEY_RADIUS, top-left_b,0);
+        g2d.drawLine(
+                (int)(left - bottleCenter - PULLEY_RADIUS), (int)(top-MOTOR_WIDTH/2),
+                (int)(left - bottleCenter - PULLEY_RADIUS), (int)(top - left_b));
 		// belt from motor to counterweight right
-		belts.addColor(0.2f,0.2f,0.2f,1.0f);  belts.addVertex(right+bottleCenter+PULLEY_RADIUS, top-MOTOR_WIDTH/2,0);
-		belts.addColor(0.2f,0.2f,0.2f,1.0f);  belts.addVertex(right+bottleCenter+PULLEY_RADIUS, top-right_b,0);
-		belts.render(gl);
+        g2d.drawLine(
+                (int)(right + bottleCenter + PULLEY_RADIUS), (int)(top-MOTOR_WIDTH/2),
+                (int)(right + bottleCenter + PULLEY_RADIUS), (int)(top - right_b));
 		
 		// counterweight left
-		Mesh cwLeft = new Mesh();
-		cwLeft.setRenderStyle(GL3.GL_LINE_LOOP);
-		cwLeft.addColor(0, 0, 1,1);  cwLeft.addVertex(left-PULLEY_RADIUS-bottleCenter-COUNTERWEIGHT_W/2,top-left_b, 0);
-		cwLeft.addColor(0, 0, 1,1);  cwLeft.addVertex(left-PULLEY_RADIUS-bottleCenter+COUNTERWEIGHT_W/2,top-left_b, 0);
-		cwLeft.addColor(0, 0, 1,1);  cwLeft.addVertex(left-PULLEY_RADIUS-bottleCenter+COUNTERWEIGHT_W/2,top-left_b-COUNTERWEIGHT_H, 0);
-		cwLeft.addColor(0, 0, 1,1);  cwLeft.addVertex(left-PULLEY_RADIUS-bottleCenter-COUNTERWEIGHT_W/2,top-left_b-COUNTERWEIGHT_H, 0);
-		cwLeft.render(gl);
-		
+        g2d.setColor(Color.BLUE);
+        g2d.drawRect(
+                (int)(left - bottleCenter - PULLEY_RADIUS - COUNTERWEIGHT_W/2),
+                (int)(top - left_b-COUNTERWEIGHT_H),
+                (int)(COUNTERWEIGHT_W),
+                (int)(COUNTERWEIGHT_H));
+
 		// counterweight right
-		Mesh cwRight = new Mesh();
-		cwRight.setRenderStyle(GL3.GL_LINE_LOOP);
-		cwRight.addColor(0, 0, 1,1);  cwRight.addVertex(right+PULLEY_RADIUS+bottleCenter-COUNTERWEIGHT_W/2,top-right_b, 0);
-		cwRight.addColor(0, 0, 1,1);  cwRight.addVertex(right+PULLEY_RADIUS+bottleCenter+COUNTERWEIGHT_W/2,top-right_b, 0);
-		cwRight.addColor(0, 0, 1,1);  cwRight.addVertex(right+PULLEY_RADIUS+bottleCenter+COUNTERWEIGHT_W/2,top-right_b-COUNTERWEIGHT_H, 0);
-		cwRight.addColor(0, 0, 1,1);  cwRight.addVertex(right+PULLEY_RADIUS+bottleCenter-COUNTERWEIGHT_W/2,top-right_b-COUNTERWEIGHT_H, 0);
-		cwRight.render(gl);
+        g2d.setColor(Color.BLUE);
+        g2d.drawRect(
+                (int)(right+PULLEY_RADIUS+bottleCenter-COUNTERWEIGHT_W/2),
+                (int)(top-right_b-COUNTERWEIGHT_H),
+                (int)(COUNTERWEIGHT_W),
+                (int)(COUNTERWEIGHT_H)
+        );
 	}
 
-	private void paintPlotter(GL3 gl, float gx, float gy) {
+	private void paintPlotter(Graphics graphics, float gx, float gy) {
 		// plotter
-		drawCircle(gl, gx, gy, PEN_HOLDER_RADIUS_5, new Color(0f,0f,1f));
+        DrawingHelper.drawCircle(graphics, gx, gy, PEN_HOLDER_RADIUS_5, new Color(0f,0f,1f));
 	}
 }

@@ -25,7 +25,7 @@ public class BarberPoleTurtleRenderer implements TurtleRenderer {
 		this.gl2 = gl2;
 
 		// set pen diameter
-		gl2.setStroke(new BasicStroke(penDiameter));
+		gl2.setStroke(new BasicStroke(penDiameter, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 		moveCounter=0;
 	}
 

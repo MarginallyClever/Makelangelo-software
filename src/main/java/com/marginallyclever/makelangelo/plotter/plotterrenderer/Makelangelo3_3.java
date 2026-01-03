@@ -1,25 +1,25 @@
 package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 
-import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.preview.ShaderProgram;
+
+import java.awt.*;
 
 public class Makelangelo3_3 implements PlotterRenderer {
 
 	@Override
-	public void render(ShaderProgram shader, GL3 gl, Plotter robot) {
-		paintControlBox(shader,gl,robot);
-		Polargraph.paintMotors(shader,gl,robot);
+	public void render(Graphics graphics, Plotter robot) {
+		paintControlBox(graphics,robot);
+		Polargraph.paintMotors(graphics,robot);
 		if(robot.getDidFindHome()) 
-			Polargraph.paintPenHolderToCounterweights(shader,gl,robot);
+			Polargraph.paintPenHolderToCounterweights(graphics,robot);
 	}
 	
 	/**
 	 * paint the controller and the LCD panel
-	 * @param shader the render context
+	 * @param graphics the render context
 	 * @param robot the machine to draw.
 	 */
-	private void paintControlBox(ShaderProgram shader, GL3 gl,Plotter robot) {/*
+	private void paintControlBox(Graphics graphics,Plotter robot) {/*
 		double cy = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 		double right = robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
@@ -53,7 +53,7 @@ public class Makelangelo3_3 implements PlotterRenderer {
 		gl2.glPopMatrix();*/
 	}
 	
-	protected void renderLCD(GL3 gl2) {/*
+	protected void renderLCD(Graphics2D g2d) {/*
 		// position
 		gl2.glPushMatrix();
 		gl2.glTranslated(-180, 0, 0);

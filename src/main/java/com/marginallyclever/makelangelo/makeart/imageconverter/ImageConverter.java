@@ -1,22 +1,19 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import com.jogamp.opengl.GL3;
-import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.helpers.MathHelper;
-
-import com.marginallyclever.makelangelo.Mesh;
+import com.marginallyclever.donatello.select.Select;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.donatello.select.Select;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.vecmath.Point2d;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +29,7 @@ public abstract class ImageConverter {
 	protected Turtle turtle = new Turtle();
 
 	// for previewing the image
-	private Texture texture = null;
+	private BufferedImage texture = null;
 
 	private final List<Select> panelElements = new ArrayList<>();
 
@@ -66,29 +63,21 @@ public abstract class ImageConverter {
 	 * Live preview as the system is converting pictures.
 	 * draw the results as the calculation is being performed.
 	 */
-	protected void render(GL3 gl) {
+	public void render(Graphics graphics) {
 		if( texture==null && myImage!=null) {
-			texture = AWTTextureIO.newTexture(gl.getGLProfile(), myImage.getSourceImage(), false);
+			texture = myImage.getSourceImage();
 		}
 		if(texture!=null) {
 			double w = myImage.getSourceImage().getWidth() * myImage.getScaleX();
 			double h = myImage.getSourceImage().getHeight() * myImage.getScaleY();
-			gl.glEnable(GL3.GL_TEXTURE_2D);
-			gl.glEnable(GL3.GL_BLEND);
-			gl.glBlendFunc(GL3.GL_SRC_ALPHA, GL3.GL_ONE_MINUS_SRC_ALPHA);
-			gl.glDisable(GL3.GL_COLOR);
-			texture.bind(gl);
-			Mesh mesh = new Mesh();
-			mesh.setRenderStyle(GL3.GL_TRIANGLE_FAN);
-			mesh.addColor(1, 1, 1,0.5f);
-			mesh.addTexCoord(0, 0);	mesh.addVertex((float)-w/2, (float)-h/2,0);
-			mesh.addTexCoord(1, 0);	mesh.addVertex((float) w/2, (float)-h/2,0);
-			mesh.addTexCoord(1, 1);	mesh.addVertex((float) w/2, (float) h/2,0);
-			mesh.addTexCoord(0, 1);	mesh.addVertex((float)-w/2, (float) h/2,0);
-			mesh.render(gl);
-			gl.glDisable(GL3.GL_TEXTURE_2D);
-			gl.glDisable(GL3.GL_BLEND);
-			gl.glEnable(GL3.GL_COLOR);
+
+            Graphics2D g2d = (Graphics2D) graphics;
+            g2d.drawImage(texture,
+                (int)(-w/2),
+                (int)(-h/2),
+                (int)(w),
+                (int)(h),
+                null);
 		}	
 	}
 	
