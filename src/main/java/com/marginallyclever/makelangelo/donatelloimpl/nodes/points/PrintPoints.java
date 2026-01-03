@@ -46,7 +46,7 @@ public class PrintPoints extends Node implements PrintWithGraphics {
         Graphics2D g2 = (Graphics2D)g.create();
         GraphViewPanel.setHints(g2);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setStroke(new BasicStroke(radius.getValue(),BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));
+        g2.setStroke(new BasicStroke(radius.getValue()*2,BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));
         g2.setColor(color.getValue());
 
         lock.lock();

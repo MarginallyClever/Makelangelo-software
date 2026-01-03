@@ -173,10 +173,12 @@ public class RenderPanel extends JPanel implements MouseWheelListener, MouseList
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        setHints((Graphics2D) g);
+        var g2d =(Graphics2D) g;
+        setHints(g2d);
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+
         eraseEverything(g);
 
-        var g2d = (Graphics2D)g.create();
         try {
             applyCameraTransform(g2d);
             g2d.scale(1,-1);

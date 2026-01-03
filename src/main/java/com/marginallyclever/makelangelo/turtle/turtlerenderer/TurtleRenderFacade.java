@@ -29,7 +29,10 @@ public class TurtleRenderFacade implements RenderListener {
 	private double penDiameter = 0.8;
 	private boolean showTravel;
 	private int turtleHash = 0;
-    private BufferedImage backbuffer = null;
+    private BufferedImage mipmap0 = null;
+    private BufferedImage mipmap1 = null;
+    private BufferedImage mipmap2 = null;
+    private BufferedImage mipmap3 = null;
 
 	@Override
 	public void render(Graphics graphics) {
@@ -37,16 +40,39 @@ public class TurtleRenderFacade implements RenderListener {
 			turtleHash = myTurtle.hashCode();
 			render((Graphics2D) graphics);
 		}
-        if(backbuffer != null) {
-            graphics.drawImage(backbuffer,
-                    -backbuffer.getWidth()/20,
-                    -backbuffer.getHeight()/20,
-                    backbuffer.getWidth()/20,
-                    backbuffer.getHeight()/20,
+        if(mipmap0 != null) {
+            var g2d = (Graphics2D) graphics;
+
+            // find the scale from the transform.
+            var transform = g2d.getTransform();
+            var sx = transform.getScaleX();
+            var sy = transform.getScaleY();
+            var scale = Math.abs(Math.min(sx, sy));
+            // use the scale to determine which mipmap to use
+            // scale
+            // -5 is very close (mipmap0),
+            // -2 is close (mipmap1)
+            // -1 is medium (mipmap2)
+            // -0.5 is far (mipmap3)
+
+            BufferedImage mipmapToUse = mipmap0;
+                 if(scale < 0.35) mipmapToUse = mipmap3;
+            else if(scale < 0.5) mipmapToUse = mipmap2;
+            else if(scale < 1.0) mipmapToUse = mipmap1;
+
+            //System.out.println("Scale="+scale+" using mipmap size "+mipmapToUse.getWidth()+"x"+mipmapToUse.getHeight());
+
+            var bbw = mipmap0.getWidth()/20;
+            var bbh = mipmap0.getHeight()/20;
+            graphics.drawImage(mipmapToUse,
+                    -bbw,
+                    -bbh,
+                    bbw,
+                    bbh,
                     0,
                     0,
-                    backbuffer.getWidth(),
-                    backbuffer.getHeight(),
+                    mipmapToUse.getWidth(),
+                    mipmapToUse.getHeight(),
                     null);
         }
 	}
@@ -60,21 +86,59 @@ public class TurtleRenderFacade implements RenderListener {
 		myTurtle.lock();
 		try {
             var bounds = myTurtle.getBounds();
-            backbuffer = new BufferedImage(
-                    (int)Math.max(1,Math.ceil(bounds.width))*10,
-                    (int)Math.max(1,Math.ceil(bounds.height))*10,
+            mipmap0 = new BufferedImage(
+                    (int)Math.ceil(bounds.width)*10,
+                    (int)Math.ceil(bounds.height)*10,
                     BufferedImage.TYPE_INT_ARGB);
-            Graphics2D bg = backbuffer.createGraphics();
+            mipmap1 = new BufferedImage(
+                    mipmap0.getWidth()/2,
+                    mipmap0.getHeight()/2,
+                    BufferedImage.TYPE_INT_ARGB);
+            mipmap2 = new BufferedImage(
+                    mipmap1.getWidth()/2,
+                    mipmap1.getHeight()/2,
+                    BufferedImage.TYPE_INT_ARGB);
+            mipmap3 = new BufferedImage(
+                    mipmap2.getWidth()/2,
+                    mipmap2.getHeight()/2,
+                    BufferedImage.TYPE_INT_ARGB);
+            Graphics2D bg = mipmap0.createGraphics();
             bg.scale(10,10);
             bg.translate(-bounds.x, -bounds.y);
             renderLockedTurtle(bg);
+            renderMipMaps();
 		}
 		finally {
 			myTurtle.unlock();
 		}
 	}
 
-	private void renderLockedTurtle(Graphics2D g2d) {
+    private void renderMipMaps() {
+        Graphics2D g2d;
+
+        g2d = mipmap1.createGraphics();
+        setHints(g2d);
+        g2d.drawImage(mipmap0, 0, 0, mipmap1.getWidth(), mipmap1.getHeight(), null);
+        g2d.dispose();
+
+        g2d = mipmap2.createGraphics();
+        setHints(g2d);
+        g2d.drawImage(mipmap1, 0, 0, mipmap2.getWidth(), mipmap2.getHeight(), null);
+        g2d.dispose();
+
+        g2d = mipmap3.createGraphics();
+        setHints(g2d);
+        g2d.drawImage(mipmap2, 0, 0, mipmap3.getWidth(), mipmap3.getHeight(), null);
+        g2d.dispose();
+    }
+
+    private void setHints(Graphics2D g2d) {
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    }
+
+    private void renderLockedTurtle(Graphics2D g2d) {
 		// where we're at in the drawing (to check if we're between first & last)
 		int showCount = 0;
 		myRenderer.setPenUpColor(penUpColor);
