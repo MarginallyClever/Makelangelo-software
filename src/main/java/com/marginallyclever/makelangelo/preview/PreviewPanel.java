@@ -65,7 +65,6 @@ public class PreviewPanel extends JPanel {
 
         onPlotterSettingsUpdate(myPlotter.getSettings());
 
-
         camera.zoomToFit( Paper.DEFAULT_WIDTH, Paper.DEFAULT_HEIGHT);
     }
 
