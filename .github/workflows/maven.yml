@@ -82,7 +82,7 @@ jobs:
     strategy:
       matrix:
         include:
-        - runs_on: macos-13
+        - runs_on: macos-15-intel
           arch: x64
           java_arch: x64
           os_label: mac-intel
