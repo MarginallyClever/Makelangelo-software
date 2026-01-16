@@ -52,13 +52,9 @@ public class TurtleGeneratorFactory {
 	public static TurtleGeneratorLeaf available = new TurtleGeneratorLeaf(Translator.get("MenuGenerate"),new TurtleGeneratorLeaf[]{
 			new TurtleGeneratorLeaf(new Generator_Border()),
 			new TurtleGeneratorLeaf(Translator.get("MenuGenerate.Fractals"), new TurtleGeneratorLeaf[]{
-                    new TurtleGeneratorLeaf(new Generator_Dragon()),
                     new TurtleGeneratorLeaf(new Generator_FibonacciSpiral()),
-                    new TurtleGeneratorLeaf(new Generator_GosperCurve()),
-                    new TurtleGeneratorLeaf(new Generator_HilbertCurve()),
-                    new TurtleGeneratorLeaf(new Generator_KochCurve()),
+                    new TurtleGeneratorLeaf(new Generator_LSystem()),
                     new TurtleGeneratorLeaf(new Generator_LSystemTree()),
-					new TurtleGeneratorLeaf(new Generator_SierpinskiTriangle()),
             }),
 			new TurtleGeneratorLeaf(Translator.get("MenuGenerate.Grids"), new TurtleGeneratorLeaf[]{
 					new TurtleGeneratorLeaf(new Generator_GraphPaper()),

@@ -89,11 +89,12 @@ public class Converter_Pulse extends ImageConverter {
 
 		Point2d a = new Point2d();
 		Point2d b = new Point2d();
-		
-		turtle = new Turtle();
-		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 
-		var wave = new WaveByIntensity(img,blockScale/2,sampleRate,zigDensity);
+        var d = settings.getDouble(PlotterSettings.DIAMETER);
+		turtle = new Turtle();
+		turtle.setStroke(Color.BLACK,d);
+
+		var wave = new WaveByIntensity(img,(blockScale+d)/2,sampleRate,zigDensity);
 
 		Vector2d majorAxis = new Vector2d(
 				Math.cos(Math.toRadians(angle)),
@@ -102,6 +103,7 @@ public class Converter_Pulse extends ImageConverter {
 		Vector2d minorAxis = new Vector2d(majorAxis.y, -majorAxis.x); // perpendicular to major axis
 		double height = yTop-yBottom;
 		double width = xRight-xLeft;
+        // radius of circle that bounds the rectangle
 		double r = Math.sqrt(Math.pow(width/2,2) + Math.pow(height/2,2));
 
 		double i=-r;

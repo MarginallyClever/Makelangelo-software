@@ -37,9 +37,12 @@ public class TurtleRenderFacade implements RenderListener {
 	@Override
 	public void render(Graphics graphics) {
 		if(turtleHash != myTurtle.hashCode()) {
-			turtleHash = myTurtle.hashCode();
-			render((Graphics2D) graphics);
+			if(updateMipMaps()) {
+                // finished ok
+                turtleHash = myTurtle.hashCode();
+            }
 		}
+        // if mipmaps are available, use them
         if(mipmap0 != null) {
             var g2d = (Graphics2D) graphics;
 
@@ -81,11 +84,21 @@ public class TurtleRenderFacade implements RenderListener {
 		turtleHash = -1;  // force a re-render next time
 	}
 
-	public void render(@Nonnull Graphics2D g2d) {
-		if(myTurtle.isLocked()) return;
-		myTurtle.lock();
+	public boolean updateMipMaps() {
+        if(myTurtle.isLocked()) return false;
+
+        var bounds = myTurtle.getBounds();
+        if(bounds.width==0 || bounds.height==0) {
+            // nothing to draw
+            mipmap0 = null;
+            mipmap1 = null;
+            mipmap2 = null;
+            mipmap3 = null;
+            return false;
+        }
+
+        myTurtle.lock();
 		try {
-            var bounds = myTurtle.getBounds();
             mipmap0 = new BufferedImage(
                     (int)Math.ceil(bounds.width)*10,
                     (int)Math.ceil(bounds.height)*10,
@@ -107,6 +120,7 @@ public class TurtleRenderFacade implements RenderListener {
             bg.translate(-bounds.x, -bounds.y);
             renderLockedTurtle(bg);
             renderMipMaps();
+            return true;
 		}
 		finally {
 			myTurtle.unlock();
@@ -132,10 +146,16 @@ public class TurtleRenderFacade implements RenderListener {
         g2d.dispose();
     }
 
-    private void setHints(Graphics2D g2d) {
-        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    private void setHints(Graphics2D g2) {
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_DITHERING,RenderingHints.VALUE_DITHER_DISABLE);
+        g2.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+        g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,RenderingHints.VALUE_STROKE_NORMALIZE);
+        g2.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+        g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
     }
 
     private void renderLockedTurtle(Graphics2D g2d) {
