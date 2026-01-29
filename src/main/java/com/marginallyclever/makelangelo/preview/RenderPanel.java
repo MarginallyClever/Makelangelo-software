@@ -144,8 +144,7 @@ public class RenderPanel extends JPanel implements MouseWheelListener, MouseList
 		canvasWidth = width;
 		canvasHeight = height;
         if(camera!=null) {
-            camera.setWidth(canvasWidth);
-            camera.setHeight(canvasHeight);
+            camera.reshape(width,height);
         }
 	}
 

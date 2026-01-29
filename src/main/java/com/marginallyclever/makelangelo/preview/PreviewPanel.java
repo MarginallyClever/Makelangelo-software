@@ -58,16 +58,14 @@ public class PreviewPanel extends JPanel {
         myPlotter.setSettings(plotterSettingsManager.getLastSelectedProfile());
         myPaper.loadConfig();
 
-        rangeSlider.addChangeListener(e->{
+        rangeSlider.addChangeListener(e -> {
             myTurtleRenderer.setFirst(rangeSlider.getBottom());
             myTurtleRenderer.setLast(rangeSlider.getTop());
         });
 
         onPlotterSettingsUpdate(myPlotter.getSettings());
-
-        camera.zoomToFit( Paper.DEFAULT_WIDTH, Paper.DEFAULT_HEIGHT);
     }
-
+    
     private JToolBar createToolBar() {
         var bar = new JToolBar();
 

@@ -119,6 +119,7 @@ public class MainMenu extends JMenuBar {
         menu.add(new ZoomOutAction(Translator.get("MenuView.zoomOut"),camera));
         menu.add(new ZoomInAction(Translator.get("MenuView.zoomIn"),camera));
         menu.add(new ZoomToFitAction(Translator.get("MenuView.zoomFit"),camera,paper));
+        menu.add(new ZoomToFitMachineAction(Translator.get("MenuView.zoomFitMachine"),camera,frame.getPlotter()));
 
         JCheckBoxMenuItem checkboxShowPenUpMoves = new JCheckBoxMenuItem(new ActionShowPenUpMoves());
         GFXPreferences.addListener((e)->checkboxShowPenUpMoves.setSelected ((boolean)e.getNewValue()));

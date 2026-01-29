@@ -9,6 +9,7 @@ import ModernDocking.ext.ui.DockingUI;
 import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.donatello.Donatello;
 import com.marginallyclever.donatello.nodefactorypanel.NodeFactoryPanel;
+import com.marginallyclever.makelangelo.actions.ZoomToFitMachineAction;
 import com.marginallyclever.makelangelo.applicationsettings.MetricsPreferences;
 import com.marginallyclever.makelangelo.donatelloimpl.DockableEditNodePanel;
 import com.marginallyclever.makelangelo.donatelloimpl.DonatelloDropTarget;
@@ -276,13 +277,15 @@ public class MainFrame extends JFrame {
             Docking.undock(w);
         }
         var previewPanel = windows.get(0);
-        var donatelloPanel = windows.get(1);
-        var addPanel = windows.get(2);
+        //var donatelloPanel = windows.get(1);
+        //var addPanel = windows.get(2);
         var aboutPanel2 = windows.get(3);
         Docking.dock(previewPanel, this, DockingRegion.CENTER);
-        Docking.dock(donatelloPanel, previewPanel, DockingRegion.CENTER);
-        Docking.dock(addPanel, previewPanel, DockingRegion.EAST);
-        Docking.dock(aboutPanel2, addPanel, DockingRegion.NORTH);
+        //Docking.dock(donatelloPanel, previewPanel, DockingRegion.CENTER);
+        //Docking.dock(addPanel, previewPanel, DockingRegion.EAST);
+        //Docking.dock(aboutPanel2, addPanel, DockingRegion.NORTH);
+        Docking.dock(aboutPanel2, previewPanel, DockingRegion.EAST);
+
         logger.debug("done.");
     }
 

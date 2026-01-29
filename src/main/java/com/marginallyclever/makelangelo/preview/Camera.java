@@ -3,7 +3,6 @@ package com.marginallyclever.makelangelo.preview;
 
 import com.marginallyclever.util.PreferencesHelper;
 
-import javax.vecmath.Matrix4d;
 import javax.vecmath.Point2d;
 
 /**
@@ -23,10 +22,6 @@ public class Camera {
 
 	// window size (for aspect ratio?)
 	private double width, height;
-
-	private double fovY = 60;
-	private double nearZ = 1;
-	private double farZ = 1000;
 
 	public Camera() {}
 
@@ -78,11 +73,19 @@ public class Camera {
 		offsetY -= after.y - before.y;
 	}
 
-	// scale the picture of the robot to fake a zoom.
+	/**
+	 * Center and zoom such that w + h fit in the view.  zoom 1 is the furthest away, larger zooms are closer.
+	 * @param w width to fit
+	 * @param h height to fit
+	 */
 	public void zoomToFit(double w,double h) {
 		offsetX = 0;
 		offsetY = 0;
-		zoom = Math.max(w/h, h/w);
+		// use width and height of camera viewport to determine zoom level.
+		// compute the maximum zoom that still fits both dimensions
+		double scaleX = width / w;
+		double scaleY = height / h;
+		zoom = Math.min(scaleX, scaleY);
 
 		limitCameraZoom();
 	}
@@ -103,91 +106,12 @@ public class Camera {
 		return width;
 	}
 
-	public void setWidth(double width) {
+	public void reshape(double width,double height) {
 		this.width = width;
+		this.height = height;
 	}
 
 	public double getHeight() {
 		return height;
-	}
-
-	public void setHeight(double height) {
-		this.height = height;
-	}
-
-	/**
-	 * return the finite perspective matrix for the camera.
-	 * @param width width of the viewport
-	 * @param height height of the viewport
-	 * @return the perspective projection matrix
-	 */
-	public Matrix4d getProjectionMatrix(int width,int height) {
-		double aspect = (double)width / (double)height;
-		var far = getFarZ();
-		var	near = getNearZ();
-		var m = new Matrix4d();
-		double f = 1.0 / Math.tan(Math.toRadians(fovY) / 2.0);
-		m.m00 = f / aspect;
-		m.m11 = f;
-		m.m22 = -(far + near) / (far - near);
-		m.m32 = -1.0;
-		m.m23 = -(2.0 * far * near) / (far - near);
-		m.m33 = 0.0;
-		return m;
-	}
-
-	public Matrix4d getOrthographicMatrix(int width, int height) {
-		Matrix4d matrix = new Matrix4d();
-		double h = height / 2.0;
-		double w = width / 2.0;
-		double left = -w;
-		double right = w;
-		double bottom = -h;
-		double top = h;
-		double near = nearZ; // Near plane
-		double far = farZ; // Far plane
-		matrix.m00 = 2.0 / (right - left);
-		matrix.m11 = 2.0 / (top - bottom);
-		matrix.m22 = -2.0 / (far - near);
-		matrix.m33 = 1.0;
-		matrix.m30 = -(right + left) / (right - left);
-		matrix.m31 = -(top + bottom) / (top - bottom);
-		matrix.m32 = -(far + near) / (far - near);
-		return matrix;
-	}
-
-	public Matrix4d getViewMatrix() {
-		Matrix4d matrix = new Matrix4d();
-		matrix.setIdentity();
-		matrix.m00 = zoom;
-		matrix.m11 = zoom;
-		matrix.m03 = -offsetX * zoom;
-		matrix.m13 = offsetY * zoom;
-		matrix.m23 = -1;
-		return matrix;
-	}
-
-	public double getFovY() {
-		return fovY;
-	}
-
-	public void setFovY(double fovY) {
-		this.fovY = fovY;
-	}
-
-	public double getNearZ() {
-		return nearZ;
-	}
-
-	public void setNearZ(double nearZ) {
-		this.nearZ = nearZ;
-	}
-
-	public double getFarZ() {
-		return farZ;
-	}
-
-	public void setFarZ(double farZ) {
-		this.farZ = farZ;
 	}
 }

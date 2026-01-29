@@ -6,6 +6,9 @@ import com.marginallyclever.makelangelo.preview.Camera;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
+/**
+ * An action to zoom the camera to fit the entire paper area.
+ */
 public class ZoomToFitAction extends AbstractAction {
     private final Camera camera;
     private final Paper paper;
