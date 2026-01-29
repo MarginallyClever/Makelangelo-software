@@ -5,6 +5,7 @@ env:
   # in your browser and copy the full "upload_url" value including the {?name,label} part.
   UPLOAD_URL: https://uploads.github.com/repos/MarginallyClever/Makelangelo-software/releases/54908875/assets{?name,label}
   RELEASE_ID: 54908875 # same as above (id can just be taken out the upload_url, it's used to find old releases)
+  JAVA_VERSION: '22'    # add once here
 
 on:
   push:
@@ -19,7 +20,7 @@ jobs:
       - uses: actions/setup-java@v5.1.0
         with:
           distribution: 'temurin'
-          java-version: '22'
+          java-version: ${{ env.JAVA_VERSION }}
           cache: 'maven'
 
       - name: Build and Test with Maven
@@ -105,7 +106,8 @@ jobs:
       - uses: actions/setup-java@v5.1.0
         with:
           distribution: 'temurin'
-          java-version: '22'
+          cache: 'maven'
+          java-version: ${{ env.JAVA_VERSION }}
           architecture: ${{ matrix.java_arch }}
 
       - uses: actions/download-artifact@v6.0.0
@@ -119,9 +121,11 @@ jobs:
           APP_VERSION=$(ls -1 target/package/Makelangelo-*-with-dependencies.jar | sed "s/.*Makelangelo-\([^-]*\)-with-dependencies.jar/\1/")
           sed -i.bak "s/\(--app-version\).*/\1 $APP_VERSION/" src/main/package/jpackage.cfg
           APP_NAME="Makelangelo-${{ matrix.os_label }}"
+          
           jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-${{ matrix.runs_on }}.cfg" \
             --main-jar "Makelangelo-$APP_VERSION-with-dependencies.jar" \
             --name "$APP_NAME"
+          
           BINARY=$(find . -maxdepth 1 -iname 'makelangelo*' | grep -E '\.msi$|\.deb$|\.dmg$')
           EXT="${BINARY##*.}"
           DATE=$(date +%Y%m%d)
