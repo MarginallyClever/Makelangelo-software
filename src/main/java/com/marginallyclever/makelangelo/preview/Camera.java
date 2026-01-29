@@ -3,7 +3,9 @@ package com.marginallyclever.makelangelo.preview;
 
 import com.marginallyclever.util.PreferencesHelper;
 
+import javax.swing.event.EventListenerList;
 import javax.vecmath.Point2d;
+import java.beans.PropertyChangeListener;
 
 /**
  * All information about the position and zoom level of the virtual eye looking through the PreviewPanel at the robot/art
@@ -109,9 +111,23 @@ public class Camera {
 	public void reshape(double width,double height) {
 		this.width = width;
 		this.height = height;
+		fireReshapeEvent();
 	}
 
 	public double getHeight() {
 		return height;
+	}
+
+	private EventListenerList list = new EventListenerList();
+
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+		list.add(PropertyChangeListener.class,listener);
+	}
+
+	private void fireReshapeEvent() {
+		var listeners = list.getListeners(PropertyChangeListener.class);
+		for(var listener : listeners) {
+			listener.propertyChange(null);
+		}
 	}
 }
