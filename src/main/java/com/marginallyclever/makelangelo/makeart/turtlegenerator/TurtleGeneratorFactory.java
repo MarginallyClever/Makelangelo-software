@@ -78,6 +78,7 @@ public class TurtleGeneratorFactory {
 			new TurtleGeneratorLeaf(new Generator_Lissajous()),
 			new TurtleGeneratorLeaf(new Generator_Package()),
 			new TurtleGeneratorLeaf(new Generator_Polyeder()),
+			new TurtleGeneratorLeaf(new Generator_RegistrationMarks()),
 			new TurtleGeneratorLeaf(new Generator_Spirograph()),
 			new TurtleGeneratorLeaf(new Generator_Text()),
 	});
