@@ -21,8 +21,6 @@ import static com.marginallyclever.donatello.graphview.GraphViewPanel.setHints;
 public class RenderPanel extends JPanel implements MouseWheelListener, MouseListener, MouseMotionListener {
 	private static final Logger logger = LoggerFactory.getLogger(RenderPanel.class);
 
-	private int canvasWidth, canvasHeight;
-
 	private final List<RenderListener> renderListeners = new ArrayList<>();
 	
 	private Camera camera;
@@ -141,11 +139,8 @@ public class RenderPanel extends JPanel implements MouseWheelListener, MouseList
 	 * Set up the correct projection so the image appears in the right location and aspect ratio.
 	 */
 	private void reshape(int width, int height) {
-		canvasWidth = width;
-		canvasHeight = height;
         if(camera!=null) {
-            camera.setWidth(canvasWidth);
-            camera.setHeight(canvasHeight);
+            camera.reshape(width,height);
         }
 	}
 

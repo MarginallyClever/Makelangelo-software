@@ -14,7 +14,7 @@ public class Generator_Border extends TurtleGenerator {
 	
 	@Override
 	public String getName() {
-		return Translator.get("BorderName");
+		return Translator.get("Generator_Border.Name");
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.preview;
 import com.marginallyclever.makelangelo.ActionShowPenUpMoves;
 import com.marginallyclever.makelangelo.MakeleangeloRangeSlider;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.actions.ZoomToFitMachineAction;
 import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.paper.Paper;
@@ -39,9 +40,17 @@ public class PreviewPanel extends JPanel {
     private PlotterRenderer myPlotterRenderer;
     private final PlotterSettingsManager plotterSettingsManager = new PlotterSettingsManager();
 
+    private boolean first = true;
     public PreviewPanel() {
         super(new BorderLayout());
         setOpaque(true);
+
+        camera.addPropertyChangeListener((e)->{
+            if(!first) return;
+            // zoom to fit
+            new ZoomToFitMachineAction("", getCamera(), getPlotter()).actionPerformed(null);
+            first=false;
+        });
 
         renderPanel.setCamera(camera);
         renderPanel.addRenderListener(myPaper);
@@ -58,15 +67,12 @@ public class PreviewPanel extends JPanel {
         myPlotter.setSettings(plotterSettingsManager.getLastSelectedProfile());
         myPaper.loadConfig();
 
-        rangeSlider.addChangeListener(e->{
+        rangeSlider.addChangeListener(e -> {
             myTurtleRenderer.setFirst(rangeSlider.getBottom());
             myTurtleRenderer.setLast(rangeSlider.getTop());
         });
 
         onPlotterSettingsUpdate(myPlotter.getSettings());
-
-
-        camera.zoomToFit( Paper.DEFAULT_WIDTH, Paper.DEFAULT_HEIGHT);
     }
 
     private JToolBar createToolBar() {
