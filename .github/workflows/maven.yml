@@ -16,8 +16,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6.0.1
-      - uses: actions/setup-java@v5.1.0
+      - uses: actions/checkout@v6.0.2
+      - uses: actions/setup-java@v5.2.0
         with:
           distribution: 'temurin'
           java-version: ${{ env.JAVA_VERSION }}
@@ -41,7 +41,7 @@ jobs:
           cp README.md target/package/
 
       - name: Upload common files
-        uses: actions/upload-artifact@v6.0.0
+        uses: actions/upload-artifact@v7.0.0
         with:
           name: shared
           path: |
@@ -102,15 +102,15 @@ jobs:
     runs-on: ${{ matrix.runs_on }}
 
     steps:
-      - uses: actions/checkout@v6.0.1
-      - uses: actions/setup-java@v5.1.0
+      - uses: actions/checkout@v6.0.2
+      - uses: actions/setup-java@v5.2.0
         with:
           distribution: 'temurin'
           cache: 'maven'
           java-version: ${{ env.JAVA_VERSION }}
           architecture: ${{ matrix.java_arch }}
 
-      - uses: actions/download-artifact@v7.0.0
+      - uses: actions/download-artifact@v8.0.1
         with:
           name: shared
 
