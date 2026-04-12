@@ -14,6 +14,9 @@ import java.util.List;
 public class ReorderHelper {
     private static final Logger logger = LoggerFactory.getLogger(ReorderHelper.class);
 
+    private static final double EPSILON = 1e-6;
+    private static final double EPSILON_SQ = EPSILON * EPSILON;
+
     /**
      * Split the turtle into multiple turtles, one for each color, then reorder each turtle.
      * @param turtle the {@link Turtle} to split and reorder
@@ -33,9 +36,8 @@ public class ReorderHelper {
     }
 
     /**
-     * Reorder drawing moves to minimize travel moves.
-     * look at all pen down moves.
-     * if two pen down moves share a start/end, then they are connected in sequence.
+     * <p>Reorder drawing moves to minimize travel moves.</p>
+     * <p>Look at all pen down moves. If two pen down moves share a start/end then they are connected in sequence.</p>
      * @param turtle the {@link Turtle} to reorder
      * @return a new {@link Turtle} with the same colors but reordered.
      */
@@ -60,9 +62,6 @@ public class ReorderHelper {
      * @return a new {@link LineCollection} with the same lines but reordered.
      */
     private LineCollection sortFirstPass(List<LineCollection> firstPass) {
-        final double epsilon = 1e-6;
-        final double epsilon2 = epsilon*epsilon;
-
         if(firstPass.isEmpty()) return new LineCollection();
 
         for(int i=0;i<firstPass.size();++i) {
@@ -78,18 +77,18 @@ public class ReorderHelper {
                 var bStart = b.getStart();
                 var bEnd = b.getEnd();
 
-                if(aEnd.distanceSquared(bStart)<epsilon2) {
+                if(aEnd.distanceSquared(bStart)< EPSILON_SQ) {
                     a.addAll(b);
                     b.clear();
-                } else if(aEnd.distanceSquared(bEnd)<epsilon2) {
+                } else if(aEnd.distanceSquared(bEnd)< EPSILON_SQ) {
                     b.flip();
                     a.addAll(b);
                     b.clear();
-                } else if(aStart.distanceSquared(bStart)<epsilon2) {
+                } else if(aStart.distanceSquared(bStart)< EPSILON_SQ) {
                     a.flip();
                     a.addAll(b);
                     b.clear();
-                } else if(aStart.distanceSquared(bEnd)<epsilon2) {
+                } else if(aStart.distanceSquared(bEnd)< EPSILON_SQ) {
                     a.flip();
                     b.flip();
                     a.addAll(b);
@@ -148,7 +147,7 @@ public class ReorderHelper {
 
     /**
      * From the pool of uniqueLines, take one and make it the head.
-     * looking for the nearest available segment that begins where the head ends.
+     * Looking for the nearest available segment that begins where the head ends.
      * The segment found is removed from the available pool and becomes the new head.  Repeat until the avilable pool is empty.
      * @param uniqueLines the unsorted list.
      * @return the sorted list.
@@ -158,7 +157,7 @@ public class ReorderHelper {
         List<LineCollection> firstPass = new ArrayList<>();
         if(uniqueLines.isEmpty()) return firstPass;
 
-        LineCollection orderedLines = new LineCollection();
+        LineCollection orderedLine = new LineCollection();
 
         Point2d lastPosition = uniqueLines.getFirst().start;
 
@@ -181,22 +180,25 @@ public class ReorderHelper {
             }
             assert bestLine != null;
 
-            if(bestFlip) bestLine.flip();
-
-            if(bestD>1e-6) {
-                firstPass.add(orderedLines);
-                orderedLines = new LineCollection();
+            if(bestD>EPSILON) {
+                // bestLine is too far away.  start a new orderedLine.
+                firstPass.add(orderedLine);
+                orderedLine = new LineCollection();
+            } else if(bestFlip) {
+                // only need to flip if extending an ordered line.
+                bestLine.flip();
             }
 
             uniqueLines.remove(bestLine);
-            orderedLines.add(bestLine);
+            orderedLine.add(bestLine);
 
             // Start next iteration where current line ends.
             lastPosition = bestLine.end;
         }
 
-        if(!orderedLines.isEmpty()) {
-            firstPass.add(orderedLines);
+        if(!orderedLine.isEmpty()) {
+            // we were working on a line when the job ended.  don't lose it.
+            firstPass.add(orderedLine);
         }
 
         return firstPass;
@@ -254,7 +256,7 @@ public class ReorderHelper {
         return uniqueLines;
     }
 
-    // assumes extPoint is a point which lies on the infinite extension of targetLine
+    // assumes extPoint is a point that lies on the infinite extension of targetLine
     private void extendLine(LineSegment2D targetLine, Point2d extPoint) {
         double newLengthA = targetLine.start.distanceSquared(extPoint);
         double newLengthB = targetLine.end.distanceSquared(extPoint);
