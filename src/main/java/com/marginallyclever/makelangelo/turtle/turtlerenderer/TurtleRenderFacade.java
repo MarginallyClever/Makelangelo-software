@@ -164,6 +164,7 @@ public class TurtleRenderFacade implements RenderListener {
 		myRenderer.setPenUpColor(penUpColor);
 		myRenderer.setPenDownColor(penDownColor);
 		myRenderer.setShowTravel(showTravel);
+		setHints(g2d);
 		myRenderer.start(g2d);
 		try {
 			Point2d prev = new Point2d(0, 0);

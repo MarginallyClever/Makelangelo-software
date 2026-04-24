@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 7.78.5
+
+### Added
+- Drag + drop a file now adds that file to the "Recent Files" list.
+
+### Fixed
+- Infill of closed loops should now be properly filled.  Was occasionally failing the in/out test and creating a mess.
+- MickeyMoe1992 now properly obeys the margin limits, same as the other converters.
+- Render hints are now forced to enable antialiasing, etc.
+
+## 7.78.3
+
+### Added
+- Added Generator "Registration Marks"
+- Added "Zoom to fit machine"
+
+### Removed 
+- Hid the Donatello panel at startup for a less confusing new user experience.
+
 ## 7.78.0
 
 ### Added
