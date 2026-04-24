@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## 7.78.4
+### Fixed
+- First travel move was appearing in white instead of the travel color.
+
+## 7.78.5
+
+### Added
+- Drag + drop a file now adds that file to the "Recent Files" list.
 
 ### Fixed
 - MickeyMoe1992 now properly obeys the margin limits, same as the other converters.
