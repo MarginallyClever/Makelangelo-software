@@ -3,6 +3,8 @@ package com.marginallyclever.makelangelo.makeart.turtletool;
 import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.linecollection.LineCollection;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.vecmath.Point2d;
 import javax.vecmath.Vector2d;
@@ -17,6 +19,8 @@ import java.util.List;
  * @since 7.31.0
  */
 public class InfillTurtle {
+	private static final Logger logger = LoggerFactory.getLogger(InfillTurtle.class);
+
 	public static final double MINIMUM_PEN_DIAMETER = 0.1;
 
 	private double penDiameter = 0.8;
@@ -162,7 +166,7 @@ public class InfillTurtle {
 			}
 		} else {
 			// odd number of intersections — something unexpected; log for debugging
-			System.out.println("infill: odd intersection count=" + size);
+			logger.error("infill: odd intersection count=" + size);
 		}
 
 		return results;
