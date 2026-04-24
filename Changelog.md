@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
 ### Fixed
 - First travel move was appearing in white instead of the travel color.
 
@@ -16,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Drag + drop a file now adds that file to the "Recent Files" list.
 
 ### Fixed
+
+- Infill of closed loops should now be properly filled.  Was occasionally failing the in/out test and creating a mess.
 - MickeyMoe1992 now properly obeys the margin limits, same as the other converters.
 - Render hints are now forced to enable antialiasing, etc.
 

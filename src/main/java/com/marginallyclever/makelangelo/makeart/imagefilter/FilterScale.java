@@ -31,9 +31,9 @@ public class FilterScale extends ImageFilter {
         for (int y = 0; y < h; ++y) {
             for (int x = 0; x < w; ++x) {
                 ColorRGB diff = new ColorRGB(aa.getRGB(x, y));
-                diff.red   = (int)Math.max(0,Math.min(255,diff.red * scale));
-                diff.green = (int)Math.max(0,Math.min(255,diff.green * scale));
-                diff.blue  = (int)Math.max(0,Math.min(255,diff.blue * scale));
+                diff.red   = (int) Math.clamp(diff.red * scale, 0, 255);
+                diff.green = (int) Math.clamp(diff.green * scale, 0, 255);
+                diff.blue  = (int) Math.clamp(diff.blue * scale, 0, 255);
                 rr.setRGB(x, y, diff.toInt());
             }
         }

@@ -195,11 +195,7 @@ public class LoadSVG implements TurtleLoader {
 		}
 
 		myTurtle.add(t);
-		if(isFilled(element)) {
-			var filler = new InfillTurtle();
-			filler.setPenDiameter(myTurtle.getDiameter());
-			myTurtle.add(filler.run(t));
-		}
+		if(isFilled(element)) fillTurtle(t);
 	}
 
 	/**
@@ -402,11 +398,13 @@ public class LoadSVG implements TurtleLoader {
 		arcTurtle(t, x1,y2, rx,ry, Math.PI * -1.5,Math.PI * -1.0,m);
 		arcTurtle(t, x1,y1, rx,ry, Math.PI * -1.0,Math.PI * -0.5,m);
 		myTurtle.add(t);
-		if(isFilled(element)) {
-			var filler = new InfillTurtle();
-			filler.setPenDiameter(myTurtle.getDiameter());
-			myTurtle.add(filler.run(t));
-		}
+		if(isFilled(element)) fillTurtle(t);
+	}
+
+	private void fillTurtle(Turtle t) {
+		var filler = new InfillTurtle();
+		filler.setPenDiameter(myTurtle.getDiameter());
+		myTurtle.add(filler.run(t));
 	}
 
 	/**
@@ -457,11 +455,7 @@ public class LoadSVG implements TurtleLoader {
 		//logger.debug("circ={}", circ);
 		printEllipse(t, m, cx, cy, r, r, circ);
 		myTurtle.add(t);
-		if(isFilled(element)) {
-			var filler = new InfillTurtle();
-			filler.setPenDiameter(myTurtle.getDiameter());
-			myTurtle.add(filler.run(t));
-		}
+		if(isFilled(element)) fillTurtle(t);
 	}
 
 	private void parseEllipseElement(Element element) {
@@ -482,11 +476,7 @@ public class LoadSVG implements TurtleLoader {
 		steps = Math.min(60,steps);
 		printEllipse(t, m, cx, cy, rx, ry, steps);
 		myTurtle.add(t);
-		if(isFilled(element)) {
-			var filler = new InfillTurtle();
-			filler.setPenDiameter(myTurtle.getDiameter());
-			myTurtle.add(filler.run(t));
-		}
+		if(isFilled(element)) fillTurtle(t);
 	}
 
 	private void printEllipse(Turtle t, Matrix3d m, double cx, double cy, double rx, double ry, double steps) {
@@ -533,11 +523,7 @@ public class LoadSVG implements TurtleLoader {
 			}
 		}
 		myTurtle.add(t);
-		if(isFilled(element)) {
-			var filler = new InfillTurtle();
-			filler.setPenDiameter(myTurtle.getDiameter());
-			myTurtle.add(filler.run(t));
-		}
+		if(isFilled(element)) fillTurtle(t);
 	}
 
 	private void doCubicCurveAbs(SVGPathSeg item, Matrix3d m,Turtle t) {
