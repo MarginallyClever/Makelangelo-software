@@ -14,6 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * <p>Convert a {@link Turtle} to a list of {@link Polyline}s.</p>
  */
+@Deprecated(forRemoval = true,since="7.78.4")
 public class TurtleToPolyline {
     private static final Logger logger = LoggerFactory.getLogger(TurtleToPolyline.class);
 
