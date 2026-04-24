@@ -9,7 +9,6 @@ import ModernDocking.ext.ui.DockingUI;
 import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.donatello.Donatello;
 import com.marginallyclever.donatello.nodefactorypanel.NodeFactoryPanel;
-import com.marginallyclever.makelangelo.actions.ZoomToFitMachineAction;
 import com.marginallyclever.makelangelo.applicationsettings.MetricsPreferences;
 import com.marginallyclever.makelangelo.donatelloimpl.DockableEditNodePanel;
 import com.marginallyclever.makelangelo.donatelloimpl.DonatelloDropTarget;
@@ -366,5 +365,9 @@ public class MainFrame extends JFrame {
 
     public void onPlotterSettingsUpdate(PlotterSettings lastSelectedProfile) {
         previewPanel.onPlotterSettingsUpdate(lastSelectedProfile);
+    }
+
+    public RecentFiles getRecentFiles() {
+        return mainMenuBar.getRecentFiles();
     }
 }

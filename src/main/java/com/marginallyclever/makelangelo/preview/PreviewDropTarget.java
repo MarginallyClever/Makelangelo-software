@@ -38,7 +38,7 @@ public class PreviewDropTarget extends DropTargetAdapter {
                     if (o instanceof List<?> list && !list.isEmpty()) {
                         o = list.getFirst();
                         if (o instanceof File file) {
-                            (new LoadFileAction(null,frame,null)).openFile(file.getAbsolutePath());
+                            (new LoadFileAction(null,frame,frame.getRecentFiles())).openFile(file.getAbsolutePath());
                             dtde.dropComplete(true);
                             return;
                         }
