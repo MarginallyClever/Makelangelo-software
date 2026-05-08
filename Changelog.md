@@ -7,9 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 7.78.6
+
+### Added
+- Added an EditorContext to better track drawing updates to refresh the view
+- Real time updates when using the Rotate, Scale, and Translate tools.
 
 ### Fixed
 - First travel move was appearing in white instead of the travel color.
+- Render of the drawing was fixed to the world center, not the Turtle center.
 
 ## 7.78.5
 
