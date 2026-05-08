@@ -17,8 +17,8 @@ public class TranslateTurtlePanel extends JPanel {
 
 	private final Turtle turtleToChange;
 	private final Turtle turtleOriginal;
-	private final JSpinner dx;
-	private final JSpinner dy;
+	private final JSpinner xSpinner;
+	private final JSpinner ySpinner;
 	private final Rectangle2D.Double myOriginalBounds;
 
 	public TranslateTurtlePanel(Turtle t) {
@@ -27,9 +27,13 @@ public class TranslateTurtlePanel extends JPanel {
 		turtleOriginal = new Turtle(t);  // make a deep copy of the original.  Doubles memory usage!
 
 		myOriginalBounds = turtleToChange.getBounds();
-		dx = new JSpinner(new SpinnerNumberModel(myOriginalBounds.getCenterX(),null,null,1));
-		dy = new JSpinner(new SpinnerNumberModel(myOriginalBounds.getCenterY(),null,null,1));
-		
+		var cx = myOriginalBounds.getCenterX();
+		var cy = myOriginalBounds.getCenterY();
+		xSpinner = new JSpinner(new SpinnerNumberModel(cx,null,null,1));
+		ySpinner = new JSpinner(new SpinnerNumberModel(cy,null,null,1));
+
+		System.out.println("move LOAD "+cx+","+cy);
+
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets=new Insets(10,10,3,10);
@@ -49,22 +53,31 @@ public class TranslateTurtlePanel extends JPanel {
 		c.gridy=0;
 		c.anchor=GridBagConstants.NORTHWEST;
 		c.fill=GridBagConstants.HORIZONTAL;
-		add(dx,c);
+		add(xSpinner,c);
 
 		c.gridx=1;
 		c.gridy=1;
 		c.anchor=GridBagConstants.NORTHWEST;
 		c.fill=GridBagConstants.HORIZONTAL;
-		add(dy,c);
+		add(ySpinner,c);
 		
-		dx.addChangeListener(this::onChange);
-		dy.addChangeListener(this::onChange);
+		xSpinner.addChangeListener(this::onChange);
+		ySpinner.addChangeListener(this::onChange);
+
+		System.out.println("move LOAD2 "+myOriginalBounds.x+","+myOriginalBounds.y);
 	}
 
 	private void onChange(ChangeEvent e) {
-		double dx2 = (Double) dx.getValue() - myOriginalBounds.x;
-		double dy2 = (Double) dy.getValue() - myOriginalBounds.y;
+		double nx = (Double) xSpinner.getValue();
+		double ny = (Double) ySpinner.getValue();
+		var cx = myOriginalBounds.getCenterX();
+		var cy = myOriginalBounds.getCenterY();
+		double dx2 = nx - cx;
+		double dy2 = ny - cy;
 
+		System.out.println("move ABS "+nx+","+ny
+						+" FROM "+cx+","+cy
+						+" REL "+dx2+","+dy2);
 		logger.debug("move {}x{}", dx2, dy2);
 		revertOriginalTurtle();
 		turtleToChange.translate(dx2, dy2);
@@ -79,7 +92,6 @@ public class TranslateTurtlePanel extends JPanel {
 		TranslateTurtlePanel panel = new TranslateTurtlePanel(t);
 
 		JDialog dialog = new JDialog(parent,Translator.get("Translate"));
-
 		JButton okButton = new JButton(Translator.get("OK"));
 		JButton cancelButton = new JButton(Translator.get("Cancel"));
 
