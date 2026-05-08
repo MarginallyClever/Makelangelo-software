@@ -33,10 +33,7 @@ public class ResizeTurtleToPaperAction extends TurtleTool {
 		double py = myPaper.getCenterY();
 		double ratioH = ph/ih;
 		double ratioW = pw/iw;
-		double ratio = 1;
-		if(fillPage == false) ratio=Math.min(ratioW, ratioH);
-		else 				  ratio=Math.max(ratioW, ratioH);
-		
+		double ratio = (!fillPage) ? Math.min(ratioW, ratioH) : Math.max(ratioW, ratioH);
 		double ix = turtleBounds.getCenterX();
 		double iy = turtleBounds.getCenterY();
 		

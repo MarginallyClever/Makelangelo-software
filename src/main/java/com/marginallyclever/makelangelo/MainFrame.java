@@ -264,7 +264,6 @@ public class MainFrame extends JFrame {
         return myTurtle;
     }
 
-
     /**
      * Reset the default layout.  These depend on the order of creation in createDefaultLayout().
      */
