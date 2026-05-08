@@ -12,6 +12,7 @@ import com.marginallyclever.donatello.nodefactorypanel.NodeFactoryPanel;
 import com.marginallyclever.makelangelo.applicationsettings.MetricsPreferences;
 import com.marginallyclever.makelangelo.donatelloimpl.DockableEditNodePanel;
 import com.marginallyclever.makelangelo.donatelloimpl.DonatelloDropTarget;
+import com.marginallyclever.makelangelo.editorcontext.EditorContext;
 import com.marginallyclever.makelangelo.makeart.io.SaveGCode;
 import com.marginallyclever.makelangelo.makeart.io.TurtleFactory;
 import com.marginallyclever.makelangelo.paper.Paper;
@@ -57,7 +58,7 @@ public class MainFrame extends JFrame {
     private final NodeFactoryPanel nodeFactoryPanel = new NodeFactoryPanel();
     private final DockableEditNodePanel editNodePanel = new DockableEditNodePanel();
 
-    private Turtle myTurtle = new Turtle();
+    private final EditorContext editorContext = new EditorContext();
 
     private final MainMenu mainMenuBar;
 
@@ -67,6 +68,7 @@ public class MainFrame extends JFrame {
         setLocationByPlatform(true);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
+        editorContext.addChangeListener(previewPanel);
         createAppWindow();
         initDocking();
         createDefaultLayout();
@@ -256,12 +258,11 @@ public class MainFrame extends JFrame {
     }
 
     public void setTurtle(Turtle turtle) {
-        myTurtle = turtle;
-        previewPanel.setTurtle(turtle);
+        editorContext.setTurtle(turtle);
     }
 
     public Turtle getTurtle() {
-        return myTurtle;
+        return editorContext.getTurtle();
     }
 
     /**
@@ -331,7 +332,7 @@ public class MainFrame extends JFrame {
             int head = previewPanel.getRangeBottom();
             int tail = previewPanel.getRangeTop();
             SaveGCode save = new SaveGCode();
-            save.run(getTurtle(), previewPanel.getPlotter(), this, head, tail);
+            save.run(editorContext.getTurtle(), previewPanel.getPlotter(), this, head, tail);
         } catch(Exception e) {
             logger.error("Error while exporting the gcode", e);
             JOptionPane.showMessageDialog(this, Translator.get("SaveError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
@@ -368,5 +369,9 @@ public class MainFrame extends JFrame {
 
     public RecentFiles getRecentFiles() {
         return mainMenuBar.getRecentFiles();
+    }
+
+    public EditorContext getEditorContext() {
+        return editorContext;
     }
 }

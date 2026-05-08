@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.turtletool;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.editorcontext.EditorContext;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
 import org.apache.batik.ext.swing.GridBagConstants;
@@ -15,24 +16,22 @@ import java.awt.geom.Rectangle2D;
 public class TranslateTurtlePanel extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(TranslateTurtlePanel.class);
 
-	private final Turtle turtleToChange;
+	private final EditorContext context;
 	private final Turtle turtleOriginal;
 	private final JSpinner xSpinner;
 	private final JSpinner ySpinner;
 	private final Rectangle2D.Double myOriginalBounds;
 
-	public TranslateTurtlePanel(Turtle t) {
+	public TranslateTurtlePanel(EditorContext context) {
 		super();
-		turtleToChange = t;
-		turtleOriginal = new Turtle(t);  // make a deep copy of the original.  Doubles memory usage!
+		this.context = context;
+		turtleOriginal = new Turtle(context.getTurtle());  // make a deep copy of the original.  Doubles memory usage!
 
-		myOriginalBounds = turtleToChange.getBounds();
+		myOriginalBounds = turtleOriginal.getBounds();
 		var cx = myOriginalBounds.getCenterX();
 		var cy = myOriginalBounds.getCenterY();
 		xSpinner = new JSpinner(new SpinnerNumberModel(cx,null,null,1));
 		ySpinner = new JSpinner(new SpinnerNumberModel(cy,null,null,1));
-
-		System.out.println("move LOAD "+cx+","+cy);
 
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -63,8 +62,6 @@ public class TranslateTurtlePanel extends JPanel {
 		
 		xSpinner.addChangeListener(this::onChange);
 		ySpinner.addChangeListener(this::onChange);
-
-		System.out.println("move LOAD2 "+myOriginalBounds.x+","+myOriginalBounds.y);
 	}
 
 	private void onChange(ChangeEvent e) {
@@ -75,21 +72,19 @@ public class TranslateTurtlePanel extends JPanel {
 		double dx2 = nx - cx;
 		double dy2 = ny - cy;
 
-		System.out.println("move ABS "+nx+","+ny
-						+" FROM "+cx+","+cy
-						+" REL "+dx2+","+dy2);
 		logger.debug("move {}x{}", dx2, dy2);
-		revertOriginalTurtle();
-		turtleToChange.translate(dx2, dy2);
+		Turtle temp = new Turtle(turtleOriginal);
+		temp.translate(dx2, dy2);
+		context.setTurtle(temp);
 	}
 
 	private void revertOriginalTurtle() {
 		// reset original turtle to original scale.
-		turtleToChange.set(turtleOriginal);
+		context.setTurtle(turtleOriginal);
 	}
 
-	public static void runAsDialog(Window parent,Turtle t) {
-		TranslateTurtlePanel panel = new TranslateTurtlePanel(t);
+	public static void runAsDialog(Window parent,EditorContext context) {
+		TranslateTurtlePanel panel = new TranslateTurtlePanel(context);
 
 		JDialog dialog = new JDialog(parent,Translator.get("Translate"));
 		JButton okButton = new JButton(Translator.get("OK"));
@@ -136,6 +131,6 @@ public class TranslateTurtlePanel extends JPanel {
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.pack();
 		frame.setLocationRelativeTo(null);
-		runAsDialog(frame,new Turtle());
+		runAsDialog(frame,new EditorContext());
 	}
 }

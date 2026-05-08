@@ -5,6 +5,7 @@ import com.marginallyclever.makelangelo.MakeleangeloRangeSlider;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.actions.ZoomToFitMachineAction;
 import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
+import com.marginallyclever.makelangelo.editorcontext.EditorContextListener;
 import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
@@ -27,7 +28,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Objects;
 
-public class PreviewPanel extends JPanel {
+public class PreviewPanel extends JPanel implements EditorContextListener {
     private static final Logger logger = LoggerFactory.getLogger(PreviewPanel.class);
 
     private final Plotter myPlotter = new Plotter();
@@ -41,6 +42,7 @@ public class PreviewPanel extends JPanel {
     private final PlotterSettingsManager plotterSettingsManager = new PlotterSettingsManager();
 
     private boolean first = true;
+
     public PreviewPanel() {
         super(new BorderLayout());
         setOpaque(true);
@@ -187,9 +189,11 @@ public class PreviewPanel extends JPanel {
         return plotterSettingsManager;
     }
 
-    public void setTurtle(Turtle turtle) {
-        myTurtleRenderer.setTurtle(turtle);
-        rangeSlider.setLimits(0,turtle.countPoints());
+    @Override
+    public void turtleChanged(Turtle subject) {
+        myTurtleRenderer.setTurtle(subject);
+        rangeSlider.setLimits(0,subject.countPoints());
+        if(renderPanel != null) renderPanel.repaint();
     }
 
     public int getRangeBottom() {
