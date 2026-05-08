@@ -50,6 +50,7 @@ module com.marginallyclever.makelangelo {
     exports com.marginallyclever.makelangelo.plotter.plottercontrols;
     exports com.marginallyclever.makelangelo.turtle;
     exports com.marginallyclever.makelangelo.turtle.turtlerenderer;
+    exports com.marginallyclever.makelangelo;
 
     opens com.marginallyclever.convenience;
     opens com.marginallyclever.makelangelo.turtle;
