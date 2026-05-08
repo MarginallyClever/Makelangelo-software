@@ -54,10 +54,6 @@ public class InfillTurtle {
 	}
 
 	private LineCollection infillFromTurtle(Turtle input) {
-		// make sure line segments don't start on another line, leading to an odd number
-		// of intersections.
-		Rectangle2D.Double bounds = addPaddingToBounds(input.getBounds(), 2.0);
-
 		LineCollection results = new LineCollection();
 
 		// do this once here instead of once per line.
@@ -66,6 +62,9 @@ public class InfillTurtle {
 		// working variable
 		LineSegment2D line = new LineSegment2D(new Point2d(), new Point2d(), input.getColor());
 
+		// make sure line segments don't start on another line, leading to an odd number
+		// of intersections.
+		Rectangle2D.Double bounds = addPaddingToBounds(input.getBounds(), 2.0);
 		double size = Math.max(bounds.getHeight(), bounds.getWidth());
 		Vector2d majorDir = new Vector2d(Math.cos(Math.toRadians(angle   )), Math.sin(Math.toRadians(angle   )));
 		Vector2d minorDir = new Vector2d(Math.cos(Math.toRadians(angle+90)), Math.sin(Math.toRadians(angle+90)));
@@ -77,10 +76,19 @@ public class InfillTurtle {
 
 		var end = size*2;
 
+		int j=0;
 		for(double i=0;i<end;i+=penDiameter) {
 			minorTemp.scaleAdd(i,minorDir,minorStart);
-			majorStart.scaleAdd(-size,majorDir,minorTemp);
-			majorEnd.scaleAdd(size,majorDir,minorTemp);
+			// reverse direction of each scanline in a zig-zag pattern
+			if(j%2==0) {
+				majorStart.scaleAdd(-size, majorDir, minorTemp);
+				majorEnd.scaleAdd(size, majorDir, minorTemp);
+			} else {
+				majorStart.scaleAdd(size, majorDir, minorTemp);
+				majorEnd.scaleAdd(-size, majorDir, minorTemp);
+			}
+			j++;
+
 			line.start.set(majorStart.x,majorStart.y);
 			line.end.set(majorEnd.x,majorEnd.y);
 			results.addAll(trimLineToPath(line, convertedPath));
