@@ -4,6 +4,9 @@ import com.marginallyclever.makelangelo.plotter.Plotter;
 
 import java.awt.*;
 
+/**
+ * Draws a Makelangelo 3.3 plotter machine.
+ */
 public class Makelangelo3_3 implements PlotterRenderer {
 
 	@Override

@@ -4,6 +4,9 @@ import com.marginallyclever.makelangelo.plotter.Plotter;
 
 import java.awt.*;
 
+/**
+ * Draws a cartesian plotter machine.
+ */
 public class Cartesian implements PlotterRenderer {
 	final public double ZAR_MOTOR_MOUNT_SIZE=45; //cm
 	final public double ZAR_PLOTTER_SIZE=60; //cm

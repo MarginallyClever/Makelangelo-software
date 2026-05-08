@@ -9,6 +9,9 @@ import com.marginallyclever.makelangelo.texture.TextureWithMetadata;
 import javax.vecmath.Point2d;
 import java.awt.*;
 
+/**
+ * Draws a custom makelangelo plotter machine.
+ */
 public class MakelangeloCustom implements PlotterRenderer {
 	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm
 	public final static float COUNTERWEIGHT_W = 30;
