@@ -311,7 +311,7 @@ public class MainMenu extends JMenuBar {
 
         menu.add(createActionMenuItem(new ResizeTurtleToPaperAction(frame.getPaper(),false,Translator.get("ConvertImagePaperFit"))));
         menu.add(createActionMenuItem(new ResizeTurtleToPaperAction(frame.getPaper(),true,Translator.get("ConvertImagePaperFill"))));
-        menu.add(createActionMenuItem(new CenterTurtleToPaperAction(Translator.get("ConvertImagePaperCenter"))));
+        menu.add(createActionMenuItem(new CenterTurtleToPaperAction(frame.getPaper(), Translator.get("ConvertImagePaperCenter"))));
 
         menu.add(createMover(Translator.get("Translate"),"/com/marginallyclever/makelangelo/icons8-move-16.png",(e)->runTranslatePanel()));
         menu.add(createMover(Translator.get("Scale"),"/com/marginallyclever/makelangelo/icons8-resize-16.png",(e)->runScalePanel()));
