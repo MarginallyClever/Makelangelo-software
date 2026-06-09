@@ -60,11 +60,10 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 	@Override
 	public void travel(Point2d p0, Point2d p1) {
 		drawPoints();
-		if(showTravel) {
-			gl2.setColor(colorTravel);
-			line.setLine(p0.x, p0.y, p1.x, p1.y);
-			gl2.draw(line);
-		}
+		if(!showTravel) return;
+		gl2.setColor(colorTravel);
+		line.setLine(p0.x, p0.y, p1.x, p1.y);
+		gl2.draw(line);
 	}
 
 	@Override

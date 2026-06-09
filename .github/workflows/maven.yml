@@ -41,7 +41,7 @@ jobs:
           cp README.md target/package/
 
       - name: Upload common files
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: shared
           path: |
@@ -57,7 +57,7 @@ jobs:
     if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev'
     steps:
       - name: Delete all assets from Nightly Builds release
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |

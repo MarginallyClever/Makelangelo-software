@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.turtletool;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.editorcontext.EditorContext;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
 import org.apache.batik.ext.swing.GridBagConstants;
@@ -17,7 +18,7 @@ public class ScaleTurtlePanel extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(ScaleTurtlePanel.class);
 	
 	private final String [] unitTypes = new String[]{"mm","%"};
-	private final Turtle turtleToChange;
+	private final EditorContext context;
 	private final Turtle turtleOriginal;
 	private final JSpinner widthSpinner;
 	private final JSpinner heightSpinner;
@@ -31,13 +32,13 @@ public class ScaleTurtlePanel extends JPanel {
 
 	private double width,height;
 	
-	public ScaleTurtlePanel(Turtle t) {
+	public ScaleTurtlePanel(EditorContext context) {
 		super();
 		setName("ScaleTurtlePanel");
-		turtleToChange = t;
-		turtleOriginal = new Turtle(t);  // make a deep copy of the original.  Doubles memory usage!
+		this.context = context;
+		turtleOriginal = new Turtle(context.getTurtle());  // make a deep copy of the original.  Doubles memory usage!
 
-		myOriginalBounds = turtleToChange.getBounds();
+		myOriginalBounds = turtleOriginal.getBounds();
 		width = myOriginalBounds.width;
 		height = myOriginalBounds.height;
 
@@ -152,12 +153,13 @@ public class ScaleTurtlePanel extends JPanel {
 		}
 
 		logger.debug("scale {}x{} -> {}x{} units={}", ow, oh, w1, h1, units.getSelectedIndex());
-		revertOriginalTurtle();
-		turtleToChange.scale(w1, h1);
+		Turtle temp = new Turtle(turtleOriginal);
+		temp.scale(w1,h1);
+		context.setTurtle(temp);
 	}
 
 	private void revertOriginalTurtle() {
-		turtleToChange.set(turtleOriginal);
+		context.setTurtle(turtleOriginal);
 	}
 	
 	private void onUnitChange(ActionEvent e) {
@@ -193,8 +195,8 @@ public class ScaleTurtlePanel extends JPanel {
 		}
 	}
 
-	public static void runAsDialog(Window parent,Turtle t) {
-		ScaleTurtlePanel panel = new ScaleTurtlePanel(t);
+	public static void runAsDialog(Window parent,EditorContext context) {
+		ScaleTurtlePanel panel = new ScaleTurtlePanel(context);
 
 		JDialog dialog = new JDialog(parent,Translator.get("Scale"));
 
@@ -238,8 +240,10 @@ public class ScaleTurtlePanel extends JPanel {
 		PreferencesHelper.start();
 		Translator.start();
 
+		EditorContext context = new EditorContext();
+
 		// make a Turtle of a rectangle
-		Turtle turtle = new Turtle();
+		Turtle turtle = context.getTurtle();
 		turtle.jumpTo(0, 0);
 		turtle.moveTo(100, 0);
 		turtle.moveTo(100, 50);
@@ -250,6 +254,6 @@ public class ScaleTurtlePanel extends JPanel {
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.pack();
 		frame.setLocationRelativeTo(null);
-		runAsDialog(frame,turtle);
+		runAsDialog(frame,context);
 	}
 }

@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.turtletool;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.editorcontext.EditorContext;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
 import org.apache.batik.ext.swing.GridBagConstants;
@@ -13,14 +14,14 @@ import java.awt.*;
 
 public class RotateTurtlePanel extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(RotateTurtlePanel.class);
-	private final Turtle turtleToChange;
+	private final EditorContext context;
 	private final Turtle turtleOriginal;
 	private final JSpinner degrees = new JSpinner(new SpinnerNumberModel(0, -360, 360, 1));
 
-	public RotateTurtlePanel(Turtle t) {
+	public RotateTurtlePanel(EditorContext context) {
 		super();
-		turtleToChange = t;
-		turtleOriginal = new Turtle(t);  // make a deep copy of the original.
+		this.context = context;
+		turtleOriginal = new Turtle(context.getTurtle());  // make a deep copy of the original.
 
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -58,16 +59,17 @@ public class RotateTurtlePanel extends JPanel {
 		}
 
 		logger.debug("rotate {}", angle);
-		revertOriginalTurtle();
-		turtleToChange.rotate(angle);
+		Turtle temp = new Turtle(turtleOriginal);
+		temp.rotate(angle);
+		context.setTurtle(temp);
 	}
 
 	private void revertOriginalTurtle() {
-		turtleToChange.set(turtleOriginal);
+		context.setTurtle(turtleOriginal);
 	}
 
-	public static void runAsDialog(Window parent,Turtle t) {
-		RotateTurtlePanel panel = new RotateTurtlePanel(t);
+	public static void runAsDialog(Window parent, EditorContext context) {
+		RotateTurtlePanel panel = new RotateTurtlePanel(context);
 
 		JDialog dialog = new JDialog(parent,Translator.get("Rotate"));
 
@@ -115,6 +117,6 @@ public class RotateTurtlePanel extends JPanel {
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.pack();
 		frame.setLocationRelativeTo(null);
-		runAsDialog(frame,new Turtle());
+		runAsDialog(frame,new EditorContext());
 	}
 }

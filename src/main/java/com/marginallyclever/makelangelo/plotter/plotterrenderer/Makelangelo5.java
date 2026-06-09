@@ -11,6 +11,9 @@ import javax.vecmath.Point2d;
 import java.awt.*;
 
 
+/**
+ * Draws a Makelangelo 5 plotter machine.
+ */
 public class Makelangelo5 implements PlotterRenderer {
 	private final TextureWithMetadata textureMainBody;
 	private final TextureWithMetadata textureMotors;

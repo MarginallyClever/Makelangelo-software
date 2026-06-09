@@ -323,7 +323,7 @@ public class Turtle implements Cloneable {
 	}
 
 	/**
-	 * Scale all draw and move segments by the given amounts
+	 * Scale all the points relative to the turtle origin
 	 * @param sx the x-axis scale factor.
 	 * @param sy the y-axis scale factor.
 	 */
@@ -339,7 +339,7 @@ public class Turtle implements Cloneable {
 	}
 
 	/**
-	 * Translate all draw and move segments by parameters
+	 * Translate all the points
 	 * @param dx relative move x
 	 * @param dy relative move y
 	 */
@@ -355,8 +355,8 @@ public class Turtle implements Cloneable {
 	}
 
 	/**
-	 * Translate all draw and move segments by degrees
-	 * @param degrees relative ccw rotation
+	 * Rotate all points around the turtle origin counter-clockwise
+	 * @param degrees relative ccw rotation in degrees
 	 */
 	public void rotate(double degrees) {
 		double r = Math.toRadians(degrees);
@@ -411,12 +411,9 @@ public class Turtle implements Cloneable {
 				Point2d prev = iter.next();
 				while(iter.hasNext()) {
 					Point2d next = iter.next();
-					LineSegment2D segment = new LineSegment2D(
-							new Point2d(prev.x, prev.y),
-							new Point2d(next.x, next.y),
-							cl.getColor());
-					if (segment.lengthSquared() > 0) {
-						result.add(segment);
+					if (prev.distanceSquared(next) > 0) {
+						// LineSegment2D constructor makes a copy of prev and next.
+						result.add( new LineSegment2D( prev, next, cl.getColor() ) );
 					}
 					prev = next;
 				}

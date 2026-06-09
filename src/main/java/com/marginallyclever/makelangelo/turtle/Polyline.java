@@ -5,6 +5,7 @@ import java.awt.*;
 /**
  * A poly line is a collection of x,y coordinates and a color.
  */
+@Deprecated(forRemoval = true,since="7.78.4")
 public class Polyline {
     private final int[] x;
     private final int[] y;

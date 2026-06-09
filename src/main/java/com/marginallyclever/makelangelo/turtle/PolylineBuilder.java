@@ -5,6 +5,7 @@ import java.awt.*;
 /**
  * A tool for creating a {@link Polyline}.  Optimizes to remove points on nearly straight lines.
  */
+@Deprecated(forRemoval = true,since="7.78.4")
 public class PolylineBuilder {
     private int[] x;
     private int[] y;

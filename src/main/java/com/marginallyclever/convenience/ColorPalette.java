@@ -42,12 +42,7 @@ public class ColorPalette {
      */
     @Deprecated(forRemoval = true)
     public void removeColor(Color c) {
-        for (final Iterator<Color> colorsIterator = colors.iterator(); colorsIterator.hasNext(); ) {
-            final Color nextColor = colorsIterator.next();
-            if (nextColor.equals(c)) {
-                colorsIterator.remove();
-            }
-        }
+        colors.removeIf(nextColor -> nextColor.equals(c));
     }
 
 

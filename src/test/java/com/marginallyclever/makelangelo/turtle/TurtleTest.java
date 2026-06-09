@@ -184,7 +184,14 @@ class TurtleTest {
         turtle.moveTo(3, 4);
         turtle.jumpTo(12, 18);
 
+        var before = turtle.getBounds();
+        assertEquals(new Rectangle.Double(-15,-7,35,37),before);
         turtle.translate(-10, 3);
+        var after = turtle.getBounds();
+        assertEquals(new Rectangle.Double(-25,-4,35,37),after);
+
+        assertEquals(before.getCenterX()-10,after.getCenterX(),1e-3);
+        assertEquals(before.getCenterY()+3,after.getCenterY(),1e-3);
 
         // then
         assertEquals("[TOOL R0 G0 B0 A255 D1.000, TRAVEL X-10.000 Y3.000, DRAW_LINE X10.000 Y33.000, DRAW_LINE X0.000 Y18.000, TRAVEL X-25.000 Y-4.000, DRAW_LINE X-7.000 Y7.000, TRAVEL X2.000 Y21.000]", turtle.generateHistory());

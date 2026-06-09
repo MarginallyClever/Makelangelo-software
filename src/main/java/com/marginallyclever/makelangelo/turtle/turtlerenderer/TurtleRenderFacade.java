@@ -33,6 +33,7 @@ public class TurtleRenderFacade implements RenderListener {
     private BufferedImage mipmap1 = null;
     private BufferedImage mipmap2 = null;
     private BufferedImage mipmap3 = null;
+	private double tx,ty;
 
 	@Override
 	public void render(Graphics graphics) {
@@ -45,6 +46,7 @@ public class TurtleRenderFacade implements RenderListener {
         // if mipmaps are available, use them
         if(mipmap0 != null) {
             var g2d = (Graphics2D) graphics;
+			setHints(g2d);
 
             // find the scale from the transform.
             var transform = g2d.getTransform();
@@ -67,7 +69,8 @@ public class TurtleRenderFacade implements RenderListener {
 
             var bbw = mipmap0.getWidth()/20;
             var bbh = mipmap0.getHeight()/20;
-            graphics.drawImage(mipmapToUse,
+			g2d.translate(tx, ty);
+            g2d.drawImage(mipmapToUse,
                     -bbw,
                     -bbh,
                     bbw,
@@ -77,6 +80,7 @@ public class TurtleRenderFacade implements RenderListener {
                     mipmapToUse.getWidth(),
                     mipmapToUse.getHeight(),
                     null);
+			g2d.translate(-tx, -ty);
         }
 	}
 
@@ -120,6 +124,8 @@ public class TurtleRenderFacade implements RenderListener {
             bg.translate(-bounds.x, -bounds.y);
             renderLockedTurtle(bg);
             renderMipMaps();
+			tx = bounds.getCenterX();
+			ty = bounds.getCenterY();
             return true;
 		}
 		finally {
@@ -149,12 +155,12 @@ public class TurtleRenderFacade implements RenderListener {
     private void setHints(Graphics2D g2) {
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setRenderingHint(RenderingHints.KEY_DITHERING,RenderingHints.VALUE_DITHER_DISABLE);
+        g2.setRenderingHint(RenderingHints.KEY_DITHERING,RenderingHints.VALUE_DITHER_ENABLE);
         g2.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
         g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,RenderingHints.VALUE_STROKE_NORMALIZE);
         g2.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,RenderingHints.VALUE_COLOR_RENDER_QUALITY);
         g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         g2.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
     }
 
@@ -164,6 +170,7 @@ public class TurtleRenderFacade implements RenderListener {
 		myRenderer.setPenUpColor(penUpColor);
 		myRenderer.setPenDownColor(penDownColor);
 		myRenderer.setShowTravel(showTravel);
+		setHints(g2d);
 		myRenderer.start(g2d);
 		try {
 			Point2d prev = new Point2d(0, 0);
@@ -216,7 +223,7 @@ public class TurtleRenderFacade implements RenderListener {
 
 	public void setRenderer(@Nonnull TurtleRenderer render) {
 		myRenderer = render;
-        turtleHash = -1;  // force a re-render next time
+		dispose();  // force a re-render next time
 	}
 
 	public @Nonnull TurtleRenderer getRenderer() {
@@ -230,7 +237,7 @@ public class TurtleRenderFacade implements RenderListener {
 	public void setFirst(int arg0) {
 		first = Math.min(Math.max(arg0, 0), getMax());
 		if(last<first) setLast(first);
-		turtleHash = 0;
+		dispose();
 	}
 	
 	public int getFirst() {
@@ -240,7 +247,7 @@ public class TurtleRenderFacade implements RenderListener {
 	public void setLast(int arg0) {
 		last = Math.min(Math.max(arg0, 0), getMax());
 		if(first>last) setFirst(last);
-		turtleHash = 0;
+		dispose();
 	}
 
 	public int getLast() {
@@ -250,24 +257,24 @@ public class TurtleRenderFacade implements RenderListener {
 	public void setDownColor(Color penDownColor) {
 		if(this.penDownColor == penDownColor) return; // no change
 		this.penDownColor = penDownColor;
-		turtleHash = 0;
+		dispose();
 	}
 
 	public void setUpColor(Color penUpColor) {
 		if(this.penUpColor == penUpColor) return; // no change
 		this.penUpColor = penUpColor;
-		turtleHash = 0;
+		dispose();
 	}
 
 	public void setPenDiameter(double penDiameter) {
 		if(this.penDiameter == penDiameter) return; // no change
 		this.penDiameter = penDiameter;
-		turtleHash = 0;
+		dispose();
 	}
 
 	public void setShowTravel(boolean showTravel) {
 		if(this.showTravel == showTravel) return; // no change
 		this.showTravel = showTravel;
-		turtleHash = 0;
+		dispose();
 	}
 }

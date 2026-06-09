@@ -5,7 +5,7 @@ import com.marginallyclever.makelangelo.plotter.Plotter;
 import java.awt.*;
 
 /**
- * Deprecated because it cannot find home.
+ * Draws a Makelangelo 3 plotter machine.  Deprecated because it cannot find home.
  * @author Dan Royer
  */
 @Deprecated

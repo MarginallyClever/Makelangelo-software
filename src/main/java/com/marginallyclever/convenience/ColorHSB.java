@@ -3,7 +3,7 @@ package com.marginallyclever.convenience;
 import java.awt.*;
 
 /**
- * HSB color class.  Each component is 0...1
+ * {@link ColorHSB} stores a color by its Hue, Saturation, and Brightness.  Each component is 0...1
  *
  * @author Dan Royer
  * @since 2022-08-31

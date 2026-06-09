@@ -311,7 +311,7 @@ public class MainMenu extends JMenuBar {
 
         menu.add(createActionMenuItem(new ResizeTurtleToPaperAction(frame.getPaper(),false,Translator.get("ConvertImagePaperFit"))));
         menu.add(createActionMenuItem(new ResizeTurtleToPaperAction(frame.getPaper(),true,Translator.get("ConvertImagePaperFill"))));
-        menu.add(createActionMenuItem(new CenterTurtleToPaperAction(Translator.get("ConvertImagePaperCenter"))));
+        menu.add(createActionMenuItem(new CenterTurtleToPaperAction(frame.getPaper(), Translator.get("ConvertImagePaperCenter"))));
 
         menu.add(createMover(Translator.get("Translate"),"/com/marginallyclever/makelangelo/icons8-move-16.png",(e)->runTranslatePanel()));
         menu.add(createMover(Translator.get("Scale"),"/com/marginallyclever/makelangelo/icons8-resize-16.png",(e)->runScalePanel()));
@@ -319,20 +319,16 @@ public class MainMenu extends JMenuBar {
 
         menu.add(createMover(Translator.get("Crop"),"/com/marginallyclever/makelangelo/icons8-crop-16.png",(e)-> {
             CropTurtleAction act = new CropTurtleAction(frame.getPaper());
-            frame.setTurtle(act.run(frame.getTurtle()));
+            frame.getEditorContext().mutate(act::run);
         }));
         menu.addSeparator();
 
-        var a4 = new FlipTurtleAction(1,-1,Translator.get("FlipV"));
-        a4.putValue(Action.SMALL_ICON, new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-flip-horizontal-16.png"))));
-        a4.setSource(frame);
-        a4.addModifierListener(frame::setTurtle);
+        var a4 = createModifier(new FlipTurtleAction(1,-1,Translator.get("FlipV")),"/com/marginallyclever/makelangelo/icons8-flip-horizontal-16.png");
+        a4.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_V, SHORTCUT_CTRL));//"ctrl V"
         menu.add(a4);
 
-        var a5 = new FlipTurtleAction(-1,1,Translator.get("FlipH"));
-        a5.putValue(Action.SMALL_ICON, new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-flip-vertical-16.png"))));
-        a5.setSource(frame);
-        a5.addModifierListener(frame::setTurtle);
+        var a5 = createModifier(new FlipTurtleAction(-1,1,Translator.get("FlipH")),"/com/marginallyclever/makelangelo/icons8-flip-vertical-16.png");
+        a5.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, SHORTCUT_CTRL));//"ctrl H"
         menu.add(a5);
 
         menu.addSeparator();
@@ -356,8 +352,7 @@ public class MainMenu extends JMenuBar {
         if(resource!=null) {
             action.putValue(Action.SMALL_ICON, new ImageIcon(Objects.requireNonNull(getClass().getResource(resource))));
         }
-        action.setSource(frame);
-        action.addModifierListener(frame::setTurtle);
+        action.setContext(frame.getEditorContext());
 
         return action;
     }
@@ -370,21 +365,20 @@ public class MainMenu extends JMenuBar {
     }
 
     private TurtleTool createActionMenuItem(TurtleTool action) {
-        action.setSource(frame);
-        action.addModifierListener(frame::setTurtle);
+        action.setContext(frame.getEditorContext());
         return action;
     }
 
     private void runRotatePanel() {
-        RotateTurtlePanel.runAsDialog(SwingUtilities.getWindowAncestor(this), frame.getTurtle());
+        RotateTurtlePanel.runAsDialog(SwingUtilities.getWindowAncestor(this), frame.getEditorContext());
     }
 
     private void runScalePanel() {
-        ScaleTurtlePanel.runAsDialog(SwingUtilities.getWindowAncestor(this), frame.getTurtle());
+        ScaleTurtlePanel.runAsDialog(SwingUtilities.getWindowAncestor(this), frame.getEditorContext());
     }
 
     private void runTranslatePanel() {
-        TranslateTurtlePanel.runAsDialog(SwingUtilities.getWindowAncestor(this), frame.getTurtle());
+        TranslateTurtlePanel.runAsDialog(SwingUtilities.getWindowAncestor(this), frame.getEditorContext());
     }
 
     private JMenu createRobotMenu() {

@@ -16,7 +16,6 @@ public class TurtlePathWalker {
     private double segmentDistanceSum;
 
     public TurtlePathWalker(@Nonnull Turtle turtle) {
-        if (turtle == null) throw new IllegalArgumentException("Turtle cannot be null");
         this.iter = turtle.getIterator();
         drawDistance = turtle.getDrawDistance();
         tSum = 0;
@@ -57,7 +56,7 @@ public class TurtlePathWalker {
             if (segmentDistanceSum + segmentDistance >= tSum) {
                 double dx = m.x - prev.x;
                 double dy = m.y - prev.y;
-                double ratio = Math.max(Math.min((tSum - segmentDistanceSum) / segmentDistance,1),0);
+                double ratio = Math.clamp((tSum - segmentDistanceSum) / segmentDistance, 0, 1);
                 double newX = prev.x + ratio * dx;
                 double newY = prev.y + ratio * dy;
                 return new Point2d(newX, newY);

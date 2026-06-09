@@ -12,6 +12,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Point2d;
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
 import java.util.PriorityQueue;
 
@@ -70,20 +71,23 @@ public class Converter_Mickeymoe1992 extends ImageConverter {
         FilterDesaturate bw = new FilterDesaturate(myImage);
         img = bw.filter();
 
+        double d = Math.max(0.1,turtle.getDiameter());
         // use fast marching method to compute arrival times
         if(recalculateFFM) {
-            ffm = computeArrivalTimes();
+            ffm = computeArrivalTimes(d);
         }
+
+        Rectangle2D.Double rect = myPaper.getMarginRectangle();
+        px = rect.getMinX();
+        py = rect.getMinY();
 
         turtle = new Turtle();
         turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
-        px = myPaper.getMarginRectangle().getMinX();
-        py = myPaper.getMarginRectangle().getMinY();
 
-        extractContours(ffm, minSpacing);
+        extractContours(ffm, minSpacing,d);
 
+        //CropTurtle.run(turtle,rect);
         fireConversionFinished();
-        recalculateFFM=true;
     }
 
     /**
@@ -91,7 +95,7 @@ public class Converter_Mickeymoe1992 extends ImageConverter {
      * @param T scalar field (arrival times)
      * @param spacing spacing between contours
      */
-    public void extractContours(double[][] T, double spacing) {
+    public void extractContours(double[][] T, double spacing,double d) {
         int h = T[0].length;
 
         // Find min and max values in T
@@ -115,6 +119,7 @@ public class Converter_Mickeymoe1992 extends ImageConverter {
         for (double level = min; level <= max; level += step) {
             turtle = new Turtle(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
             marchingSquares(T,level);
+            turtle.scale(d,d);
             var result = reorderHelper.splitAndReorderTurtle(turtle);
             sum.add(result);
         }
@@ -274,9 +279,8 @@ public class Converter_Mickeymoe1992 extends ImageConverter {
      * Computes the arrival times using the Fast Marching Method (FMM).
      * @return
      */
-    public double[][] computeArrivalTimes() {
+    public double[][] computeArrivalTimes(double d) {
         var rect = myPaper.getMarginRectangle();
-        double d = Math.max(0.1,turtle.getDiameter());
         int w = (int)Math.ceil(rect.getWidth()/d);
         int h = (int)Math.ceil(rect.getHeight()/d);
         int minX = (int)rect.getMinX();

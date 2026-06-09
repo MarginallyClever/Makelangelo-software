@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.turtletool;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.editorcontext.EditorContext;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
 import org.assertj.swing.core.BasicRobot;
@@ -24,16 +25,16 @@ public class ScaleTurtlePanelTest {
 
         PreferencesHelper.start();
         Translator.start();
-
+        EditorContext context = new EditorContext();
         // make a Turtle of a rectangle
-        Turtle turtle = new Turtle();
+        Turtle turtle = context.getTurtle();
         turtle.jumpTo(0, 0);
         turtle.moveTo(100, 0);
         turtle.moveTo(100, 50);
         turtle.moveTo(0, 50);
         turtle.moveTo(0, 0);
 
-        ScaleTurtlePanel panel = new ScaleTurtlePanel(turtle);
+        ScaleTurtlePanel panel = new ScaleTurtlePanel(context);
         JFrame frame = new JFrame();
         frame.setContentPane(panel);
         frame.pack();

@@ -1,15 +1,15 @@
 package com.marginallyclever.makelangelo.makeart.turtletool;
 
-import com.marginallyclever.convenience.linecollection.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
+import com.marginallyclever.convenience.linecollection.LineCollection;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.vecmath.Vector2d;
 import javax.vecmath.Point2d;
-import java.awt.*;
+import javax.vecmath.Vector2d;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -19,6 +19,8 @@ import java.util.List;
  * @since 7.31.0
  */
 public class InfillTurtle {
+	private static final Logger logger = LoggerFactory.getLogger(InfillTurtle.class);
+
 	public static final double MINIMUM_PEN_DIAMETER = 0.1;
 
 	private double penDiameter = 0.8;
@@ -38,9 +40,10 @@ public class InfillTurtle {
 		List<Turtle> list = input.splitByToolChange();
 		for(Turtle t : list) {
 			LineCollection segments = infillFromTurtle(t);
-			result.setStroke(t.getColor(), t.getDiameter());
+			//result.setStroke(t.getColor(), t.getDiameter());
 			result.addLineSegments(segments);
 		}
+
 
 		return result;
 	}
@@ -51,10 +54,6 @@ public class InfillTurtle {
 	}
 
 	private LineCollection infillFromTurtle(Turtle input) {
-		// make sure line segments don't start on another line, leading to an odd number
-		// of intersections.
-		Rectangle2D.Double bounds = addPaddingToBounds(input.getBounds(), 2.0);
-
 		LineCollection results = new LineCollection();
 
 		// do this once here instead of once per line.
@@ -63,21 +62,36 @@ public class InfillTurtle {
 		// working variable
 		LineSegment2D line = new LineSegment2D(new Point2d(), new Point2d(), input.getColor());
 
+		// make sure line segments don't start on another line, leading to an odd number
+		// of intersections.
+		Rectangle2D.Double bounds = addPaddingToBounds(input.getBounds(), 2.0);
 		double size = Math.max(bounds.getHeight(), bounds.getWidth());
 		Vector2d majorDir = new Vector2d(Math.cos(Math.toRadians(angle   )), Math.sin(Math.toRadians(angle   )));
 		Vector2d minorDir = new Vector2d(Math.cos(Math.toRadians(angle+90)), Math.sin(Math.toRadians(angle+90)));
 		Vector2d minorStart = new Vector2d(bounds.getCenterX(),bounds.getCenterY());
 		minorStart.scaleAdd(-size,minorDir,minorStart);
+		Vector2d minorTemp = new Vector2d();
 		Vector2d majorStart = new Vector2d();
 		Vector2d majorEnd = new Vector2d();
 
-		for(double i=0;i<size*2;i+=penDiameter) {
-			majorStart.scaleAdd(-size,majorDir,minorStart);
-			majorEnd.scaleAdd(size,majorDir,minorStart);
+		var end = size*2;
+
+		int j=0;
+		for(double i=0;i<end;i+=penDiameter) {
+			minorTemp.scaleAdd(i,minorDir,minorStart);
+			// reverse direction of each scanline in a zig-zag pattern
+			if(j%2==0) {
+				majorStart.scaleAdd(-size, majorDir, minorTemp);
+				majorEnd.scaleAdd(size, majorDir, minorTemp);
+			} else {
+				majorStart.scaleAdd(size, majorDir, minorTemp);
+				majorEnd.scaleAdd(-size, majorDir, minorTemp);
+			}
+			j++;
+
 			line.start.set(majorStart.x,majorStart.y);
 			line.end.set(majorEnd.x,majorEnd.y);
 			results.addAll(trimLineToPath(line, convertedPath));
-			minorStart.scaleAdd(penDiameter,minorDir,minorStart);
 		}
 
 		return results;
@@ -87,7 +101,7 @@ public class InfillTurtle {
 	 * Add padding to a {@link Rectangle2D.Double} bounding rectangle.
 	 * 
 	 * @param before the original rectangle
-	 * @param percent the added percentage.
+	 * @param percent the added percentage. 0...100
 	 * @return the larger bounds
 	 */
 	private Rectangle2D.Double addPaddingToBounds(Rectangle2D.Double before, double percent) {
@@ -113,70 +127,57 @@ public class InfillTurtle {
 	 * example). Then, taken in pairs, they give you the end points of the segments
 	 * of the line that lie inside the polygon.
 	 * </p>
+	 * <p>Collect intersections and compute their parametric 't' along the infill line.
+	 * Sorting by projection (t) is more robust than sorting by x or y, and we
+	 * remove nearly-duplicate intersections caused by shared segment endpoints
+	 * or floating point noise.</p>
 	 * 
 	 * @param line  A {@link LineSegment2D} to clip
 	 * @param convertedPath The boundary line, which must be a closed loop
 	 * @return a list of remaining {@link LineSegment2D}.
 	 */
 	private LineCollection trimLineToPath(LineSegment2D line, LineCollection convertedPath) {
-		List<Point2d> intersections = new ArrayList<>();
+		record Hit(Point2d p,double t) {}
+		List<Hit> hits = new ArrayList<>();
+		Vector2d s1 = new Vector2d(line.end);
+		s1.sub(line.start);
+		double s1_len2 = s1.lengthSquared();
 
 		for (LineSegment2D s : convertedPath) {
 			Point2d p = getIntersection(line, s);
-			if (p != null) intersections.add(p);
-		}
-
-		LineCollection results = new LineCollection();
-		int size = intersections.size();
-		if(size%2==0) {
-			if (size == 2) {
-				results.add(new LineSegment2D(intersections.get(0), intersections.get(1), line.color));
-			} else if (size > 2) {
-				results.addAll(sortIntersectionsIntoSegments(intersections, line.color));
+			if (p != null) {
+				double t = 0.0;
+				if (s1_len2 > 0) {
+					t = ((p.x - line.start.x) * s1.x + (p.y - line.start.y) * s1.y) / s1_len2;
+				}
+				hits.add(new Hit(p, t));
 			}
 		}
 
-		return results;
-	}
-
-	/**
-	 * @param intersections A list of intersections. guaranteed to be 2 or more even
-	 *                      number of intersections.
-	 * @param color         Color to assign to line
-	 * @return return Intersections sorted by ascending x value. If x values match,
-	 *         sort by ascending y value.
-	 */
-	private LineCollection sortIntersectionsIntoSegments(List<Point2d> intersections, Color color) {
-		Point2d first = intersections.get(0);
-		Point2d second = intersections.get(1);
-		if (Double.compare(first.x, second.x) == 0) {
-			intersections.sort(new ComparePointsByY());
-		} else {
-			intersections.sort(new ComparePointsByX());
-		}
-
 		LineCollection results = new LineCollection();
-		int i = 0;
-		while (i < intersections.size()-1) {
-			results.add(new LineSegment2D(intersections.get(i), intersections.get(i + 1), color));
-			i += 2;
+		if (hits.isEmpty()) return results;
+
+		// sort by t and deduplicate near-equal t values
+		hits.sort((a,b) -> Double.compare(a.t,b.t));
+		List<Hit> unique = new ArrayList<>();
+		double EPS = 1e-8;
+		for (Hit h : hits) {
+			if (unique.isEmpty() || Math.abs(h.t - unique.getLast().t) > EPS) {
+				unique.add(h);
+			}
+		}
+
+		int size = unique.size();
+		if (size % 2 == 0) {
+			for (int i = 0; i < size - 1; i += 2) {
+				results.add(new LineSegment2D(unique.get(i).p, unique.get(i+1).p, line.color));
+			}
+		} else {
+			// odd number of intersections — something unexpected; log for debugging
+			logger.error("infill: odd intersection count=" + size);
 		}
 
 		return results;
-	}
-
-	static class ComparePointsByY implements Comparator<Point2d> {
-		@Override
-		public int compare(Point2d o1, Point2d o2) {
-			return Double.compare(o1.y, o2.y);
-		}
-	}
-
-	static class ComparePointsByX implements Comparator<Point2d> {
-		@Override
-		public int compare(Point2d o1, Point2d o2) {
-			return Double.compare(o1.x, o2.x);
-		}
 	}
 
 	/**
@@ -194,6 +195,9 @@ public class InfillTurtle {
 		double s2_y = beta.end.y - beta.start.y;
 
 		double denominator = (-s2_x * s1_y + s1_x * s2_y);
+		// avoid division by (near) zero -> parallel or nearly-parallel segments
+		if (Math.abs(denominator) < 1e-12) return null;
+
 		double s = (-s1_y * (alpha.start.x - beta.start.x) + s1_x * (alpha.start.y - beta.start.y)) / denominator;
 		double t = ( s2_x * (alpha.start.y - beta.start.y) - s2_y * (alpha.start.x - beta.start.x)) / denominator;
 
