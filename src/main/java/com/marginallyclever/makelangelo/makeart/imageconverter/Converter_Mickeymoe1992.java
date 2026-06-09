@@ -86,7 +86,10 @@ public class Converter_Mickeymoe1992 extends ImageConverter {
 
         extractContours(ffm, minSpacing,d);
 
-        //CropTurtle.run(turtle,rect);
+        // recenter the image
+        var b = turtle.getBounds();
+        turtle.translate(-b.getCenterX(),-b.getCenterY());
+
         fireConversionFinished();
     }
 
