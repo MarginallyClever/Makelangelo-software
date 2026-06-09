@@ -1,11 +1,14 @@
 package com.marginallyclever.makelangelo;
 
 import com.marginallyclever.convenience.FileAccess;
+import com.marginallyclever.makelangelo.actions.NamedAbstractAction;
+import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -20,6 +23,8 @@ public class MenuShortcutManagerTest {
 
     @BeforeEach
     public void setUp() throws IOException {
+        PreferencesHelper.start();
+        Translator.start();
         shortcutFilePath = Paths.get(FileAccess.getHomeDirectory(), ".makelangelo", "menuShortcuts.json");
         if (Files.exists(shortcutFilePath)) {
             Files.move(shortcutFilePath, shortcutFilePath.resolveSibling("menuShortcuts.json.bak"));
@@ -39,7 +44,10 @@ public class MenuShortcutManagerTest {
     public void testCollectAndSave() throws IOException {
         JMenuBar menuBar = new JMenuBar();
         JMenu menu = new JMenu("File");
-        JMenuItem item = new JMenuItem("New");
+        JMenuItem item = new JMenuItem(new NamedAbstractAction("New") {
+            @Override
+            public void actionPerformed(ActionEvent e) {}
+        });
         item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
         menu.add(item);
         menuBar.add(menu);
@@ -62,7 +70,10 @@ public class MenuShortcutManagerTest {
 
         JMenuBar menuBar = new JMenuBar();
         JMenu menu = new JMenu("File");
-        JMenuItem item = new JMenuItem("New");
+        JMenuItem item = new JMenuItem(new NamedAbstractAction("New") {
+            @Override
+            public void actionPerformed(ActionEvent e) {}
+        });
         item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
         menu.add(item);
         menuBar.add(menu);
