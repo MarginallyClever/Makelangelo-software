@@ -34,7 +34,7 @@ public class Generator_MazeRectangle extends Generator_Maze {
 	
 	@Override
 	public String getName() {
-		return Translator.get("Generator_MazeRectangle.name");
+		return "Generator_MazeRectangle.name";
 	}
 
 	public int getRows() {

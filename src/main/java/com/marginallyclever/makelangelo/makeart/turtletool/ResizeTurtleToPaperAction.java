@@ -13,7 +13,7 @@ public class ResizeTurtleToPaperAction extends TurtleTool {
 	private final Paper myPaper;
 	private final boolean fillPage;
 	
-	public ResizeTurtleToPaperAction(Paper paper,boolean fillPage,String name) {
+	public ResizeTurtleToPaperAction(String name,Paper paper,boolean fillPage) {
 		super(name);
 		this.fillPage = fillPage;
 		this.myPaper = paper;

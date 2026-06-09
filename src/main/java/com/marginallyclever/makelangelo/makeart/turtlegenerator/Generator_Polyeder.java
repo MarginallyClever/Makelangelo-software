@@ -24,6 +24,7 @@ import java.util.ArrayList;
 public class Generator_Polyeder extends TurtleGenerator {
 
 	private static final Logger logger = LoggerFactory.getLogger(Generator_Polyeder.class);
+
 	/**
 	 * Helper class that describe a solid
 	 * @author Guenther Sohler
@@ -161,7 +162,7 @@ public class Generator_Polyeder extends TurtleGenerator {
 	
 	@Override
 	public String getName() {
-		return Translator.get("Polyeder");
+		return "Polyeder";
 	}
 
 	void addModel(String name,int [] instructions) {

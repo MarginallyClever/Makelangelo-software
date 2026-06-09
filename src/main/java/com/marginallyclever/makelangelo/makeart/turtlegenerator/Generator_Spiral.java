@@ -34,7 +34,7 @@ public class Generator_Spiral extends TurtleGenerator {
 
 	@Override
 	public String getName() {
-		return Translator.get("Generator_Spiral.name");
+		return "Generator_Spiral.name";
 	}
 
 	@Override

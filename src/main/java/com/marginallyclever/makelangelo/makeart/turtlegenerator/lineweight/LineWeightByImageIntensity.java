@@ -69,7 +69,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
 
     @Override
     public String getName() {
-        return Translator.get("LineWeightByImageIntensity.name");
+        return "LineWeightByImageIntensity.name";
     }
 
     @Override

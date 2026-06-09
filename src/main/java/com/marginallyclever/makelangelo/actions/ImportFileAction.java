@@ -19,13 +19,13 @@ import java.util.prefs.Preferences;
 /**
  * Load a vector and add it to the existing {@link Turtle}.
  */
-public class ImportFileAction extends AbstractAction {
+public class ImportFileAction extends NamedAbstractAction {
     private static final Logger logger = LoggerFactory.getLogger(ImportFileAction.class);
 
     private final MainFrame frame;
 
-    public ImportFileAction(String label, MainFrame frame) {
-        super(label);
+    public ImportFileAction(String name, MainFrame frame) {
+        super(name);
         this.frame = frame;
         putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("icons8-import-16.png"))));
     }
@@ -47,9 +47,9 @@ public class ImportFileAction extends AbstractAction {
 
             // commit the load
             try {
-                Turtle sum = frame.getTurtle();
+                Turtle sum = frame.getEditorContext().getTurtle();
                 sum.add(TurtleFactory.load(filename));
-                frame.setTurtle(sum);
+                frame.getEditorContext().setTurtle(sum);
             } catch(Exception e1) {
                 logger.error("Failed to load {}", filename, e1);
                 JOptionPane.showMessageDialog(frame, e1.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);

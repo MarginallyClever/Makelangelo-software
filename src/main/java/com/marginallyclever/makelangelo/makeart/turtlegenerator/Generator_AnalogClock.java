@@ -11,7 +11,7 @@ import com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight.Gener
 public class Generator_AnalogClock extends TurtleGenerator {
 	@Override
 	public String getName() {
-		return Translator.get("Generator_AnalogClock.name");
+		return "Generator_AnalogClock.name";
 	}
 
 	@Override

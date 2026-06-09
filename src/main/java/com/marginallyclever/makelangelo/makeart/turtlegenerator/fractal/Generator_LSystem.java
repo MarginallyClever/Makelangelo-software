@@ -59,7 +59,7 @@ public class Generator_LSystem extends TurtleGenerator {
 
     @Override
     public String getName() {
-        return Translator.get("LSystemName");
+        return "LSystemName";
     }
 
     @Override
@@ -83,7 +83,7 @@ public class Generator_LSystem extends TurtleGenerator {
         }
 
         // scale turtle to fit paper
-        ResizeTurtleToPaperAction action = new ResizeTurtleToPaperAction(myPaper,false,null);
+        ResizeTurtleToPaperAction action = new ResizeTurtleToPaperAction(null,myPaper,false);
         turtle = action.run(turtle);
 
         notifyListeners(turtle);

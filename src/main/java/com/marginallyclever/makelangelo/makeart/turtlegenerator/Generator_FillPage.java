@@ -38,7 +38,7 @@ public class Generator_FillPage extends TurtleGenerator {
 
 	@Override
 	public String getName() {
-		return Translator.get("FillPageName");
+		return "FillPageName";
 	}
 
 	@Override

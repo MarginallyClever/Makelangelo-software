@@ -33,7 +33,7 @@ public class Generator_GraphPaper extends TurtleGenerator {
 
 	@Override
 	public String getName() {
-		return Translator.get("GraphPaperName");
+		return "GraphPaperName";
 	}
 
 	static public double getAngle() {

@@ -29,7 +29,7 @@ public class Generator_MazeCircle extends Generator_Maze {
 	
 	@Override
 	public String getName() {
-		return Translator.get("Generator_MazeCircle.name");
+		return "Generator_MazeCircle.name";
 	}
 
 	public void setRings(int arg0) {

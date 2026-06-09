@@ -78,7 +78,7 @@ public class Generator_TruchetTiles extends TurtleGenerator {
 
 	@Override
 	public String getName() {
-		return Translator.get("Generator_TruchetTiles.Name");
+		return "Generator_TruchetTiles.Name";
 	}
 
 	@Override

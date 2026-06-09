@@ -28,6 +28,14 @@ import java.net.URI;
 import java.util.Locale;
 import java.util.Objects;
 
+/**
+ * The MainMenu class is responsible for managing the application's main menu bar.
+ * It extends the JMenuBar class and provides a series of menus and menu items for
+ * facilitating user interaction with different application features.
+ *
+ * The class also handles platform-specific adjustments for MacOS and provides
+ * utilities for creating and organizing menus and their respective actions.
+ */
 public class MainMenu extends JMenuBar {
     private static final Logger logger = LoggerFactory.getLogger(MainMenu.class);
 
@@ -51,6 +59,8 @@ public class MainMenu extends JMenuBar {
         add(createRobotMenu());
         add(createHelpMenu());
         updateUI();
+
+        new MenuShortcutManager().manage(this);
     }
 
     private void setSystemLookAndFeelForMacos() {
@@ -68,14 +78,14 @@ public class MainMenu extends JMenuBar {
 
         recentFiles = new RecentFiles(Translator.get("MenuReopenFile"),frame);
 
-        menu.add(new NewFileAction(Translator.get("MenuNewFile"),frame));
+        menu.add(new NewFileAction("MenuNewFile",frame));
         menu.add(new LoadFileAction(null,frame,recentFiles));
         menu.add(recentFiles);
-        menu.add(new ImportFileAction(Translator.get("MenuImportFile"),frame));
-        menu.add(new SaveFileAction(Translator.get("MenuSaveFile"),frame));
+        menu.add(new ImportFileAction("MenuImportFile",frame));
+        menu.add(new SaveFileAction("MenuSaveFile",frame));
         menu.addSeparator();
-        menu.add(new AdjustPreferencesAction(Translator.get("ApplicationSettings.title"),frame));
-        menu.add(new UpdateFirmwareAction(Translator.get("FirmwareUpdate"),frame));
+        menu.add(new AdjustPreferencesAction("ApplicationSettings.title",frame));
+        menu.add(new UpdateFirmwareAction("FirmwareUpdate",frame));
 
         addQuit(menu);
 
@@ -101,7 +111,7 @@ public class MainMenu extends JMenuBar {
 
         if(!added) {
             menu.addSeparator();
-            menu.add(new QuitAction(Translator.get("MenuQuit"),frame));
+            menu.add(new QuitAction("MenuQuit",frame));
         }
     }
 
@@ -114,12 +124,12 @@ public class MainMenu extends JMenuBar {
 
         var app = frame.getPreviewPanel();
         var camera = app.getCamera();
-        var paper = app.getPaper();
+        var paper = frame.getEditorContext().getPaper();
 
-        menu.add(new ZoomOutAction(Translator.get("MenuView.zoomOut"),camera));
-        menu.add(new ZoomInAction(Translator.get("MenuView.zoomIn"),camera));
-        menu.add(new ZoomToFitAction(Translator.get("MenuView.zoomFit"),camera,paper));
-        menu.add(new ZoomToFitMachineAction(Translator.get("MenuView.zoomFitMachine"),camera,frame.getPlotter()));
+        menu.add(new ZoomOutAction("MenuView.zoomOut",camera));
+        menu.add(new ZoomInAction("MenuView.zoomIn",camera));
+        menu.add(new ZoomToFitAction("MenuView.zoomFit",camera,paper));
+        menu.add(new ZoomToFitMachineAction("MenuView.zoomFitMachine",camera,frame.getEditorContext().getPlotter()));
 
         JCheckBoxMenuItem checkboxShowPenUpMoves = new JCheckBoxMenuItem(new ActionShowPenUpMoves());
         GFXPreferences.addListener((e)->checkboxShowPenUpMoves.setSelected ((boolean)e.getNewValue()));
@@ -142,7 +152,7 @@ public class MainMenu extends JMenuBar {
         }
 
         menuWindows.add(new JSeparator());
-        menuWindows.add(new ResetLayoutAction(Translator.get("MenuWindows.ResetLayout"),frame));
+        menuWindows.add(new ResetLayoutAction("MenuWindows.ResetLayout",frame));
 
         return menuWindows;
     }
@@ -151,37 +161,49 @@ public class MainMenu extends JMenuBar {
         JMenu menu = new JMenu(Translator.get("Help"));
         menu.setMnemonic('H');
 
-        JMenuItem buttonViewLog = new JMenuItem(Translator.get("ShowLog"));
-        buttonViewLog.addActionListener((e) -> runLogPanel());
+        JMenuItem buttonViewLog = new JMenuItem(new NamedAbstractAction("ShowLog") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                runLogPanel();
+            }
+        });
         buttonViewLog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, SHORTCUT_CTRL));//"ctrl L"
         menu.add(buttonViewLog);
 
-        JMenuItem buttonLogFolder = new JMenuItem(Translator.get("OpenLogFolder"));
-        buttonLogFolder.addActionListener((e) -> openLogDirectory());
+        JMenuItem buttonLogFolder = new JMenuItem(new NamedAbstractAction("OpenLogFolder") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openLogDirectory();
+            }
+        });
         buttonLogFolder.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-folder-16.png"))));
         menu.add(buttonLogFolder);
 
-        JMenuItem buttonReportBug = createMenuItemBrowse(Translator.get("ReportBug"),"https://github.com/MarginallyClever/Makelangelo-Software/issues");
+        JMenuItem buttonReportBug = createMenuItemBrowse("ReportBug","https://github.com/MarginallyClever/Makelangelo-Software/issues");
         buttonReportBug.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("icons8-bug-16.png"))));
         menu.add(buttonReportBug);
 
-        JMenuItem buttonManual = createMenuItemBrowse(Translator.get("MenuManual"), "https://mcr.dozuki.com/c/Makelangelo_3_and_5_Guide");
+        JMenuItem buttonManual = createMenuItemBrowse("MenuManual", "https://mcr.dozuki.com/c/Makelangelo_3_and_5_Guide");
         buttonManual.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-open-book-16.png"))));
         menu.add(buttonManual);
 
-        JMenuItem buttonForums = createMenuItemBrowse(Translator.get("MenuForums"), "https://discord.gg/Q5TZFmB");
+        JMenuItem buttonForums = createMenuItemBrowse("MenuForums", "https://discord.gg/Q5TZFmB");
         buttonForums.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-discord-16.png"))));
         menu.add(buttonForums);
 
-        JMenuItem buttonDonation = createMenuItemBrowse(Translator.get("MenuItemPayPalDonation"), "https://www.marginallyclever.com/products/makelangelo-software/");
+        JMenuItem buttonDonation = createMenuItemBrowse("MenuItemPayPalDonation", "https://www.marginallyclever.com/products/makelangelo-software/");
         menu.add(buttonDonation);
 
-        JMenuItem buttonTranslate = createMenuItemBrowse(Translator.get("MenuItemTranslate"), "https://crowdin.com/project/makelangelo");
+        JMenuItem buttonTranslate = createMenuItemBrowse("MenuItemTranslate", "https://crowdin.com/project/makelangelo");
         buttonTranslate.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-translate-16.png"))));
         menu.add(buttonTranslate);
 
-        JMenuItem buttonCheckForUpdate = new JMenuItem(Translator.get("MenuUpdate"));
-        buttonCheckForUpdate.addActionListener((e) -> frame.checkForUpdate(true));
+        JMenuItem buttonCheckForUpdate = new JMenuItem(new NamedAbstractAction("MenuUpdate") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.checkForUpdate(true);
+            }
+        });
         buttonCheckForUpdate.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-update-16.png"))));
         menu.add(buttonCheckForUpdate);
 
@@ -202,8 +224,12 @@ public class MainMenu extends JMenuBar {
             }
         }
         if(!added) {
-            JMenuItem buttonAbout = new JMenuItem(Translator.get("MenuAbout"));
-            buttonAbout.addActionListener((e) -> frame.onDialogAbout() );
+            JMenuItem buttonAbout = new JMenuItem(new NamedAbstractAction("MenuAbout") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    frame.onDialogAbout();
+                }
+            });
             menu.add(buttonAbout);
         }
     }
@@ -217,24 +243,26 @@ public class MainMenu extends JMenuBar {
     }
 
     public JMenuItem createMenuItemBrowse(String menuLabelAlreadyTranslated, String urlAsString) {
-        JMenuItem jmi = new JMenuItem(menuLabelAlreadyTranslated);
-        jmi.setToolTipText(urlAsString);
-        jmi.addActionListener((e) -> {
-            try {
-                if (Desktop.isDesktopSupported()) {
-                    if (Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                        java.awt.Desktop.getDesktop().browse(URI.create(urlAsString));
+        JMenuItem jmi = new JMenuItem(new NamedAbstractAction(menuLabelAlreadyTranslated) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    if (Desktop.isDesktopSupported()) {
+                        if (Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                            java.awt.Desktop.getDesktop().browse(URI.create(urlAsString));
+                        } else {
+                            logger.error("Desktop.Action.BROWSE not supported. Can't open the browser to " + urlAsString);
+                        }
                     } else {
-                        logger.error("Desktop.Action.BROWSE not supported. Can't open the browser to " + urlAsString);
+                        logger.error("Desktop not supported. Can't open the browser to " + urlAsString);
                     }
-                } else {
-                    logger.error("Desktop not supported. Can't open the browser to " + urlAsString);
-                }
 
-            } catch (IOException ioe) {
-                logger.error("Can't open the browser to "+urlAsString, ioe);
+                } catch (IOException ioe) {
+                    logger.error("Can't open the browser to "+urlAsString, ioe);
+                }
             }
         });
+        jmi.setToolTipText(urlAsString);
         return jmi;
     }
 
@@ -247,12 +275,16 @@ public class MainMenu extends JMenuBar {
     }
 
     private JMenu createGeneratorMenuFromTree(TurtleGeneratorFactory.TurtleGeneratorLeaf root) {
-        JMenu menu = new JMenu(root.getName());
+        JMenu menu = new JMenu(Translator.get(root.getName()));
         for (TurtleGeneratorFactory.TurtleGeneratorLeaf child : root.getChildren()) {
             if (child.getChildren().isEmpty()) {
-                JMenuItem menuItem = new JMenuItem(child.getName());
+                JMenuItem menuItem = new JMenuItem(new NamedAbstractAction(child.getName()) {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        runGeneratorDialog(child.getGenerator());
+                    }
+                });
                 menu.add(menuItem);
-                menuItem.addActionListener((e) -> runGeneratorDialog(child.getGenerator()));
             } else {
                 JMenu subMenu = createGeneratorMenuFromTree(child);
                 menu.add(subMenu);
@@ -262,9 +294,9 @@ public class MainMenu extends JMenuBar {
     }
 
     private void runGeneratorDialog(TurtleGenerator turtleGenerator) {
-        turtleGenerator.setPaper(frame.getPaper());
-        turtleGenerator.addListener(frame::setTurtle);
-        turtleGenerator.setTurtle(frame.getTurtle());
+        turtleGenerator.setPaper(frame.getEditorContext().getPaper());
+        turtleGenerator.addListener(t->frame.getEditorContext().setTurtle(t));
+        turtleGenerator.setTurtle(frame.getEditorContext().getTurtle());
         turtleGenerator.generate();
 
         if(turtleGenerator.getPanelElements().isEmpty()) {
@@ -285,7 +317,7 @@ public class MainMenu extends JMenuBar {
             @Override
             public void windowClosing(WindowEvent e) {
                 frame.enableMenuBar(true);
-                frame.getPaper().setRotationRef(0);
+                frame.getEditorContext().getPaper().setRotationRef(0);
                 logger.debug("Generation finished");
             }
         });
@@ -300,8 +332,12 @@ public class MainMenu extends JMenuBar {
         try {
             PiCaptureAction pc = new PiCaptureAction();
 
-            JButton bCapture = new JButton(Translator.get("MenuCaptureImage"));
-            bCapture.addActionListener((e)-> pc.run(frame,frame.getPaper()));
+            JButton bCapture = new JButton(new NamedAbstractAction("MenuCaptureImage") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    pc.run(frame,frame.getEditorContext().getPaper());
+                }
+            });
             bCapture.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-camera-16.png"))));
             menu.add(bCapture);
             menu.addSeparator();
@@ -309,25 +345,24 @@ public class MainMenu extends JMenuBar {
             logger.debug("PiCaptureAction unavailable.");
         }
 
-        menu.add(createActionMenuItem(new ResizeTurtleToPaperAction(frame.getPaper(),false,Translator.get("ConvertImagePaperFit"))));
-        menu.add(createActionMenuItem(new ResizeTurtleToPaperAction(frame.getPaper(),true,Translator.get("ConvertImagePaperFill"))));
-        menu.add(createActionMenuItem(new CenterTurtleToPaperAction(frame.getPaper(), Translator.get("ConvertImagePaperCenter"))));
+        menu.add(createActionMenuItem(new ResizeTurtleToPaperAction("ConvertImagePaperFit",frame.getEditorContext().getPaper(),false)));
+        menu.add(createActionMenuItem(new ResizeTurtleToPaperAction("ConvertImagePaperFill",frame.getEditorContext().getPaper(),true)));
+        menu.add(createActionMenuItem(new CenterTurtleToPaperAction("ConvertImagePaperCenter",frame.getEditorContext().getPaper())));
 
-        menu.add(createMover(Translator.get("Translate"),"/com/marginallyclever/makelangelo/icons8-move-16.png",(e)->runTranslatePanel()));
-        menu.add(createMover(Translator.get("Scale"),"/com/marginallyclever/makelangelo/icons8-resize-16.png",(e)->runScalePanel()));
-        menu.add(createMover(Translator.get("Rotate"),"/com/marginallyclever/makelangelo/icons8-rotate-16.png",(e)->runRotatePanel()));
-
-        menu.add(createMover(Translator.get("Crop"),"/com/marginallyclever/makelangelo/icons8-crop-16.png",(e)-> {
-            CropTurtleAction act = new CropTurtleAction(frame.getPaper());
+        menu.add(createMover("Translate","/com/marginallyclever/makelangelo/icons8-move-16.png",(e)->runTranslatePanel()));
+        menu.add(createMover("Scale","/com/marginallyclever/makelangelo/icons8-resize-16.png",(e)->runScalePanel()));
+        menu.add(createMover("Rotate","/com/marginallyclever/makelangelo/icons8-rotate-16.png",(e)->runRotatePanel()));
+        menu.add(createMover("Crop","/com/marginallyclever/makelangelo/icons8-crop-16.png",(e)-> {
+            CropTurtleAction act = new CropTurtleAction(frame.getEditorContext().getPaper());
             frame.getEditorContext().mutate(act::run);
         }));
         menu.addSeparator();
 
-        var a4 = createModifier(new FlipTurtleAction(1,-1,Translator.get("FlipV")),"/com/marginallyclever/makelangelo/icons8-flip-horizontal-16.png");
+        var a4 = createModifier(new FlipTurtleAction("FlipV",1,-1),"/com/marginallyclever/makelangelo/icons8-flip-horizontal-16.png");
         a4.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_V, SHORTCUT_CTRL));//"ctrl V"
         menu.add(a4);
 
-        var a5 = createModifier(new FlipTurtleAction(-1,1,Translator.get("FlipH")),"/com/marginallyclever/makelangelo/icons8-flip-vertical-16.png");
+        var a5 = createModifier(new FlipTurtleAction("FlipH",-1,1),"/com/marginallyclever/makelangelo/icons8-flip-vertical-16.png");
         a5.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, SHORTCUT_CTRL));//"ctrl H"
         menu.add(a5);
 
@@ -358,9 +393,13 @@ public class MainMenu extends JMenuBar {
     }
 
     private JMenuItem createMover(String label, String resource, ActionListener listener) {
-        JMenuItem menuItem = new JMenuItem(label);
+        JMenuItem menuItem = new JMenuItem(new NamedAbstractAction(label) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                listener.actionPerformed(e);
+            }
+        });
         menuItem.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource(resource))));
-        menuItem.addActionListener(listener);
         return menuItem;
     }
 
@@ -385,20 +424,32 @@ public class MainMenu extends JMenuBar {
         JMenu menu = new JMenu(Translator.get("Robot"));
         menu.setMnemonic('k');
 
-        JMenuItem bEstimate = new JMenuItem(Translator.get("RobotMenu.GetTimeEstimate"));
+        JMenuItem bEstimate = new JMenuItem(new NamedAbstractAction("RobotMenu.GetTimeEstimate") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                estimateTime();
+            }
+        });
         bEstimate.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, SHORTCUT_CTRL));
-        bEstimate.addActionListener((e)-> estimateTime());
         bEstimate.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-stopwatch-16.png"))));
         menu.add(bEstimate);
 
-        JMenuItem bSaveToSD = new JMenuItem(Translator.get("RobotMenu.SaveGCode"));
-        bSaveToSD.addActionListener((e)-> frame.saveGCode());
+        JMenuItem bSaveToSD = new JMenuItem(new NamedAbstractAction("RobotMenu.SaveGCode") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.saveGCode();
+            }
+        });
         bSaveToSD.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, SHORTCUT_CTRL));
         bSaveToSD.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-export-16.png"))));
         menu.add(bSaveToSD);
 
-        JMenuItem bOpenControls = new JMenuItem(Translator.get("RobotMenu.OpenControls"));
-        bOpenControls.addActionListener((e)-> openPlotterControls());
+        JMenuItem bOpenControls = new JMenuItem(new NamedAbstractAction("RobotMenu.OpenControls") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openPlotterControls();
+            }
+        });
         bOpenControls.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, SHORTCUT_CTRL));
         bOpenControls.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-joystick-16.png"))));
         menu.add(bOpenControls);
@@ -436,8 +487,8 @@ public class MainMenu extends JMenuBar {
     }
 
     private void estimateTime() {
-        MarlinSimulation ms = new MarlinSimulation(frame.getPlotter().getSettings());
-        int estimatedSeconds = (int)Math.ceil(ms.getTimeEstimate(frame.getTurtle()));
+        MarlinSimulation ms = new MarlinSimulation(frame.getEditorContext().getPlotter().getSettings());
+        int estimatedSeconds = (int)Math.ceil(ms.getTimeEstimate(frame.getEditorContext().getTurtle()));
         String timeAsString = StringHelper.getElapsedTime(estimatedSeconds);
         String message = Translator.get("EstimatedTimeIs",new String[]{timeAsString});
         JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this), message, Translator.get("RobotMenu.GetTimeEstimate"), JOptionPane.INFORMATION_MESSAGE);
@@ -447,7 +498,7 @@ public class MainMenu extends JMenuBar {
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), Translator.get("PlotterControls.Title"));
         dialog.setPreferredSize(new Dimension(PlotterControls.DIMENSION_PANEL_WIDTH, PlotterControls.DIMENSION_PANEL_HEIGHT));
         dialog.setMinimumSize(new Dimension(PlotterControls.DIMENSION_PANEL_WIDTH, PlotterControls.DIMENSION_PANEL_HEIGHT));
-        PlotterControls plotterControls = new PlotterControls(frame.getPlotter(),frame.getTurtle(), dialog);
+        PlotterControls plotterControls = new PlotterControls(frame.getEditorContext().getPlotter(),frame.getEditorContext().getTurtle(), dialog);
         dialog.add(plotterControls);
         dialog.pack();
 
@@ -468,13 +519,22 @@ public class MainMenu extends JMenuBar {
         JMenu menu = new JMenu(Translator.get("MenuSettings"));
         menu.setMnemonic('S');
 
-        JMenuItem bOpenPaperSettings = new JMenuItem(Translator.get("OpenPaperSettings"));
-        bOpenPaperSettings.addActionListener((e)-> openPaperSettings());
+        JMenuItem bOpenPaperSettings = new JMenuItem(new NamedAbstractAction("OpenPaperSettings") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openPaperSettings();
+            }
+        });
         menu.add(bOpenPaperSettings);
+        bOpenPaperSettings.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, SHORTCUT_CTRL));
 
-        JMenuItem bOpenPlotterSettings = new JMenuItem(Translator.get("OpenPlotterSettings"));
-        bOpenPlotterSettings.addActionListener((e)-> openPlotterSettings());
-        bOpenPlotterSettings.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, SHORTCUT_CTRL));//"ctrl P"
+        JMenuItem bOpenPlotterSettings = new JMenuItem(new NamedAbstractAction("OpenPlotterSettings") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openPlotterSettings();
+            }
+        });
+        bOpenPlotterSettings.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, SHORTCUT_CTRL));
         menu.add(bOpenPlotterSettings);
 
         return menu;
@@ -504,7 +564,7 @@ public class MainMenu extends JMenuBar {
     }
 
     private void openPaperSettings() {
-        PaperSettingsPanel settings = new PaperSettingsPanel(frame.getPaper());
+        PaperSettingsPanel settings = new PaperSettingsPanel(frame.getEditorContext().getPaper());
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this),Translator.get("PaperSettings.Title"));
         dialog.add(settings);
         dialog.setMinimumSize(new Dimension(300,300));

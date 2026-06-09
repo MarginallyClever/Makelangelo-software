@@ -26,7 +26,7 @@ public class Generator_GridHexagons extends TurtleGenerator {
 
 	@Override
 	public String getName() {
-		return Translator.get("Generator_GridHexagons.Name");
+		return "Generator_GridHexagons.Name";
 	}
 
 	@Override
@@ -62,7 +62,7 @@ public class Generator_GridHexagons extends TurtleGenerator {
 			}
 		}
 
-		ResizeTurtleToPaperAction act = new ResizeTurtleToPaperAction(myPaper,false,"");
+		ResizeTurtleToPaperAction act = new ResizeTurtleToPaperAction(null,myPaper,false);
 		turtle = act.run(turtle);
 
 		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());

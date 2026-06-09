@@ -53,7 +53,7 @@ public class Generator_Lissajous extends TurtleGenerator {
 	
 	@Override
 	public String getName() {
-		return Translator.get("LissajousName");
+		return "LissajousName";
 	}
 
 	static public int getA() {

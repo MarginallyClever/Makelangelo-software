@@ -15,7 +15,7 @@ public class Generator_RegistrationMarks extends TurtleGenerator {
 
 	@Override
 	public String getName() {
-		return Translator.get("Generator_RegistrationMarks.Name");
+		return "Generator_RegistrationMarks.Name";
 	}
 
 	@Override

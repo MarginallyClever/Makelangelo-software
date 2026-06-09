@@ -5,7 +5,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 public class FlipTurtleAction extends TurtleTool {
 	private final double scaleX,scaleY;
 	
-	public FlipTurtleAction(double x,double y,String name) {
+	public FlipTurtleAction(String name,double x,double y) {
 		super(name);
 		scaleX=x;
 		scaleY=y;

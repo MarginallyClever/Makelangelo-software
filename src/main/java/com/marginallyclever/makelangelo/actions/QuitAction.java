@@ -9,7 +9,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.util.Objects;
 
-public class QuitAction extends AbstractAction {
+public class QuitAction extends NamedAbstractAction {
     private final JFrame frame;
 
     public QuitAction(String label, MainFrame frame) {

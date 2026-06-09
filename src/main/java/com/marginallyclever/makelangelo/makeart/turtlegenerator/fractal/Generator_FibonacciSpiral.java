@@ -38,7 +38,7 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 	
 	@Override
 	public String getName() {
-		return Translator.get("FibonacciSpiralName");
+		return "FibonacciSpiralName";
 	}
 
 	private void buildFibonacciSequence(int order) {

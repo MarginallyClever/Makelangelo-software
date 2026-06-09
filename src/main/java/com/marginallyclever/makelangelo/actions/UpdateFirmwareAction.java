@@ -10,7 +10,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Objects;
 
-public class UpdateFirmwareAction extends AbstractAction {
+public class UpdateFirmwareAction extends NamedAbstractAction {
     private final MainFrame frame;
 
     public UpdateFirmwareAction(String label, MainFrame frame) {

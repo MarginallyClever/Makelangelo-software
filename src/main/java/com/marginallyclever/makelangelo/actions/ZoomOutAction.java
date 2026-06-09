@@ -7,7 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Objects;
 
-public class ZoomOutAction extends AbstractAction {
+public class ZoomOutAction extends NamedAbstractAction {
     private final Camera camera;
 
     public ZoomOutAction(String label, Camera camera) {

@@ -12,7 +12,7 @@ import java.awt.geom.Rectangle2D;
 public class CenterTurtleToPaperAction extends TurtleTool {
 	private final Paper paper;
 
-	public CenterTurtleToPaperAction(Paper paper, String name) {
+	public CenterTurtleToPaperAction(String name,Paper paper) {
 		super(name);
 		this.paper = paper;
 	}

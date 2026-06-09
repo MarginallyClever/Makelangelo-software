@@ -15,13 +15,10 @@ import com.marginallyclever.makelangelo.donatelloimpl.DonatelloDropTarget;
 import com.marginallyclever.makelangelo.editorcontext.EditorContext;
 import com.marginallyclever.makelangelo.makeart.io.SaveGCode;
 import com.marginallyclever.makelangelo.makeart.io.TurtleFactory;
-import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManager;
 import com.marginallyclever.makelangelo.preview.PreviewDropTarget;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
-import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderer;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
@@ -257,14 +254,6 @@ public class MainFrame extends JFrame {
         setTitle(finalTitle);
     }
 
-    public void setTurtle(Turtle turtle) {
-        editorContext.setTurtle(turtle);
-    }
-
-    public Turtle getTurtle() {
-        return editorContext.getTurtle();
-    }
-
     /**
      * Reset the default layout.  These depend on the order of creation in createDefaultLayout().
      */
@@ -332,7 +321,7 @@ public class MainFrame extends JFrame {
             int head = previewPanel.getRangeBottom();
             int tail = previewPanel.getRangeTop();
             SaveGCode save = new SaveGCode();
-            save.run(editorContext.getTurtle(), previewPanel.getPlotter(), this, head, tail);
+            save.run(editorContext.getTurtle(), getEditorContext().getPlotter(), this, head, tail);
         } catch(Exception e) {
             logger.error("Error while exporting the gcode", e);
             JOptionPane.showMessageDialog(this, Translator.get("SaveError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
@@ -341,14 +330,6 @@ public class MainFrame extends JFrame {
 
     public PreviewPanel getPreviewPanel() {
         return previewPanel;
-    }
-
-    public Plotter getPlotter() {
-        return previewPanel.getPlotter();
-    }
-
-    public Paper getPaper() {
-        return previewPanel.getPaper();
     }
 
     public TurtleRenderer getTurtleRenderer() {

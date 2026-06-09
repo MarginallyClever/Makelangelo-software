@@ -9,7 +9,7 @@ import java.awt.event.ActionEvent;
 /**
  * An action to zoom the camera to fit the entire paper area.
  */
-public class ZoomToFitAction extends AbstractAction {
+public class ZoomToFitAction extends NamedAbstractAction {
     private final Camera camera;
     private final Paper paper;
 

@@ -115,7 +115,7 @@ public class Generator_FlowField extends TurtleGenerator {
 
 	@Override
 	public String getName() {
-		return Translator.get("Generator_FlowField.name");
+		return "Generator_FlowField.name";
 	}
 
 	@Override

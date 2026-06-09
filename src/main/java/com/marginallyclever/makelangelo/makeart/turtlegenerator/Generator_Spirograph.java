@@ -60,7 +60,7 @@ public class Generator_Spirograph extends TurtleGenerator {
 	
 	@Override
 	public String getName() {
-		return Translator.get("SpirographName");
+		return "SpirographName";
 	}
 
 	static public boolean getEpitrochoid() {

@@ -32,9 +32,6 @@ import javax.swing.*;
 public final class Makelangelo {
 	private static final Logger logger = LoggerFactory.getLogger(Makelangelo.class);
 
-	// GUI elements
-	private MainFrame mainFrame;
-
 	public static void main(String[] args) {
 		CommandLineOptions.setFromMain(args);
 		Log.start();

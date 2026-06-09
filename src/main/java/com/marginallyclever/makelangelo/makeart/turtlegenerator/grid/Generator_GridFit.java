@@ -58,7 +58,7 @@ public class Generator_GridFit extends TurtleGenerator {
 
 	@Override
 	public String getName() {
-		return Translator.get("Generator_GridFit.Name");
+		return "Generator_GridFit.Name";
 	}
 
 	private void changeWide() {

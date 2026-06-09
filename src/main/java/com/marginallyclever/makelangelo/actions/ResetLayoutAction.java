@@ -5,7 +5,7 @@ import com.marginallyclever.makelangelo.MainFrame;
 import javax.swing.*;
 import java.util.Objects;
 
-public class ResetLayoutAction extends AbstractAction {
+public class ResetLayoutAction extends NamedAbstractAction {
     private final MainFrame frame;
 
     public ResetLayoutAction(String label, MainFrame frame) {

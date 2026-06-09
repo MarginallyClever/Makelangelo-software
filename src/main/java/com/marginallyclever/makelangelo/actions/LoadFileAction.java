@@ -47,7 +47,7 @@ public class LoadFileAction extends AbstractAction {
                     : filePath;
             putValue(Action.NAME, shortName);
         }
-        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control O"));
+        //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control O"));
         putValue(Action.SMALL_ICON, new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/actions/icons8-load-16.png"))));
     }
 
@@ -66,8 +66,8 @@ public class LoadFileAction extends AbstractAction {
         if(filename == null || filename.trim().isEmpty()) throw new InvalidParameterException("filename cannot be empty");
 
         try {
-            LoadFilePanel loader = new LoadFilePanel(frame.getPaper(),frame.getPlotter().getSettings(), filename);
-            loader.addActionListener(e -> frame.setTurtle((Turtle)(e.getSource())));
+            LoadFilePanel loader = new LoadFilePanel(frame.getEditorContext().getPaper(),frame.getEditorContext().getPlotter().getSettings(), filename);
+            loader.addActionListener(e -> frame.getEditorContext().setTurtle((Turtle)(e.getSource())));
 
             if (loader.onNewFilenameChosen(filename)) {
                 var previewPanel = frame.getPreviewPanel();

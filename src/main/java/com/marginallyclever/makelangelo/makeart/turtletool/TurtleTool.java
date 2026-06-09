@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.turtletool;
 
+import com.marginallyclever.makelangelo.actions.NamedAbstractAction;
 import com.marginallyclever.makelangelo.editorcontext.EditorContext;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
@@ -12,7 +13,7 @@ import java.awt.event.ActionEvent;
  * @author Dan Royer
  * @since 7.31.0
  */
-public abstract class TurtleTool extends AbstractAction {
+public abstract class TurtleTool extends NamedAbstractAction {
 	private EditorContext context;
 	
 	public TurtleTool(String label) {

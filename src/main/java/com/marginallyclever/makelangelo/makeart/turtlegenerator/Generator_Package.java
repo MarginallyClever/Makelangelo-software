@@ -40,7 +40,7 @@ public class Generator_Package extends TurtleGenerator {
 	
 	@Override
 	public String getName() {
-		return Translator.get("Package");
+		return "Package";
 	}
 
 	void drawRect(Turtle turtle,int x1,int y1,int x2,int y2) {

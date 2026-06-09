@@ -10,7 +10,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.util.Objects;
 
-public class SaveFileAction extends AbstractAction {
+public class SaveFileAction extends NamedAbstractAction {
     private static final Logger logger = LoggerFactory.getLogger(SaveFileAction.class);
 
     private final MainFrame frame;
@@ -27,7 +27,7 @@ public class SaveFileAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         var ancestor = SwingUtilities.getWindowAncestor(frame);
         try {
-            saveDialog.run(frame.getTurtle(), ancestor,frame.getPlotter().getSettings());
+            saveDialog.run(frame.getEditorContext().getTurtle(), ancestor,frame.getEditorContext().getPlotter().getSettings());
         } catch(Exception e1) {
             logger.error("Error while saving the vector file", e1);
             JOptionPane.showMessageDialog(ancestor,

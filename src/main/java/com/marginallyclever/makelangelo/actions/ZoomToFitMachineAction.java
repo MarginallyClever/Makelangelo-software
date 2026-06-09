@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 /**
  * An action to zoom the camera to fit the machine limits.
  */
-public class ZoomToFitMachineAction extends AbstractAction {
+public class ZoomToFitMachineAction extends NamedAbstractAction {
     private final Camera camera;
     private final Plotter plotter;
 

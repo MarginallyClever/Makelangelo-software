@@ -9,7 +9,7 @@ public class InfillTurtleAction extends TurtleTool {
 	private static final Logger logger = LoggerFactory.getLogger(InfillTurtleAction.class);
 
 	public InfillTurtleAction() {
-		super(Translator.get("InfillTurtleAction.title"));
+		super("InfillTurtleAction.title");
 	}
 	
 	@Override

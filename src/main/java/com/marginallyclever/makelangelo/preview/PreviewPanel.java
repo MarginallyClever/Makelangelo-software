@@ -5,10 +5,9 @@ import com.marginallyclever.makelangelo.MakeleangeloRangeSlider;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.actions.ZoomToFitMachineAction;
 import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
+import com.marginallyclever.makelangelo.editorcontext.EditorContext;
 import com.marginallyclever.makelangelo.editorcontext.EditorContextListener;
 import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
-import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRenderer;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
@@ -31,9 +30,7 @@ import java.util.Objects;
 public class PreviewPanel extends JPanel implements EditorContextListener {
     private static final Logger logger = LoggerFactory.getLogger(PreviewPanel.class);
 
-    private final Plotter myPlotter = new Plotter();
-    private final Paper myPaper = new Paper();
-
+    private EditorContext editorContext;
     private final RenderPanel renderPanel = new RenderPanel();
     private final MakeleangeloRangeSlider rangeSlider = new MakeleangeloRangeSlider();
     private final Camera camera = new Camera();
@@ -44,19 +41,24 @@ public class PreviewPanel extends JPanel implements EditorContextListener {
     private boolean first = true;
 
     public PreviewPanel() {
+        this(new EditorContext());
+    }
+
+    public PreviewPanel(EditorContext editorContext) {
         super(new BorderLayout());
         setOpaque(true);
+        this.editorContext = editorContext;
 
         camera.addPropertyChangeListener((e)->{
             if(!first) return;
             // zoom to fit
-            new ZoomToFitMachineAction("", getCamera(), getPlotter()).actionPerformed(null);
+            new ZoomToFitMachineAction("", getCamera(), editorContext.getPlotter()).actionPerformed(null);
             first=false;
         });
 
         renderPanel.setCamera(camera);
-        renderPanel.addRenderListener(myPaper);
-        renderPanel.addRenderListener(myPlotter);
+        renderPanel.addRenderListener(editorContext.getPaper());
+        renderPanel.addRenderListener(editorContext.getPlotter());
         renderPanel.addRenderListener(myTurtleRenderer);
         addPlotterRendererToPreviewPanel();
 
@@ -66,15 +68,15 @@ public class PreviewPanel extends JPanel implements EditorContextListener {
         JToolBar toolBar = createToolBar();
         add(toolBar, BorderLayout.NORTH);
 
-        myPlotter.setSettings(plotterSettingsManager.getLastSelectedProfile());
-        myPaper.loadConfig();
+        editorContext.getPlotter().setSettings(plotterSettingsManager.getLastSelectedProfile());
+        editorContext.getPaper().loadConfig();
 
         rangeSlider.addChangeListener(e -> {
             myTurtleRenderer.setFirst(rangeSlider.getBottom());
             myTurtleRenderer.setLast(rangeSlider.getTop());
         });
 
-        onPlotterSettingsUpdate(myPlotter.getSettings());
+        onPlotterSettingsUpdate(editorContext.getPlotter().getSettings());
     }
 
     private JToolBar createToolBar() {
@@ -105,7 +107,7 @@ public class PreviewPanel extends JPanel implements EditorContextListener {
         var buttonZoomToFit = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                camera.zoomToFit(myPaper.getPaperWidth(),myPaper.getPaperHeight());
+                camera.zoomToFit(editorContext.getPaper().getPaperWidth(),editorContext.getPaper().getPaperHeight());
             }
         };
         buttonZoomToFit.putValue(Action.SHORT_DESCRIPTION,Translator.get("MenuView.zoomFit"));
@@ -126,15 +128,15 @@ public class PreviewPanel extends JPanel implements EditorContextListener {
 
     private void updatePlotterRenderer() {
         try {
-            myPlotterRenderer = PlotterRendererFactory.valueOf(myPlotter.getSettings().getString(PlotterSettings.STYLE)).getPlotterRenderer();
+            myPlotterRenderer = PlotterRendererFactory.valueOf(editorContext.getPlotter().getSettings().getString(PlotterSettings.STYLE)).getPlotterRenderer();
         } catch (Exception e) {
-            logger.error("Failed to find plotter style {}", myPlotter.getSettings().getString(PlotterSettings.STYLE));
+            logger.error("Failed to find plotter style {}", editorContext.getPlotter().getSettings().getString(PlotterSettings.STYLE));
             myPlotterRenderer = PlotterRendererFactory.MAKELANGELO_5.getPlotterRenderer();
         }
     }
 
     public void onPlotterSettingsUpdate(PlotterSettings settings) {
-        myPlotter.setSettings(settings);
+        editorContext.getPlotter().setSettings(settings);
 
         TurtleRenderer turtleRenderer = TurtleRenderFactory.getTurtleRenderer(TurtleRenderFactory.MARLIN_SIMULATION);
         if(turtleRenderer instanceof MarlinSimulationVisualizer msv) {
@@ -154,23 +156,15 @@ public class PreviewPanel extends JPanel implements EditorContextListener {
         renderPanel.addRenderListener((g)->{
             if(myPlotterRenderer!=null) {
                 myTurtleRenderer.setShowTravel(GFXPreferences.getShowPenUp());
-                myPlotterRenderer.render(g, myPlotter);
+                myPlotterRenderer.render(g, editorContext.getPlotter());
             }
         });
     }
 
     public void stop() {
-        renderPanel.removePreviewListener(myPlotter);
-        myPlotter.getSettings().save();
-        plotterSettingsManager.setLastSelectedProfile(myPlotter.getSettings().getUID());
-    }
-
-    public Paper getPaper() {
-        return myPaper;
-    }
-
-    public Plotter getPlotter() {
-        return myPlotter;
+        renderPanel.removePreviewListener(editorContext.getPlotter());
+        editorContext.getPlotter().getSettings().save();
+        plotterSettingsManager.setLastSelectedProfile(editorContext.getPlotter().getSettings().getUID());
     }
 
     public TurtleRenderer getTurtleRenderer() {

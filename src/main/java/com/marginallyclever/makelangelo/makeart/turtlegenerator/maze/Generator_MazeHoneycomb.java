@@ -41,7 +41,7 @@ public class Generator_MazeHoneycomb extends Generator_Maze {
 	
 	@Override
 	public String getName() {
-		return Translator.get("Generator_MazeHoneycomb.name");
+		return "Generator_MazeHoneycomb.name";
 	}
 
 	public int getRows() {
@@ -153,7 +153,7 @@ public class Generator_MazeHoneycomb extends Generator_Maze {
 		drawInteriorWalls(turtle,len,horiz,vert);
 		drawOutsideEdge(turtle,len,horiz,vert);
 
-		ResizeTurtleToPaperAction act = new ResizeTurtleToPaperAction(myPaper,false,"");
+		ResizeTurtleToPaperAction act = new ResizeTurtleToPaperAction(null,myPaper,false);
 		turtle = act.run(turtle);
 
 		return turtle;

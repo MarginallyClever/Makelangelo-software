@@ -55,7 +55,7 @@ public class Generator_Voronoi extends TurtleGenerator {
 
 	@Override
 	public String getName() {
-		return Translator.get("Converter_Voronoi.Name");
+		return "Converter_Voronoi.Name";
 	}
 
 	static public int getNumCells() {

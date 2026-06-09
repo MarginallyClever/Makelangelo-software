@@ -49,26 +49,26 @@ public class TurtleGeneratorFactory {
 		}
 	};
 
-	public static TurtleGeneratorLeaf available = new TurtleGeneratorLeaf(Translator.get("MenuGenerate"),new TurtleGeneratorLeaf[]{
+	public static TurtleGeneratorLeaf available = new TurtleGeneratorLeaf("MenuGenerate",new TurtleGeneratorLeaf[]{
 			new TurtleGeneratorLeaf(new Generator_Border()),
-			new TurtleGeneratorLeaf(Translator.get("MenuGenerate.Fractals"), new TurtleGeneratorLeaf[]{
+			new TurtleGeneratorLeaf("MenuGenerate.Fractals", new TurtleGeneratorLeaf[]{
                     new TurtleGeneratorLeaf(new Generator_FibonacciSpiral()),
                     new TurtleGeneratorLeaf(new Generator_LSystem()),
                     new TurtleGeneratorLeaf(new Generator_LSystemTree()),
             }),
-			new TurtleGeneratorLeaf(Translator.get("MenuGenerate.Grids"), new TurtleGeneratorLeaf[]{
+			new TurtleGeneratorLeaf("MenuGenerate.Grids", new TurtleGeneratorLeaf[]{
 					new TurtleGeneratorLeaf(new Generator_GraphPaper()),
 					new TurtleGeneratorLeaf(new Generator_GridFit()),
 					new TurtleGeneratorLeaf(new Generator_GridHexagons()),
 			}),
-			new TurtleGeneratorLeaf(Translator.get("MenuGenerate.SpaceFillers"), new TurtleGeneratorLeaf[]{
+			new TurtleGeneratorLeaf("MenuGenerate.SpaceFillers", new TurtleGeneratorLeaf[]{
 					new TurtleGeneratorLeaf(new Generator_FillPage()),
 					new TurtleGeneratorLeaf(new Generator_FlowField()),
 					new TurtleGeneratorLeaf(new Generator_Spiral()),
 					new TurtleGeneratorLeaf(new Generator_TruchetTiles()),
 					new TurtleGeneratorLeaf(new Generator_Voronoi()),
 			}),
-			new TurtleGeneratorLeaf(Translator.get("MenuGenerate.Mazes"), new TurtleGeneratorLeaf[]{
+			new TurtleGeneratorLeaf("MenuGenerate.Mazes", new TurtleGeneratorLeaf[]{
 					new TurtleGeneratorLeaf(new Generator_MazeCircle()),
 					new TurtleGeneratorLeaf(new Generator_MazeHoneycomb()),
 					new TurtleGeneratorLeaf(new Generator_MazeRectangle()),

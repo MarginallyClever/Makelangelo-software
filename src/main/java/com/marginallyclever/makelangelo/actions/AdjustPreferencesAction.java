@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.util.Objects;
 
-public class AdjustPreferencesAction extends AbstractAction {
+public class AdjustPreferencesAction extends NamedAbstractAction {
     private final MainFrame frame;
     private final ApplicationSettings myPreferencesPanel = new ApplicationSettings();
 

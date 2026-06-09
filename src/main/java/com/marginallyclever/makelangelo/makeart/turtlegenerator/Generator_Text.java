@@ -92,9 +92,11 @@ public class Generator_Text extends TurtleGenerator {
 	public String [] getFontNames() {
 		return fontNames;
 	}
+
 	public int getLastFont() {
 		return lastFont;
 	}
+
 	public void setFont(int arg0) {
 		if(arg0<0) arg0=0;
 		if(arg0>=fontNames.length) arg0 = fontNames.length-1;
@@ -105,6 +107,7 @@ public class Generator_Text extends TurtleGenerator {
 	public int getLastSize() {
 		return lastSize;
 	}
+
 	public void setSize(int size) {
 		if(size<1)size=1;
 		lastSize=size;
@@ -113,13 +116,14 @@ public class Generator_Text extends TurtleGenerator {
 	public String getLastMessage() {
 		return lastMessage;
 	}
+
 	public void setMessage(String msg) {
 		lastMessage = msg;
 	}
 
 	@Override
 	public String getName() {
-		return Translator.get("YourMsgHereName");
+		return "YourMsgHereName";
 	}
 
 	protected void setupTransform() {

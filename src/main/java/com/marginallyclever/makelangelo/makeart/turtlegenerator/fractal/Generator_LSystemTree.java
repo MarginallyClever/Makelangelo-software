@@ -76,7 +76,7 @@ public class Generator_LSystemTree extends TurtleGenerator {
 
 	@Override
 	public String getName() {
-		return Translator.get("LSystemTreeName");
+		return "LSystemTreeName";
 	}
 
 	@Override
@@ -89,7 +89,7 @@ public class Generator_LSystemTree extends TurtleGenerator {
 		lSystemTree(turtle,order, 10);
 
 		// scale turtle to fit paper
-		ResizeTurtleToPaperAction action = new ResizeTurtleToPaperAction(myPaper,false,null);
+		ResizeTurtleToPaperAction action = new ResizeTurtleToPaperAction(null,myPaper,false);
 		turtle = action.run(turtle);
 
 		notifyListeners(turtle);

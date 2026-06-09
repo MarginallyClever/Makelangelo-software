@@ -93,7 +93,9 @@ public final class RecentFiles extends JMenu {
 		int i=0;
 		for( String f : fileList ) {
 			prefs.put(getNodeName(i++), f);
-			this.add(new LoadFileAction(f,frame,this));
+			var action = new LoadFileAction(f,frame,this);
+			action.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control "+(i)));
+			this.add(action);
 		}
 	}
 
