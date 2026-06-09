@@ -59,6 +59,10 @@ public class SaveGCode implements TurtleSaver {
      * @throws Exception if saving the file fails.
      */
 	public void run(Turtle turtle, Plotter plotter, JFrame parent, int trimHead, int trimTail) throws Exception {
+		// make this file chooser remember the path used by the last file chooser.
+		var fc2 = TurtleFactory.getSaveFileChooser();
+		fc.setCurrentDirectory(fc2.getCurrentDirectory());
+
 		if (fc.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
 			String fileWithExtension = addExtension(selectedFile,((FileNameExtensionFilter)fc.getFileFilter()).getExtensions());
@@ -73,6 +77,8 @@ public class SaveGCode implements TurtleSaver {
 				saveOneFile(fileWithExtension, skinnyTurtle, plotter);
 			}
 		}
+
+		fc2.setCurrentDirectory(fc2.getCurrentDirectory());
 	}
 
 	/**
