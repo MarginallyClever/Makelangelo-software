@@ -301,6 +301,7 @@ public class Turtle implements Cloneable {
 		Point2d top = new Point2d(-Double.MAX_VALUE, -Double.MAX_VALUE);
 		Point2d bottom = new Point2d(Double.MAX_VALUE, Double.MAX_VALUE);
 
+		lock();
 		int hits = 0;
 		for (var cl : strokeLayers) {
 			for (var line : cl.getAllLines()) {
@@ -313,6 +314,7 @@ public class Turtle implements Cloneable {
 				}
 			}
 		}
+		unlock();
 
 		if (hits == 0) {
 			bottom.set(0, 0);
@@ -328,6 +330,7 @@ public class Turtle implements Cloneable {
 	 * @param sy the y-axis scale factor.
 	 */
 	public void scale(double sx, double sy) {
+		lock();
 		for (var cl : strokeLayers) {
 			for (var line : cl.getAllLines()) {
 				for (var point : line.getAllPoints()) {
@@ -336,6 +339,7 @@ public class Turtle implements Cloneable {
 				}
 			}
 		}
+		unlock();
 	}
 
 	/**
@@ -344,6 +348,7 @@ public class Turtle implements Cloneable {
 	 * @param dy relative move y
 	 */
 	public void translate(double dx, double dy) {
+		lock();
 		for (var cl : strokeLayers) {
 			for (var line : cl.getAllLines()) {
 				for (var point : line.getAllPoints()) {
@@ -352,6 +357,7 @@ public class Turtle implements Cloneable {
 				}
 			}
 		}
+		unlock();
 	}
 
 	/**
@@ -363,6 +369,7 @@ public class Turtle implements Cloneable {
 		double c = Math.cos(r);
 		double s = Math.sin(r);
 
+		lock();
 		for (var cl : strokeLayers) {
 			for (var line : cl.getAllLines()) {
 				for (var point : line.getAllPoints()) {
@@ -373,6 +380,7 @@ public class Turtle implements Cloneable {
 				}
 			}
 		}
+		unlock();
 	}
 
 	/**
