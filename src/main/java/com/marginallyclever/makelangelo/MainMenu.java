@@ -35,6 +35,9 @@ import java.util.Objects;
  *
  * The class also handles platform-specific adjustments for MacOS and provides
  * utilities for creating and organizing menus and their respective actions.
+ *
+ * The main menu shortcuts are controlled by the {@link MenuShortcutManager}, which
+ * stores user settings in <code>~/.makelangelo/shortcuts.json</code>.
  */
 public class MainMenu extends JMenuBar {
     private static final Logger logger = LoggerFactory.getLogger(MainMenu.class);
