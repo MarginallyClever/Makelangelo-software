@@ -78,7 +78,7 @@ public class SaveGCode implements TurtleSaver {
 			}
 		}
 
-		fc2.setCurrentDirectory(fc2.getCurrentDirectory());
+		fc2.setCurrentDirectory(fc.getCurrentDirectory());
 	}
 
 	/**
