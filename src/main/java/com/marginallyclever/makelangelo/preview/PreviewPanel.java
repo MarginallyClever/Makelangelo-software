@@ -127,10 +127,11 @@ public class PreviewPanel extends JPanel implements EditorContextListener {
     }
 
     private void updatePlotterRenderer() {
+        var style = editorContext.getPlotter().getSettings().getString(PlotterSettings.STYLE);
         try {
-            myPlotterRenderer = PlotterRendererFactory.valueOf(editorContext.getPlotter().getSettings().getString(PlotterSettings.STYLE)).getPlotterRenderer();
+            myPlotterRenderer = PlotterRendererFactory.valueOf(style).getPlotterRenderer();
         } catch (Exception e) {
-            logger.error("Failed to find plotter style {}", editorContext.getPlotter().getSettings().getString(PlotterSettings.STYLE));
+            logger.error("Failed to find plotter style {}", style);
             myPlotterRenderer = PlotterRendererFactory.MAKELANGELO_5.getPlotterRenderer();
         }
     }

@@ -89,7 +89,7 @@ public class ChooseConnection extends JPanel {
 			onClose();
 		} else {
 			ComboItem comboItem = (ComboItem) connectionComboBox.getSelectedItem();
-			if (comboItem==null) return;  // no connections selected, can't happened
+			if (comboItem==null) return;  // no connections selected, can't happen
 
 			Configuration configuration = comboItem.configuration;
 			comboItem.transportLayerUi.setSelectedValue(configuration);

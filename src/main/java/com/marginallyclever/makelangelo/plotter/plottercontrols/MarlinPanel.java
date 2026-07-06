@@ -124,22 +124,21 @@ public class MarlinPanel extends JPanel {
 	 * @param evt the network session event
 	 */
 	protected void onDataReceived(NetworkSessionEvent evt) {
-		if (evt.flag == NetworkSessionEvent.DATA_RECEIVED) {
-			lastReceivedTime = System.currentTimeMillis();
-			String message = ((String)evt.data).trim();
+		if (evt.flag != NetworkSessionEvent.DATA_RECEIVED) return;
+		lastReceivedTime = System.currentTimeMillis();
+		String message = ((String)evt.data).trim();
 
-			logger.trace("received '{}'", message.trim());
-			if(message.startsWith(STR_OK)) {
-				onHearOK();
-			} else if(message.contains(STR_RESEND)) {
-				onHearResend(message);
-			} else if(message.startsWith(STR_ERROR)) {
-				onHearError(message.substring(STR_ERROR.length()).trim());
-			} else if(message.startsWith(STR_HOME_XY_FIRST)) {
-				onHearHomeXYFirst();
-			} else if(message.startsWith(STR_ACTION_COMMAND)) {
-				onHearActionCommand(message.substring(STR_ACTION_COMMAND.length()).trim());
-			}
+		logger.trace("received '{}'", message.trim());
+		if(message.startsWith(STR_OK)) {
+			onHearOK();
+		} else if(message.contains(STR_RESEND)) {
+			onHearResend(message);
+		} else if(message.startsWith(STR_ERROR)) {
+			onHearError(message.substring(STR_ERROR.length()).trim());
+		} else if(message.startsWith(STR_HOME_XY_FIRST)) {
+			onHearHomeXYFirst();
+		} else if(message.startsWith(STR_ACTION_COMMAND)) {
+			onHearActionCommand(message.substring(STR_ACTION_COMMAND.length()).trim());
 		}
 	}
 

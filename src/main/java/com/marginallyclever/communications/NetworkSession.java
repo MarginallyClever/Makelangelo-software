@@ -31,7 +31,7 @@ public abstract class NetworkSession {
 	
 	// OBSERVER PATTERN
 
-	private List<NetworkSessionListener> listeners = new ArrayList<>();
+	private final List<NetworkSessionListener> listeners = new ArrayList<>();
 
 	public void addListener(NetworkSessionListener listener) {
 		listeners.add(listener);
