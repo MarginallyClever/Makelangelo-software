@@ -49,13 +49,12 @@ public class MainFrame extends JFrame {
 
     private final List<DockingPanel> windows = new ArrayList<>();
 
-    private final PreviewPanel previewPanel = new PreviewPanel();
+    private final EditorContext editorContext = new EditorContext();
+    private final PreviewPanel previewPanel = new PreviewPanel(editorContext);
     private final Donatello donatello = new Donatello();
     private final AboutPanel aboutPanel = new AboutPanel(MakelangeloVersion.VERSION, MakelangeloVersion.DETAILED_VERSION);
     private final NodeFactoryPanel nodeFactoryPanel = new NodeFactoryPanel();
     private final DockableEditNodePanel editNodePanel = new DockableEditNodePanel();
-
-    private final EditorContext editorContext = new EditorContext();
 
     private final MainMenu mainMenuBar;
 
