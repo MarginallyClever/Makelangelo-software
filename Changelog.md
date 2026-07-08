@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 7.80.2
+
+### Added
+- Fully customizable shortcuts in the main menu, including the ability to add new shortcuts for any menu item.
+### Changed
+- Improved support for BTT mini E3 v3 by tweaking serial settings.  Tested with RUMBA and Mini.
+### Fixed
+- Editor context (machine/paper/pen) settings were not being passed to the live drawing controls.
+- `Save to` path remembered across all dialogs.
+- MickeyMoe1992 now properly obeys the margin limits, same as the other converters.
+
 ## 7.78.6
 
 ### Added
