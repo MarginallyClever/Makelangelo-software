@@ -547,7 +547,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-core</artifactId>
-			<version>1.5.27</version>
+			<version>1.5.35</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
