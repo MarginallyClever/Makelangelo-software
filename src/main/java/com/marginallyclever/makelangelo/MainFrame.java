@@ -15,6 +15,7 @@ import com.marginallyclever.makelangelo.donatelloimpl.DonatelloDropTarget;
 import com.marginallyclever.makelangelo.editorcontext.EditorContext;
 import com.marginallyclever.makelangelo.makeart.io.SaveGCode;
 import com.marginallyclever.makelangelo.makeart.io.TurtleFactory;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorFactory;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManager;
 import com.marginallyclever.makelangelo.preview.PreviewDropTarget;
@@ -65,6 +66,7 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         editorContext.addChangeListener(previewPanel);
+        TurtleGeneratorFactory.setup();
         createAppWindow();
         initDocking();
         createDefaultLayout();

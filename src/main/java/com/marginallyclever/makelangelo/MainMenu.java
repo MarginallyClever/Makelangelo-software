@@ -9,6 +9,7 @@ import com.marginallyclever.makelangelo.actions.*;
 import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorFactory;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorLeaf;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorPanel;
 import com.marginallyclever.makelangelo.makeart.turtletool.*;
 import com.marginallyclever.makelangelo.paper.PaperSettingsPanel;
@@ -277,9 +278,9 @@ public class MainMenu extends JMenuBar {
         return createGeneratorMenuFromTree(TurtleGeneratorFactory.available);
     }
 
-    private JMenu createGeneratorMenuFromTree(TurtleGeneratorFactory.TurtleGeneratorLeaf root) {
+    private JMenu createGeneratorMenuFromTree(TurtleGeneratorLeaf root) {
         JMenu menu = new JMenu(Translator.get(root.getName()));
-        for (TurtleGeneratorFactory.TurtleGeneratorLeaf child : root.getChildren()) {
+        for (TurtleGeneratorLeaf child : root.getChildren()) {
             if (child.getChildren().isEmpty()) {
                 JMenuItem menuItem = new JMenuItem(new NamedAbstractAction(child.getName()) {
                     @Override
