@@ -384,6 +384,10 @@ public class MainMenu extends JMenuBar {
         a3.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, SHORTCUT_CTRL));//"ctrl I"
         menu.add(a3);
 
+        menu.addSeparator();
+
+        menu.add(createMover("MaskLineByImageIntensityPanel.title","/com/marginallyclever/makelangelo/icons8-mask-16.png",(e)->runMaskPanel()));
+        menu.add(a4);
         return menu;
     }
 
@@ -396,6 +400,12 @@ public class MainMenu extends JMenuBar {
         return action;
     }
 
+    /**
+     * @param label the name of the translation table lookup for the label
+     * @param resource the path to the icon resource
+     * @param listener the action listener to call when the menu item is selected
+     * @return a JMenuItem with the specified label, icon, and action listener
+     */
     private JMenuItem createMover(String label, String resource, ActionListener listener) {
         JMenuItem menuItem = new JMenuItem(new NamedAbstractAction(label) {
             @Override
@@ -410,6 +420,10 @@ public class MainMenu extends JMenuBar {
     private TurtleTool createActionMenuItem(TurtleTool action) {
         action.setContext(frame.getEditorContext());
         return action;
+    }
+
+    private void runMaskPanel() {
+        MaskLineByImageIntensityPanel.runAsDialog(SwingUtilities.getWindowAncestor(this), frame.getEditorContext());
     }
 
     private void runRotatePanel() {

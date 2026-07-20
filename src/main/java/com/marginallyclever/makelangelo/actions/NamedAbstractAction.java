@@ -11,11 +11,18 @@ import javax.swing.*;
 public abstract class NamedAbstractAction extends AbstractAction {
     private String name;
 
+    /**
+     * @param name the name of the translation table lookup for the label
+     */
     public NamedAbstractAction(String name) {
         super(name == null ? "" : Translator.get(name));
         this.name = name;
     }
 
+    /**
+     * @param name the name of the translation table lookup for the label
+     * @param icon the 16x16 icon for the action.
+     */
     public NamedAbstractAction(String name, Icon icon) {
         super(Translator.get(name), icon);
         this.name = name;

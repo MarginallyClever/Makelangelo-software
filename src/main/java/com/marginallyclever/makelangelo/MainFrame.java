@@ -66,7 +66,7 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         editorContext.addChangeListener(previewPanel);
-        TurtleGeneratorFactory.setup();
+        TurtleGeneratorFactory.setup(editorContext);
         createAppWindow();
         initDocking();
         createDefaultLayout();
