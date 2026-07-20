@@ -52,6 +52,9 @@ public class MarlinPanel extends JPanel {
 	public static final String PROMPT_END = "prompt_end";
 	public static final String STR_I_HANDLE_DIALOGS = "M876 P1";
 
+	// reset the line number for controllers that don't reboot on serial disconnect.
+	public static final String STR_RESET_LINE_NUMBER = "M110 N1";
+
 	private final TextInterfaceToNetworkSession chatInterface;
 
 	private final List<MarlinCommand> myHistory = new ArrayList<>();
@@ -90,6 +93,7 @@ public class MarlinPanel extends JPanel {
 		lineNumberAdded=0;
 		myHistory.clear();
 		lastReceivedTime = System.currentTimeMillis();
+		queueAndSendCommand(STR_RESET_LINE_NUMBER);
 		queueAndSendCommand(STR_I_HANDLE_DIALOGS);
 		// timeoutChecker uses lastReceivedTime to check if the connection is still live.
 		// so start it after setting the lastReceived time or the first check will fail.
@@ -207,15 +211,32 @@ public class MarlinPanel extends JPanel {
 			myHistory.remove(0);
 		}
 	}
-	
-	public void queueAndSendCommand(String str) {
-		str = removeComment(str);
-		if(str.length()==0) return;
 
-		lineNumberAdded++;
-		String withLineNumber = "N"+lineNumberAdded+" "+str;
-		String assembled = withLineNumber + generateChecksum(withLineNumber);
-		myHistory.add(new MarlinCommand(lineNumberAdded,assembled));
+	/**
+	 * Queue and send a command, forcibly including the line number.
+	 * @param command the command to send.
+	 */
+	public void queueAndSendCommand(String command) {
+		queueAndSendCommand(command, true);
+	}
+
+	/**
+	 * Queue and send a command.
+	 * @param command the command to send.
+	 * @param addLineNumber true if the line number should be included.
+	 */
+	public void queueAndSendCommand(String command, boolean addLineNumber) {
+		String commandMinusComment = removeComment(command);
+		if(commandMinusComment.isEmpty()) return;
+
+		if(addLineNumber) {
+			lineNumberAdded++;
+			String withLineNumber = "N" + lineNumberAdded + " " + command;
+			String assembled = withLineNumber + generateChecksum(withLineNumber);
+			myHistory.add(new MarlinCommand(lineNumberAdded, assembled));
+		} else {
+			myHistory.add(new MarlinCommand(lineNumberAdded, command));
+		}
 		if(busyCount>0) sendQueuedCommand();
 	}
 
@@ -230,7 +251,7 @@ public class MarlinPanel extends JPanel {
 	private void sendQueuedCommand() {
 		clearOldHistory();
 		
-		if(myHistory.size()==0) return;
+		if(myHistory.isEmpty()) return;
 		
 		int smallest = Integer.MAX_VALUE;
 		for( MarlinCommand mc : myHistory ) {
