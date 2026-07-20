@@ -1,8 +1,5 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight.GenerateClockHands;
-
 /**
  * Draws a border around the paper.  Uses current paper myPaper.
  * @author Dan Royer

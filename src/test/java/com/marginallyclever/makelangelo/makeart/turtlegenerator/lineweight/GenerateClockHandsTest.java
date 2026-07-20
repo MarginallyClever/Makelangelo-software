@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight;
 
 import com.marginallyclever.makelangelo.makeart.io.TurtleFactory;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.GenerateClockHands;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManager;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
