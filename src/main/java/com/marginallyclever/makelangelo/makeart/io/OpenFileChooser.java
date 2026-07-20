@@ -31,23 +31,22 @@ public class OpenFileChooser {
 
         this.parent = parent;
 
-        // add all supported type
+        // add "all supported type" filter
         String[] allSupportedTypes = Stream.concat(
                 TurtleFactory.getLoadExtensions().stream()
                         .map(FileNameExtensionFilter::getExtensions)
                         .flatMap(Stream::of)
                 ,
-                Arrays.stream(SelectImageConverterPanel.IMAGE_FILE_EXTENSIONS.clone())
+                Arrays.stream(SelectImageConverterPanel.IMAGE_FILE_EXTENSIONS)
         ).toArray(String[]::new);
-
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter(Translator.get("OpenFileChooser.AllSupportedFiles"), allSupportedTypes));
 
-        // add vector formats
+        // add all vector formats
         for (FileNameExtensionFilter ff : TurtleFactory.getLoadExtensions()) {
             fileChooser.addChoosableFileFilter(ff);
         }
 
-        // add image formats
+        // add all image formats
         String names = String.join(", ",SelectImageConverterPanel.IMAGE_FILE_EXTENSIONS);
         FileNameExtensionFilter images = new FileNameExtensionFilter(Translator.get("OpenFileChooser.FileTypeImage",new String[]{names}), SelectImageConverterPanel.IMAGE_FILE_EXTENSIONS);
         fileChooser.addChoosableFileFilter(images);

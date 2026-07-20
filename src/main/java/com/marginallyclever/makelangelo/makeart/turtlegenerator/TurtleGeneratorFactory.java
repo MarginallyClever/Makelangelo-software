@@ -41,7 +41,7 @@ public class TurtleGeneratorFactory {
 						new TurtleGeneratorLeaf(new Generator_MazeHoneycomb()),
 						new TurtleGeneratorLeaf(new Generator_MazeRectangle()),
 				}),
-				new TurtleGeneratorLeaf(new LineWeightByImageIntensity(context)),
+				new TurtleGeneratorLeaf(new LineWeightByImageIntensity()),
 				new TurtleGeneratorLeaf(new Generator_AnalogClock()),
 				new TurtleGeneratorLeaf(new Generator_Lissajous()),
 				new TurtleGeneratorLeaf(new Generator_Package()),

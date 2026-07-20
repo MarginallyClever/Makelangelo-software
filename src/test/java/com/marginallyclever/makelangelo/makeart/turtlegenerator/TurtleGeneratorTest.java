@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.editorcontext.EditorContext;
 import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.Test;
 
@@ -14,6 +15,8 @@ public class TurtleGeneratorTest {
     public void testNoMissingGeneratorPanels() {
         PreferencesHelper.start();
         Translator.start();
+        TurtleGeneratorFactory.setup(new EditorContext());
+
         try {
             testNothingMissingInTreeNode(TurtleGeneratorFactory.available);
         } catch (Exception e) {

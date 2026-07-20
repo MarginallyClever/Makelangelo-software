@@ -19,6 +19,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.io.FileInputStream;
 
+/**
+ * LoadFilePanel is a JPanel that provides a user interface for selecting and loading files.
+ * It allows users to load specific files, supports handling image and turtle files,
+ * and integrates with a rendering system through the RenderListener interface.
+ */
 public class LoadFilePanel extends JPanel implements RenderListener {
 	private static final Logger logger = LoggerFactory.getLogger(LoadFilePanel.class);
 	public static final String COMMAND_TURTLE = "turtle";
