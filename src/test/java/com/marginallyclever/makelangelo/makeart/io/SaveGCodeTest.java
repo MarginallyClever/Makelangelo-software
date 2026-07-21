@@ -8,6 +8,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -24,11 +25,20 @@ import static com.marginallyclever.makelangelo.makeart.io.SaveHelper.multiColors
 import static com.marginallyclever.makelangelo.makeart.io.SaveHelper.simpleMoves;
 
 class SaveGCodeTest {
+    private Plotter plotter;
+    private PlotterSettings settings;
 
     @BeforeAll
     public static void beforeAll() {
         PreferencesHelper.start();
         Translator.start();
+    }
+
+    @BeforeEach
+    public void beforeEach() {
+        plotter = new Plotter();
+        settings = plotter.getSettings();
+        settings.load("Makelangelo 5");
     }
 
     @Test
@@ -41,28 +51,42 @@ class SaveGCodeTest {
         verifySavedFile(multiColorsMoves(), "/gcode/save_multi_colors.gcode");
     }
 
+    @Test
+    public void saveWithChangedAccelerationAndFeedRate() throws Exception {
+        var accel = settings.getDouble(PlotterSettings.MAX_ACCELERATION);
+        var draw = settings.getDouble(PlotterSettings.FEED_RATE_DRAW);
+        var travel = settings.getDouble(PlotterSettings.FEED_RATE_TRAVEL);
+
+        settings.setDouble(PlotterSettings.MAX_ACCELERATION, 500);
+        settings.setDouble(PlotterSettings.FEED_RATE_DRAW,125);
+        settings.setDouble(PlotterSettings.FEED_RATE_TRAVEL,250);
+
+        try {
+            verifySavedFile(simpleMoves(), "/gcode/changed_rates.gcode");
+        } finally {
+            // in case future settings save as soon as a value is changed, which would be wierd.
+            settings.setDouble(PlotterSettings.MAX_ACCELERATION, accel);
+            settings.setDouble(PlotterSettings.FEED_RATE_DRAW,draw);
+            settings.setDouble(PlotterSettings.FEED_RATE_TRAVEL,travel);
+        }
+    }
+
     private void verifySavedFile(Turtle turtle, String expectedFilename) throws Exception {
         // given
         SaveGCode saveGCode = new SaveGCode();
 
         File fileTemp = File.createTempFile("unit", null);
+        // no need for a try/finally to delete a temp file.
 
-        try {
-            Plotter plotter = new Plotter();
-            PlotterSettings settings = plotter.getSettings();
-            settings.load("Makelangelo 5");
-            settings.setString(PlotterSettings.START_GCODE,"M300\nM200");
-            settings.setString(PlotterSettings.END_GCODE,"M400\nM200");
-            settings.setDouble(PlotterSettings.PEN_ANGLE_UP_TIME,50);
-            settings.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,50);
+        settings.setString(PlotterSettings.START_GCODE,"M300\nM200");
+        settings.setString(PlotterSettings.END_GCODE,"M400\nM200");
+        settings.setDouble(PlotterSettings.PEN_ANGLE_UP_TIME,50);
+        settings.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,50);
 
-            // when
-            saveGCode.saveOneFile(fileTemp.getAbsolutePath(), turtle, plotter);
-            // then
-            compareExpectedToActual(expectedFilename, fileTemp);
-        } finally {
-            fileTemp.delete();
-        }
+        // when
+        saveGCode.saveOneFile(fileTemp.getAbsolutePath(), turtle, plotter);
+        // then
+        compareExpectedToActual(expectedFilename, fileTemp);
     }
 
     private void compareExpectedToActual(String expectedFilename, File fileTemp) throws IOException {

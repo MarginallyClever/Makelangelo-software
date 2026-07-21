@@ -118,8 +118,15 @@ public class MarlinPlotterInterfaceTest {
     }
     @Test
     public void testZAxisGcode() {
-        testZAxisGcode("M280 P0 S%1 T%2","M280 P0 S%1 T%2","M280 P0 S45.0 T50.0","M280 P0 S90.0 T150.0");
-        testZAxisGcode("G1 Z%1 F%2","G0 Z%1 F%2","G1 Z45.0 F50.0","G0 Z90.0 F150.0");
+        var separator = System.lineSeparator();
+        testZAxisGcode("M280 P0 S%1 T%2",
+                "M280 P0 S%1 T%2",
+                "M280 P0 S45.0 T50.0"+separator+"G0 F3000.0",
+                "M280 P0 S90.0 T150.0"+separator+"G0 F3000.0");
+        testZAxisGcode("G1 Z%1 F%2",
+                "G0 Z%1 F%2",
+                "G1 Z45.0 F50.0"+separator+"G0 F3000.0",
+                "G0 Z90.0 F150.0"+separator+"G0 F3000.0");
     }
 
     private void testZAxisGcode(String setDown,String setUp,String matchDown,String matchUp) {

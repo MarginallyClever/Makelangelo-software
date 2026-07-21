@@ -25,6 +25,7 @@ public class MarlinPlotterPanel extends MarlinPanel {
 	private static final String STR_ACCELERATION = "echo:  M201";
 	private static final String MOTOR_ENGAGE = "M17";
 	private static final String MOTOR_DISENGAGE = "M18";
+	private static final String STR_SET_MAX_FEEDRATE = "M203 ";
 	private static final String STR_SET_STARTING_ACCELERATION= "M204 ";
 
 	// M665 Set delta/polargraph configuration.
@@ -67,28 +68,28 @@ public class MarlinPlotterPanel extends MarlinPanel {
 	}
 
 	private void sendToolChange(int toolNumber) {
-		queueAndSendCommand(myPlotter.getSettings().getPenUpString());
-		queueAndSendCommand(myPlotter.getSettings().getToolChangeString(toolNumber));
+		queueAndSendCommands(myPlotter.getSettings().getPenUpString());
+		queueAndSendCommands(myPlotter.getSettings().getToolChangeString(toolNumber));
 
 		// acceleration is set per-tool, in case different tools have custom settings.
 		// Also MarlinPanel.onConnect doesn't currently access myPlotter or its settings so it can't go there.
 		String accel = String.valueOf(myPlotter.getSettings().getDouble(PlotterSettings.MAX_ACCELERATION));
-		queueAndSendCommand(STR_SET_STARTING_ACCELERATION+" P"+accel + " S"+accel+" T"+accel);
+		queueAndSendCommands(STR_SET_STARTING_ACCELERATION+" P"+accel + " S"+accel+" T"+accel);
 	}
 
 	private void sendFindHome() {
-		queueAndSendCommand(myPlotter.getSettings().getFindHomeString());
+		queueAndSendCommands(myPlotter.getSettings().getFindHomeString());
 	}
 
 	private void sendPenUpDown() {
-		String str = myPlotter.getPenIsUp()
-				? myPlotter.getSettings().getPenUpString()
-				: myPlotter.getSettings().getPenDownString();
-		queueAndSendCommand(str);
+		queueAndSendCommands(myPlotter.getPenIsUp()
+			? myPlotter.getSettings().getPenUpString()
+			: myPlotter.getSettings().getPenDownString()
+		);
 	}
 
 	private void sendEngage() {
-		queueAndSendCommand(myPlotter.getMotorsEngaged() ? MOTOR_ENGAGE : MOTOR_DISENGAGE);
+		queueAndSendCommands(myPlotter.getMotorsEngaged() ? MOTOR_ENGAGE : MOTOR_DISENGAGE);
 	}
 
 	private void sendGoto() {
@@ -96,7 +97,7 @@ public class MarlinPlotterPanel extends MarlinPanel {
 		String msg = myPlotter.getPenIsUp()
 				? myPlotter.getSettings().getTravelToString(p.x, p.y)
 				: myPlotter.getSettings().getDrawToString(p.x, p.y);
-		queueAndSendCommand(msg);
+		queueAndSendCommands(msg);
 	}
 
 	/**
@@ -119,7 +120,7 @@ public class MarlinPlotterPanel extends MarlinPanel {
 		var height = top-bottom;
 		var maxLen = Math.sqrt(width*width + height*height);
 
-		queueAndSendCommand(M665
+		queueAndSendCommands(M665
 				+" T"+StringHelper.formatDouble(top)
 				+" B"+StringHelper.formatDouble(bottom)
 				+" L"+StringHelper.formatDouble(left)

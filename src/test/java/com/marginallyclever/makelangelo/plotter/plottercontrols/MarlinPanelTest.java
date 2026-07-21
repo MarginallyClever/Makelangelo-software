@@ -66,7 +66,7 @@ public class MarlinPanelTest {
         AtomicReference<MarlinPanelEvent> ae = new AtomicReference<>();
         mi.addListener(ae::set);
 
-        mi.queueAndSendCommand("M400");
+        mi.queueAndSendCommands("M400");
 
         Assertions.assertNotNull(ae.get());
         Assertions.assertEquals(MarlinPanelEvent.DID_NOT_FIND, ae.get().getID());

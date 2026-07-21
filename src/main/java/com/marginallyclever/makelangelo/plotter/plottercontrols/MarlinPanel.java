@@ -93,8 +93,8 @@ public class MarlinPanel extends JPanel {
 		lineNumberAdded=0;
 		myHistory.clear();
 		lastReceivedTime = System.currentTimeMillis();
-		queueAndSendCommand(STR_RESET_LINE_NUMBER);
-		queueAndSendCommand(STR_I_HANDLE_DIALOGS);
+		queueAndSendCommands(STR_RESET_LINE_NUMBER);
+		queueAndSendCommands(STR_I_HANDLE_DIALOGS);
 		// timeoutChecker uses lastReceivedTime to check if the connection is still live.
 		// so start it after setting the lastReceived time or the first check will fail.
 		timeoutChecker.start();
@@ -213,19 +213,28 @@ public class MarlinPanel extends JPanel {
 	}
 
 	/**
-	 * Queue and send a command, forcibly including the line number.
+	 * Queue and send one or more commands.  Each command should be separated by a newline \n character.
+	 * The line numbering will be forcibly added.
 	 * @param command the command to send.
 	 */
-	public void queueAndSendCommand(String command) {
-		queueAndSendCommand(command, true);
+	public void queueAndSendCommands(String command) {
+		queueAndSendCommands(command, true);
 	}
 
 	/**
-	 * Queue and send a command.
-	 * @param command the command to send.
+	 * Queue and send one or more commands.  Each command should be separated by a newline \n character.
+	 * @param command the commands to send.
 	 * @param addLineNumber true if the line number should be included.
 	 */
-	public void queueAndSendCommand(String command, boolean addLineNumber) {
+	public void queueAndSendCommands(String command, boolean addLineNumber) {
+		String [] list = command.split(System.lineSeparator());
+		for (String cmd : list) {
+			queueAndSendOneCommand(cmd, addLineNumber);
+		}
+	}
+
+
+	private void queueAndSendOneCommand(String command,boolean addLineNumber) {
 		String commandMinusComment = removeComment(command);
 		if(commandMinusComment.isEmpty()) return;
 
@@ -308,7 +317,7 @@ public class MarlinPanel extends JPanel {
 			promptDialog.addOption(actionCommand.substring(PROMPT_BUTTON.length()).trim());
 		} else if(actionCommand.startsWith(PROMPT_SHOW)) {
 			promptDialog.run(this, Translator.get("InfoTitle"),(result)-> {
-				queueAndSendCommand("M876 S" + Math.max(0,result));
+				queueAndSendCommands("M876 S" + Math.max(0,result));
 				waitingForResponse = false;
 				fireIdleNotice();
 			});

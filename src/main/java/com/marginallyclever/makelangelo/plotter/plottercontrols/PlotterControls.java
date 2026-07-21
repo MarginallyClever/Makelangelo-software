@@ -288,13 +288,13 @@ public class PlotterControls extends JPanel {
 	private void addUserStartGCODE() {
 		String gcode = myPlotter.getSettings().getString(PlotterSettings.START_GCODE);
 		Arrays.asList(gcode.split(System.getProperty("line.separator")).clone())
-				.forEach(marlinInterface::queueAndSendCommand);
+				.forEach(marlinInterface::queueAndSendCommands);
 	}
 
 	private void addUserEndGCODE() {
 		String gcode = myPlotter.getSettings().getString(PlotterSettings.END_GCODE);
 		Arrays.asList(gcode.split(System.getProperty("line.separator")).clone())
-				.forEach(marlinInterface::queueAndSendCommand);
+				.forEach(marlinInterface::queueAndSendCommands);
 	}
 
 	/**

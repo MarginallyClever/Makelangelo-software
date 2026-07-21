@@ -499,7 +499,8 @@ public class PlotterSettings {
 	 */
 	public String getTravelToString(double x, double y) {
 		return "G0 " + getPosition(x, y)
-				+ " F" + getDouble(FEED_RATE_TRAVEL);
+				//+ " F" + getDouble(FEED_RATE_TRAVEL)
+				;
 	}
 
 	/**
@@ -510,7 +511,8 @@ public class PlotterSettings {
 	 */
 	public String getDrawToString(double x, double y) {
 		return "G1 " + getPosition(x, y)
-				+ " F" + getDouble(FEED_RATE_DRAW);
+				//+ " F" + getDouble(FEED_RATE_DRAW)
+				;
 	}
 
 	private static String getPosition(double x, double y) {
@@ -522,14 +524,18 @@ public class PlotterSettings {
 		return getString2(PEN_UP_GCODE,new String[] {
 				String.valueOf(getDouble(PEN_ANGLE_UP)),
 				String.valueOf(getDouble(PEN_ANGLE_UP_TIME))
-		});
+		})
+				+ System.lineSeparator()
+				+ "G0 F" + getDouble(PlotterSettings.FEED_RATE_TRAVEL);
 	}
 
 	public String getPenDownString() {
 		return getString2(PEN_DOWN_GCODE,new String[] {
 				String.valueOf(getDouble(PEN_ANGLE_DOWN)),
 				String.valueOf(getDouble(PEN_ANGLE_DOWN_TIME))
-		});
+		})
+				+ System.lineSeparator()
+				+ "G0 F" + getDouble(PlotterSettings.FEED_RATE_DRAW);
 	}
 
 	/**
