@@ -387,7 +387,7 @@ public class MainMenu extends JMenuBar {
         menu.addSeparator();
 
         menu.add(createMover("MaskLineByImageIntensityPanel.title","/com/marginallyclever/makelangelo/icons8-mask-16.png",(e)->runMaskPanel()));
-        menu.add(a4);
+        menu.add(createMover("LineWeightByImageIntensityPanel.title","/com/marginallyclever/makelangelo/diagonal_thick_icon_16.png",(e)->runLineWeightPanel()));
         return menu;
     }
 
@@ -424,6 +424,10 @@ public class MainMenu extends JMenuBar {
 
     private void runMaskPanel() {
         MaskLineByImageIntensityPanel.runAsDialog(SwingUtilities.getWindowAncestor(this), frame.getEditorContext());
+    }
+
+    private void runLineWeightPanel() {
+        LineWeightByImageIntensityPanel.runAsDialog(SwingUtilities.getWindowAncestor(this), frame.getEditorContext());
     }
 
     private void runRotatePanel() {

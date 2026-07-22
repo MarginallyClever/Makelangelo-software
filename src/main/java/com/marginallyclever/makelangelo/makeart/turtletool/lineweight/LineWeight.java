@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight;
+package com.marginallyclever.makelangelo.makeart.turtletool.lineweight;
 
 import java.util.Collections;
 import java.util.LinkedList;

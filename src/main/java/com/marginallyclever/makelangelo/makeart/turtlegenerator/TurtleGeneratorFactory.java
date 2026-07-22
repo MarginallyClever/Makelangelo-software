@@ -1,11 +1,12 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.makelangelo.editorcontext.EditorContext;
-import com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal.*;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal.Generator_FibonacciSpiral;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal.Generator_LSystem;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal.Generator_LSystemTree;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.grid.Generator_GraphPaper;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.grid.Generator_GridFit;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.grid.Generator_GridHexagons;
-import com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight.LineWeightByImageIntensity;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_MazeCircle;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_MazeHoneycomb;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_MazeRectangle;
@@ -41,7 +42,6 @@ public class TurtleGeneratorFactory {
 						new TurtleGeneratorLeaf(new Generator_MazeHoneycomb()),
 						new TurtleGeneratorLeaf(new Generator_MazeRectangle()),
 				}),
-				new TurtleGeneratorLeaf(new LineWeightByImageIntensity()),
 				new TurtleGeneratorLeaf(new Generator_AnalogClock()),
 				new TurtleGeneratorLeaf(new Generator_Lissajous()),
 				new TurtleGeneratorLeaf(new Generator_Package()),

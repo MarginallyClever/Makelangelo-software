@@ -23,6 +23,10 @@ import java.io.FileInputStream;
 import java.text.NumberFormat;
 import java.util.prefs.Preferences;
 
+/**
+ * Control UI for {@link MaskLineByImageIntensity}.  This is a panel that allows the user to select an image, set a threshold
+ * and monte carlo value, and then generate a new turtle based on the original turtle and the image.
+ */
 public class MaskLineByImageIntensityPanel extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(MaskLineByImageIntensityPanel.class);
 	private final EditorContext context;

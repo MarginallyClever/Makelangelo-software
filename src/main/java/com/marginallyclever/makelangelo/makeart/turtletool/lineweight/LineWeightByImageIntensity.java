@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight;
+package com.marginallyclever.makelangelo.makeart.turtletool.lineweight;
 
 import com.marginallyclever.donatello.select.SelectDouble;
 import com.marginallyclever.donatello.select.SelectFile;
@@ -18,7 +18,6 @@ import java.io.FileInputStream;
  * Generate a drawing where the thickness of the line is determined by the intensity of the image at that point.
  * @deprecated since 7.62.0 to be replaced with Donatello nodes.
  */
-@Deprecated(since="7.62.0")
 public class LineWeightByImageIntensity extends TurtleGenerator {
     private static final Logger logger = LoggerFactory.getLogger(LineWeightByImageIntensity.class);
 

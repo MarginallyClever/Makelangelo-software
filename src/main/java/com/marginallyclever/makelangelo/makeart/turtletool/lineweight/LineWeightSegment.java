@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight;
+package com.marginallyclever.makelangelo.makeart.turtletool.lineweight;
 
 
 

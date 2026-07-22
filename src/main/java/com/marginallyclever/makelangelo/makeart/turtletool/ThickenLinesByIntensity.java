@@ -3,8 +3,8 @@ package com.marginallyclever.makelangelo.makeart.turtletool;
 import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.linecollection.LineCollection;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight.LineWeight;
-import com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight.LineWeightSegment;
+import com.marginallyclever.makelangelo.makeart.turtletool.lineweight.LineWeight;
+import com.marginallyclever.makelangelo.makeart.turtletool.lineweight.LineWeightSegment;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Point2d;
