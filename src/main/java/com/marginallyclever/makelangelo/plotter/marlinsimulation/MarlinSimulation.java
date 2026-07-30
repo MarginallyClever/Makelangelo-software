@@ -31,9 +31,10 @@ public class MarlinSimulation {
 
 	private double [] previousSpeed = { 0,0,0 };
 	private double previousSafeSpeed = 0;
-	private double XMAX = 325;
-	private double XMIN = -325;
-	private double YMAX = 500;
+	private final double XMAX;
+	private final double XMIN;
+	private final double YMAX;
+	private final double MINIMUM_PLANNER_SPEED;
 
 	enum JerkType {
 		CLASSIC_JERK,
@@ -44,11 +45,11 @@ public class MarlinSimulation {
 	private JerkType jerkType = JerkType.CLASSIC_JERK;
 
 	// Unit vector of previous path line segment
-	private Vector3d previousNormal = new Vector3d();
+	private final Vector3d previousNormal = new Vector3d();
 	
-	private double previousNominalSpeed=0;
+	private double previousNominalSpeed = 0;
 	private double junction_deviation = 0.05;
-	private boolean polargraphLimit=false;
+	private boolean polargraphLimit = false;
 
 	private final double [] maxJerk;
 	
@@ -58,6 +59,7 @@ public class MarlinSimulation {
 		XMIN = settings.getDouble(PlotterSettings.LIMIT_LEFT);
 		YMAX = settings.getDouble(PlotterSettings.LIMIT_TOP);
 		maxJerk = settings.getDoubleArray(PlotterSettings.MAX_JERK);
+		MINIMUM_PLANNER_SPEED =  settings.getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED);
 	}
 	
 	/**
@@ -76,7 +78,7 @@ public class MarlinSimulation {
 		double seconds = len / feedrate;
 		int segments = (int)Math.ceil(seconds * settings.getInteger(PlotterSettings.SEGMENTS_PER_SECOND));
 		int maxSeg = (int)Math.ceil(len / settings.getDouble(PlotterSettings.MIN_SEGMENT_LENGTH));
-		segments = Math.max(1,Math.min(maxSeg,segments));
+		segments = Math.clamp(segments, 1, maxSeg);
 		Vector3d deltaSegment = new Vector3d(delta);
 		deltaSegment.scale(1.0/segments);
 		
@@ -133,7 +135,7 @@ public class MarlinSimulation {
 
 		// apply speed limit
 		if(speedFactor<1.0) {
-			for(int i=0;i<currentSpeed.length;++i) currentSpeed[0] *= speedFactor;
+			for(int i=0;i<currentSpeed.length;++i) currentSpeed[i] *= speedFactor;
 			block.nominalSpeed *= speedFactor;
 		}
 
@@ -144,15 +146,14 @@ public class MarlinSimulation {
 		}
 		
 		// limit jerk between moves
-		double vmax_junction;
-		switch(jerkType) {
-			case CLASSIC_JERK:        vmax_junction = classicJerk(block,currentSpeed,block.nominalSpeed);  break;
-			case JUNCTION_DEVIATION:  vmax_junction = junctionDeviationJerk(block,block.nominalSpeed);  break;
-			case DOT_PRODUCT:         vmax_junction = dotProductJerk(block);  break;
-			default:                  vmax_junction = block.nominalSpeed;  break;
-		}
+		double vmax_junction = switch (jerkType) {
+            case CLASSIC_JERK -> classicJerk(block, currentSpeed, block.nominalSpeed);
+            case JUNCTION_DEVIATION -> junctionDeviationJerk(block, block.nominalSpeed);
+            case DOT_PRODUCT -> dotProductJerk(block);
+            default -> block.nominalSpeed;
+        };
 
-		block.allowableSpeed = maxSpeedAllowed(-block.acceleration,settings.getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED),block.distance);
+        block.allowableSpeed = maxSpeedAllowed(-block.acceleration,MINIMUM_PLANNER_SPEED,block.distance);
 		block.entrySpeedMax = vmax_junction;
 		block.entrySpeed = Math.min(vmax_junction, block.allowableSpeed);
 		block.nominalLength = ( block.allowableSpeed >= block.nominalSpeed );
@@ -170,7 +171,7 @@ public class MarlinSimulation {
 	private double dotProductJerk(MarlinSimulationBlock next) { 
 		double vmax_junction = next.nominalSpeed * next.normal.dot(previousNormal) * 1.1;
 		vmax_junction = Math.min(vmax_junction, next.nominalSpeed);
-		vmax_junction = Math.max(vmax_junction, settings.getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED));
+		vmax_junction = Math.max(vmax_junction, MINIMUM_PLANNER_SPEED);
 		previousNormal.set(next.normal);
 		
 		return vmax_junction;
@@ -179,7 +180,7 @@ public class MarlinSimulation {
 	private double junctionDeviationJerk(MarlinSimulationBlock next,double nominalSpeed) {
 		double vmax_junction=nominalSpeed;
 		// Skip first block or when previousNominalSpeed is used as a flag for homing and offset cycles.
-		if (queue.size() > 0 && previousNominalSpeed > 1e-6) {
+		if (!queue.isEmpty() && previousNominalSpeed > 1e-6) {
 			// Compute cosine of angle between previous and current path. (prev_unit_vec is negative)
 			// NOTE: Max junction velocity is computed without sin() or acos() by trig half angle identity.
 			double junction_cos_theta = (-previousNormal.x * next.normal.x)
@@ -189,7 +190,7 @@ public class MarlinSimulation {
 			// NOTE: Computed without any expensive trig, sin() or acos(), by trig half angle identity of cos(theta).
 			if (junction_cos_theta > 0.999999f) {
 				// For a 0 degree acute junction, just set minimum junction speed.
-				vmax_junction = settings.getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED);
+				vmax_junction = MINIMUM_PLANNER_SPEED;
 			} else {
 				// Check for numerical round-off to avoid divide by zero.
 				junction_cos_theta = Math.max(junction_cos_theta, -0.999999f); 
@@ -357,7 +358,7 @@ public class MarlinSimulation {
 			// acceleration; discard that c.
 			double cT = -1;
 			if (c1 > 0 && c2 > 0) {
-				cT = (c1 < c2) ? c1 : c2;
+				cT = Math.min(c1, c2);
 			} else if (c1 > 0) {
 				cT = c1;
 			} else if (c2 > 0) {
@@ -366,7 +367,7 @@ public class MarlinSimulation {
 
 			// The maximum acceleration is given by cT if cT>0
 			if (cT > 0) {
-				maxAcceleration = Math.max(Math.min(maxAcceleration, cT), (double)settings.getDouble(PlotterSettings.MIN_ACCELERATION));
+				maxAcceleration = Math.clamp(maxAcceleration, (double) settings.getDouble(PlotterSettings.MIN_ACCELERATION), cT);
 			}
 		}
 		return maxAcceleration;
@@ -392,10 +393,9 @@ public class MarlinSimulation {
 	protected void recalculateBackwardsBetween(MarlinSimulationBlock current,MarlinSimulationBlock next) {
 		double top = current.entrySpeedMax;
 		if(current.entrySpeed != top || (next!=null && next.recalculate)) {
-			double newEntrySpeed = current.nominalLength 
-					? top
-					: Math.min( top, maxSpeedAllowed( -current.acceleration, (next!=null? next.entrySpeed : settings.getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED)), current.distance));
-			current.entrySpeed = newEntrySpeed;
+            current.entrySpeed = current.nominalLength
+                    ? top
+                    : Math.min( top, maxSpeedAllowed( -current.acceleration, (next!=null? next.entrySpeed : settings.getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED)), current.distance));
 			current.recalculate = true;
 		}
 	}
@@ -403,12 +403,11 @@ public class MarlinSimulation {
 	protected void recalculateForwards() {
 		MarlinSimulationBlock current;
 		MarlinSimulationBlock prev = null;
-		Iterator<MarlinSimulationBlock> ri = queue.iterator();
-		while(ri.hasNext()) {
-			current = ri.next();
-			recalculateForwardsBetween(prev,current);
-			prev = current;
-		}
+        for (MarlinSimulationBlock marlinSimulationBlock : queue) {
+            current = marlinSimulationBlock;
+            recalculateForwardsBetween(prev, current);
+            prev = current;
+        }
 	}
 	
 	protected void recalculateForwardsBetween(MarlinSimulationBlock prev,MarlinSimulationBlock current) {
@@ -444,15 +443,15 @@ public class MarlinSimulation {
 		if(current!=null) {
 			current.recalculate = true;
 			if( !current.busy ) {
-				recalculateTrapezoidForBlock(current, currentEntrySpeed, settings.getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED));
+				recalculateTrapezoidForBlock(current, currentEntrySpeed, MINIMUM_PLANNER_SPEED);
 			}
 			current.recalculate = false;
 		}
 	}
 	
 	protected void recalculateTrapezoidForBlock(MarlinSimulationBlock block, double entrySpeed, double exitSpeed) {
-		if( entrySpeed < settings.getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED) ) entrySpeed = settings.getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED);
-		if( exitSpeed  < settings.getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED) ) exitSpeed  = settings.getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED);
+		if( entrySpeed < MINIMUM_PLANNER_SPEED ) entrySpeed = MINIMUM_PLANNER_SPEED;
+		if( exitSpeed  < MINIMUM_PLANNER_SPEED ) exitSpeed  = MINIMUM_PLANNER_SPEED;
 		
 		double accel = block.acceleration;
 		double accelerateD = estimateAccelerationDistance(entrySpeed, block.nominalSpeed, accel);
@@ -462,7 +461,7 @@ public class MarlinSimulation {
 		if( plateauD < 0 ) {
 			// never reaches nominal v
 			double d = Math.ceil(intersectionDistance(entrySpeed, exitSpeed, accel, block.distance));
-			accelerateD = Math.min(Math.max(d, 0), block.distance);
+			accelerateD = Math.clamp(d, 0, block.distance);
 			decelerateD = 0;
 			plateauD = 0;
 			cruiseRate = finalRate(accel,entrySpeed,accelerateD);
@@ -526,11 +525,11 @@ public class MarlinSimulation {
 		double travelFeedrate = settings.getDouble(PlotterSettings.FEED_RATE_TRAVEL) * perSecond;
 		double drawFeedRate = settings.getDouble(PlotterSettings.FEED_RATE_DRAW) * perSecond;
 		double penLiftTime = settings.getDouble(PlotterSettings.PEN_ANGLE_UP_TIME);
+		double penLowerTime = settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME);
 		double maxAcceleration = settings.getDouble(PlotterSettings.MAX_ACCELERATION);
 		double upAngle = settings.getDouble(PlotterSettings.PEN_ANGLE_UP);
 		double downAngle = settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN);
-		boolean isUp=true;
-		
+
 		Point2d home = settings.getHome();
 		double lx=home.x;
 		double ly=home.y;
@@ -543,12 +542,13 @@ public class MarlinSimulation {
 				if(line.isEmpty()) continue;
 				var iter = line.iterator();
 				Point2d p = iter.next();
-				bufferLine(new Vector3d(p.x,p.y,upAngle),penLiftTime,maxAcceleration);
-				bufferLine(new Vector3d(p.x,p.y,downAngle),drawFeedRate,maxAcceleration);
+				bufferLine(new Vector3d(p.x,p.y,upAngle),travelFeedrate,maxAcceleration);
+				bufferLine(new Vector3d(p.x,p.y,downAngle),penLowerTime,maxAcceleration);
 				while(iter.hasNext()) {
 					p = iter.next();
 					bufferLine(new Vector3d(p.x,p.y,downAngle),drawFeedRate,maxAcceleration);
 				}
+				bufferLine(new Vector3d(p.x,p.y,upAngle),penLiftTime,maxAcceleration);
 				while( queue.size() >= bufferSize ) consumer.run(queue.removeFirst());
 			}
 		}

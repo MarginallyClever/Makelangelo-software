@@ -4,7 +4,6 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulation;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulationBlock;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
-import com.marginallyclever.makelangelo.turtle.Line2d;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Point2d;
@@ -36,7 +35,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 
 	//private Turtle previousTurtle=null;
 	private Graphics2D gl2;
-	private final Turtle myTurtle = new Turtle();
+	private Turtle myTurtle = new Turtle();
 	private Turtle previousTurtle = null;
 	private PlotterSettings mySettings;
 	private int renderMode = 0;
@@ -84,19 +83,18 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	}
 
 	private void renderAlternatingBlocks(MarlinSimulationBlock block) {
-		Vector3d c;
-		switch(block.id % 3) {
-		case 0 : c=new Vector3d(1,0,0); break;
-		case 1 : c=new Vector3d(0,1,0); break;
-		default: c=new Vector3d(0,0,1); break;
-		}
-		buffer.add(new ColorPoint(c,block.start));
+		Vector3d c = switch (block.id % 3) {
+            case 0 -> new Vector3d(1, 0, 0);
+            case 1 -> new Vector3d(0, 1, 0);
+            default -> new Vector3d(0, 0, 1);
+        };
+        buffer.add(new ColorPoint(c,block.start));
 		buffer.add(new ColorPoint(c,block.end));
 	}
 
 	private void renderMinLength(MarlinSimulationBlock block) {
 		double d = block.distance / (mySettings.getDouble(PlotterSettings.MIN_SEGMENT_LENGTH)*2.0);
-		d = Math.max(Math.min(d, 1), 0);
+		d = Math.clamp(d, 0, 1);
 		double g = d;
 		double r = 1-d;
 		buffer.add(new ColorPoint(new Vector3d(r,g,0),block.start));
@@ -186,7 +184,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 
 	// return a color from red to blue to green
 	private Vector3d rainbow(double v) {
-		v= Math.max(0,Math.min(1,v));
+		v= Math.clamp(v, 0, 1);
 		double r=0,g=0,b;
 		if(v<0.5) {
 			r = 1.0 - v*2;
@@ -201,18 +199,17 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	@Override
 	public void start(Graphics2D gl2) {
 		this.gl2 = gl2;
-		myTurtle.getLayers().clear();
+		myTurtle = new Turtle();
 	}
 
 	@Override
 	public void draw(Point2d p0, Point2d p1) {
-		myTurtle.getLayers().getLast().getAllPoints().add(p0);
+		myTurtle.moveTo(p1.x,p1.y);
 	}
 
 	@Override
 	public void travel(Point2d p0, Point2d p1) {
-		myTurtle.getLayers().getLast().add(new Line2d());
-		myTurtle.getLayers().getLast().getAllPoints().add(p0);
+		myTurtle.jumpTo(p1.x,p1.y);
 	}
 
 	@Override
