@@ -35,7 +35,7 @@ public class InfillTurtle {
 	public Turtle run(Turtle input) {
 		// confirmTurtleIsClosedLoop(input);
 
-		Turtle result = new Turtle();
+		Turtle result = new Turtle(input.getFirstColor(),input.getDiameter());
 
 		List<Turtle> list = input.splitByToolChange();
 		for(Turtle t : list) {

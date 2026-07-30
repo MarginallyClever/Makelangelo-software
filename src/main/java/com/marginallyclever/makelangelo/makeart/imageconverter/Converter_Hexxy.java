@@ -62,7 +62,8 @@ public class Converter_Hexxy extends ImageConverter {
 		double xMax = rect.getMaxX();
 
 		turtle = new Turtle();
-		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
+		double diameter = settings.getDouble(PlotterSettings.DIAMETER);
+		turtle.setStroke(Color.BLACK,diameter);
 
 		majorRadius = boxMaxSize;
 		minorRadius = majorRadius*Math.sqrt(3);
@@ -78,26 +79,37 @@ public class Converter_Hexxy extends ImageConverter {
 		double adjY = ((yMax-yMin) - (cellsPerColumn*vert))/2.0 + yMin;
 
 		InfillTurtle filler = new InfillTurtle();
-		filler.setPenDiameter(turtle.getDiameter());
+		filler.setPenDiameter(diameter);
 
-		double magic = (minorRadius - turtle.getDiameter()/2.0) / minorRadius;
-
+		double magic = (minorRadius - turtle.getDiameter()*2) / minorRadius;
+		Vector2d p;
+		// move over the entire page
 		for(int y=0;y<cellsPerColumn;++y) {
 			for(int x=0;x<cellsPerRow;++x) {
-				Vector2d p = getCellCenter(x,y,horiz,vert);
+				// alternate direction to reduce travel
+				if(y%2==0) {
+					p = getCellCenter(x, y, horiz, vert);
+				} else {
+					p = getCellCenter(cellsPerRow-1-x, y, horiz, vert);
+				}
 				p.x += adjX;
 				p.y += adjY;
+				// find the hexagon size
 				var sample = (img.sample(p.x, p.y, majorRadius) / 255.0);
 				var inverseSample = 1.0 - sample;
 				var intensity = inverseSample * magic;
 				if(intensity<2.0/255.0) continue;
 
-				Turtle cell = new Turtle();
-				cell.setStroke(turtle.getColor(),settings.getDouble(PlotterSettings.DIAMETER));
-				drawHexagon(cell,p,intensity);
+				// add a hexagon
+				Turtle hexagon = new Turtle();
+				hexagon.setStroke(turtle.getColor(),diameter);
+				drawHexagon(hexagon,p,intensity);
 				try {
-					turtle.add(cell);
-					turtle.add(filler.run(cell));
+					hexagon.add(filler.run(hexagon));
+					// convert all travel moves within this hexagon to draw moves to save time.
+					hexagon.convertTravelToDraw();
+
+					turtle.add(hexagon);
 				} catch (Exception ignore) {
 					// do nothing.
 				}

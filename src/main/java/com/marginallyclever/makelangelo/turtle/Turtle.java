@@ -171,7 +171,7 @@ public class Turtle implements Cloneable {
 	 * Change the color without altering the diameter.
 	 * @param color the new color
 	 */
-	public void setStroke(Color color) {
+	public void setStroke(@Nonnull Color color) {
 		setStroke(color,diameter);
 	}
 	
@@ -525,7 +525,9 @@ public class Turtle implements Cloneable {
 			for (var layer : t.strokeLayers) {
 				if(layer.isEmpty()) continue; // skip empty layers
 
-				if(previousLayer!=null && previousLayer.getDiameter() == layer.getDiameter() && previousLayer.getColor().equals(layer.getColor())) {
+				if(previousLayer!=null
+						&& previousLayer.getDiameter() == layer.getDiameter()
+						&& previousLayer.getColor().equals(layer.getColor())) {
 					// if the last layer is the same color and diameter, add to it
 					List<Line2d> list = new ArrayList<>(layer.getAllLines());
 					previousLayer.addAll(list);
@@ -662,4 +664,18 @@ public class Turtle implements Cloneable {
 	public List<StrokeLayer> getLayers() {
 		return strokeLayers;
 	}
+
+    /**
+     * Convert all travel moves to draw moves within this turtle.
+     */
+    public void convertTravelToDraw() {
+        getLayers().forEach(layer->{
+            var lines = layer.getAllLines();
+            while(lines.size()>1) {
+                // concatenate line 1 on the end of line 0.
+                lines.getFirst().addAll(lines.get(1).getAllPoints());
+                lines.remove(1);
+            }
+        });
+    }
 }
