@@ -4,6 +4,7 @@ import java.awt.*;
 
 /**
  * This class is a {@link ListOfLines} with a given stroke (color and diameter).
+ * Each line in the set is assumed to be non-contiguous - the end of line N is not the start of line N+1.
  */
 public class StrokeLayer extends ListOfLines {
     private Color color;
