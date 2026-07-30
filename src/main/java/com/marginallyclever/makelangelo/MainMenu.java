@@ -17,6 +17,7 @@ import com.marginallyclever.makelangelo.plotter.PiCaptureAction;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulation;
 import com.marginallyclever.makelangelo.plotter.plottercontrols.PlotterControls;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManagerPanel;
+import com.marginallyclever.makelangelo.turtle.turtlerenderer.MarlinSimulationVisualizer;
 import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -356,6 +357,7 @@ public class MainMenu extends JMenuBar {
         menu.add(createMover("Translate","/com/marginallyclever/makelangelo/icons8-move-16.png",(e)->runTranslatePanel()));
         menu.add(createMover("Scale","/com/marginallyclever/makelangelo/icons8-resize-16.png",(e)->runScalePanel()));
         menu.add(createMover("Rotate","/com/marginallyclever/makelangelo/icons8-rotate-16.png",(e)->runRotatePanel()));
+        menu.add(createMover("Reverse","/com/marginallyclever/makelangelo/icons8-reverse-16.png",(e)->runReversePanel()));
         menu.add(createMover("Crop","/com/marginallyclever/makelangelo/icons8-crop-16.png",(e)-> {
             CropTurtleAction act = new CropTurtleAction(frame.getEditorContext().getPaper());
             frame.getEditorContext().mutate(act::run);
@@ -430,6 +432,10 @@ public class MainMenu extends JMenuBar {
         LineWeightByImageIntensityPanel.runAsDialog(SwingUtilities.getWindowAncestor(this), frame.getEditorContext());
     }
 
+    private void runReversePanel() {
+        ReverseTurtlePanel.runAsDialog(SwingUtilities.getWindowAncestor(this), frame.getEditorContext());
+    }
+
     private void runRotatePanel() {
         RotateTurtlePanel.runAsDialog(SwingUtilities.getWindowAncestor(this), frame.getEditorContext());
     }
@@ -487,6 +493,9 @@ public class MainMenu extends JMenuBar {
         var names = TurtleRenderFactory.getNames();
         for(int i=0;i<names.length;++i) {
             var renderer = TurtleRenderFactory.getTurtleRenderer(i);
+            if(renderer instanceof MarlinSimulationVisualizer msv) {
+                msv.setSettings(frame.getEditorContext().getPlotter().getSettings());
+            }
             JRadioButtonMenuItem button = new JRadioButtonMenuItem(renderer.getTranslatedName());
             if (frame.getTurtleRenderer() == renderer) button.setSelected(true);
             final var index = i;
@@ -504,6 +513,9 @@ public class MainMenu extends JMenuBar {
      */
     private void onTurtleRenderChange(int index) {
         var renderer = TurtleRenderFactory.getTurtleRenderer(index);
+        if(renderer instanceof MarlinSimulationVisualizer msv) {
+            msv.setSettings(frame.getEditorContext().getPlotter().getSettings());
+        }
         logger.debug("Switching to render style '{}'", renderer.getTranslatedName());
         frame.setTurtleRenderer(renderer);
     }
