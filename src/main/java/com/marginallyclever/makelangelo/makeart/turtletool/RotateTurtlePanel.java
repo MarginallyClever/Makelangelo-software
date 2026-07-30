@@ -19,11 +19,10 @@ public class RotateTurtlePanel extends JPanel {
 	private final JSpinner degrees = new JSpinner(new SpinnerNumberModel(0, -360, 360, 1));
 
 	public RotateTurtlePanel(EditorContext context) {
-		super();
+		super(new GridBagLayout());
 		this.context = context;
 		turtleOriginal = new Turtle(context.getTurtle());  // make a deep copy of the original.
 
-		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets=new Insets(10,10,3,10);
 
