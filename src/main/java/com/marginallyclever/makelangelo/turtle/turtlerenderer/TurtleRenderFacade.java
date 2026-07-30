@@ -20,6 +20,8 @@ import java.awt.image.BufferedImage;
 public class TurtleRenderFacade implements RenderListener {
 	private static final Logger logger = LoggerFactory.getLogger(TurtleRenderFacade.class);
 
+	private static final int MIP_MAP_SCALE = 5;
+
 	private TurtleRenderer myRenderer = TurtleRenderFactory.getTurtleRenderer(TurtleRenderFactory.DEFAULT);
 	private Turtle myTurtle = new Turtle();
 	private int first=0;
@@ -67,8 +69,8 @@ public class TurtleRenderFacade implements RenderListener {
 
             //System.out.println("Scale="+scale+" using mipmap size "+mipmapToUse.getWidth()+"x"+mipmapToUse.getHeight());
 
-            var bbw = mipmap0.getWidth()/20;
-            var bbh = mipmap0.getHeight()/20;
+            var bbw = mipmap0.getWidth()/(MIP_MAP_SCALE*2);
+            var bbh = mipmap0.getHeight()/(MIP_MAP_SCALE*2);
 			g2d.translate(tx, ty);
             g2d.drawImage(mipmapToUse,
                     -bbw,
@@ -104,8 +106,8 @@ public class TurtleRenderFacade implements RenderListener {
         myTurtle.lock();
 		try {
             mipmap0 = new BufferedImage(
-                    (int)Math.ceil(bounds.width)*10,
-                    (int)Math.ceil(bounds.height)*10,
+                    (int)Math.ceil(bounds.width)* MIP_MAP_SCALE,
+                    (int)Math.ceil(bounds.height)* MIP_MAP_SCALE,
                     BufferedImage.TYPE_INT_ARGB);
             mipmap1 = new BufferedImage(
                     mipmap0.getWidth()/2,
@@ -120,7 +122,7 @@ public class TurtleRenderFacade implements RenderListener {
                     mipmap2.getHeight()/2,
                     BufferedImage.TYPE_INT_ARGB);
             Graphics2D bg = mipmap0.createGraphics();
-            bg.scale(10,10);
+            bg.scale(MIP_MAP_SCALE, MIP_MAP_SCALE);
             bg.translate(-bounds.x, -bounds.y);
             renderLockedTurtle(bg);
             renderMipMaps();
