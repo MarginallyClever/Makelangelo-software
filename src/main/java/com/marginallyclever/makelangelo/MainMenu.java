@@ -358,6 +358,7 @@ public class MainMenu extends JMenuBar {
         menu.add(createMover("Scale","/com/marginallyclever/makelangelo/icons8-resize-16.png",(e)->runScalePanel()));
         menu.add(createMover("Rotate","/com/marginallyclever/makelangelo/icons8-rotate-16.png",(e)->runRotatePanel()));
         menu.add(createMover("Reverse","/com/marginallyclever/makelangelo/icons8-reverse-16.png",(e)->runReversePanel()));
+        menu.add(createMover("RemoveHopsPanel.Title","/com/marginallyclever/makelangelo/icons8-kangaroo-16.png",(e)->runRemoveHopsPanel()));
         menu.add(createMover("Crop","/com/marginallyclever/makelangelo/icons8-crop-16.png",(e)-> {
             CropTurtleAction act = new CropTurtleAction(frame.getEditorContext().getPaper());
             frame.getEditorContext().mutate(act::run);
@@ -434,6 +435,10 @@ public class MainMenu extends JMenuBar {
 
     private void runReversePanel() {
         ReverseTurtlePanel.runAsDialog(SwingUtilities.getWindowAncestor(this), frame.getEditorContext());
+    }
+
+    private void runRemoveHopsPanel() {
+        RemoveHopsPanel.runAsDialog(SwingUtilities.getWindowAncestor(this), frame.getEditorContext());
     }
 
     private void runRotatePanel() {
