@@ -164,8 +164,9 @@ public class MarlinSimulation {
 		
 		queue.add(block);
 		poseNow.set(to);
-		
-		recalculateAcceleration();
+
+		// in actual Marlin firmware, recalculateAcceleration() would happen here because the items are being buffered
+		// and removed in a real time queue.  This causes a huge number of recalculations on long line segments.
 	}
 	
 	private double dotProductJerk(MarlinSimulationBlock next) { 
@@ -549,9 +550,13 @@ public class MarlinSimulation {
 					bufferLine(new Vector3d(p.x,p.y,downAngle),drawFeedRate,maxAcceleration);
 				}
 				bufferLine(new Vector3d(p.x,p.y,upAngle),penLiftTime,maxAcceleration);
-				while( queue.size() >= bufferSize ) consumer.run(queue.removeFirst());
 			}
 		}
+
+		// unlike Marlin firmware, we calculate the accelerations once when all commands are buffered.
+		// we can get away with this because we have all the ram, unlike tiny arduino devices.
+		recalculateAcceleration();
+
 		while(!queue.isEmpty()) consumer.run(queue.removeFirst());
 	}
 	
