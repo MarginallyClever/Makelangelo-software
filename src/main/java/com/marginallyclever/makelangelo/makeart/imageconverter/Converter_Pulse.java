@@ -91,10 +91,10 @@ public class Converter_Pulse extends ImageConverter {
 		Point2d b = new Point2d();
 
         var d = settings.getDouble(PlotterSettings.DIAMETER);
-		turtle = new Turtle();
-		turtle.setStroke(Color.BLACK,d);
+		Turtle origin = new Turtle();
+		origin.setStroke(Color.BLACK,d);
 
-		var wave = new WaveByIntensity(img,(blockScale+d)/2,sampleRate,zigDensity);
+		var wave = new WaveByIntensity(img,(blockScale)/2,sampleRate,zigDensity);
 
 		Vector2d majorAxis = new Vector2d(
 				Math.cos(Math.toRadians(angle)),
@@ -113,9 +113,11 @@ public class Converter_Pulse extends ImageConverter {
 			b.scale(j,majorAxis);
 			a.scaleAdd(-i,minorAxis,a);
 			b.scaleAdd(i,minorAxis,b);
-			turtle.add(wave.lineToWave(a,b));
+			origin.jumpTo(a.x,a.y);
+			origin.moveTo(b.x,b.y);
 		}
 
+		turtle = wave.turtleToWave(origin);
 		CropTurtle.run(turtle, myPaper.getMarginRectangle());
 	}
 

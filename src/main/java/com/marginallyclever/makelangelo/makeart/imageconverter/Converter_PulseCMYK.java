@@ -116,14 +116,16 @@ public class Converter_PulseCMYK extends ImageConverter {
 			b.scale(j,majorAxis);
 			a.scaleAdd(-i,minorAxis,a);
 			b.scaleAdd(i,minorAxis,b);
-			newTurtle.add(wave.lineToWave(a,b));
+			newTurtle.jumpTo(a.x,a.y);
+			newTurtle.moveTo(b.x,b.y);
 		}
 
 		for(var layer : newTurtle.getLayers()) {
 			layer.setColor(channel);
 		}
 
-		CropTurtle.run(newTurtle, myPaper.getMarginRectangle());
-		turtle.add(newTurtle);
+		Turtle temp = wave.turtleToWave(newTurtle);
+		CropTurtle.run(temp, myPaper.getMarginRectangle());
+		turtle.add(temp);
 	}
 }
