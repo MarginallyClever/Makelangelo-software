@@ -221,6 +221,15 @@ public class Paper implements RenderListener {
 		return rectangle;
 	}
 
+	public Rectangle2D.Double getRectangle() {
+		Rectangle2D.Double rectangle = new Rectangle2D.Double();
+		rectangle.x = paperLeft;
+		rectangle.y = paperBottom;
+		rectangle.width = (paperRight-paperLeft);
+		rectangle.height = (paperTop-paperBottom);
+		return rectangle;
+	}
+
 	public double getRotation() {
 		return this.rotation;
 	}
