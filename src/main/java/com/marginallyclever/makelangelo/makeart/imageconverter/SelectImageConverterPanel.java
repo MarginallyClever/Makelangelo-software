@@ -4,6 +4,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterContrastAdjust;
 import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorHelper;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.preview.RenderListener;
@@ -20,7 +21,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -182,27 +182,6 @@ public class SelectImageConverterPanel extends JPanel implements RenderListener,
 		cl.show(cards, cardName);
 	}
 
-	private void scaleImage(int mode) {
-		Rectangle2D.Double rect = myPaper.getMarginRectangle();
-		double width  = rect.getWidth();
-		double height = rect.getHeight();
-
-		boolean test;
-		if (mode == 0) {
-			test = width < height;  // fit paper
-		} else {
-			test = width > height;  // fill paper
-		}
-
-		float f;
-		if( test ) {
-			f = (float)( width / (double)myImage.getSourceImage().getWidth() );
-		} else {
-			f = (float)( height / (double)myImage.getSourceImage().getHeight() );
-		}
-		myImage.setScale(f,-f);
-	}
-
 	private void setPreferredDrawStyle(int style) {
 		prefs.putInt("Draw Style", style);
 	}
@@ -237,7 +216,7 @@ public class SelectImageConverterPanel extends JPanel implements RenderListener,
 
 		logger.debug("starting {}", myConverter.getName());
 
-		scaleImage(fillNames.getSelectedIndex());
+		TurtleGeneratorHelper.scaleImage(myImage, myPaper, fillNames.getSelectedIndex());
 		FilterContrastAdjust filter = new FilterContrastAdjust(myImage,rangeSliderMin, rangeSliderMax);
 		TransformedImage result = filter.filter();
 
