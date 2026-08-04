@@ -11,12 +11,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TurtleGeneratorHelperTest {
     @Test
-    void scalesImageToFitPaperMargins() {
+    public void scalesImageToFitPaperMargins() {
         TransformedImage image = new TransformedImage(new BufferedImage(200, 100, BufferedImage.TYPE_INT_RGB));
         Paper paper = new Paper();
         Rectangle2D.Double margin = paper.getMarginRectangle();
 
-        TurtleGeneratorHelper.scaleImage(image, paper, 1);
+        TurtleGeneratorHelper.scaleImage(image, paper, 0);
 
         float expected = (float)Math.min(margin.getWidth() / 200.0, margin.getHeight() / 100.0);
         assertEquals(expected, image.getScaleX());
@@ -24,12 +24,12 @@ class TurtleGeneratorHelperTest {
     }
 
     @Test
-    void scalesImageToFillPaperMargins() {
+    public void scalesImageToFillPaperMargins() {
         TransformedImage image = new TransformedImage(new BufferedImage(200, 100, BufferedImage.TYPE_INT_RGB));
         Paper paper = new Paper();
         Rectangle2D.Double margin = paper.getMarginRectangle();
 
-        TurtleGeneratorHelper.scaleImage(image, paper, 0);
+        TurtleGeneratorHelper.scaleImage(image, paper, 1);
 
         float expected = (float)Math.max(margin.getWidth() / 200.0, margin.getHeight() / 100.0);
         assertEquals(expected, image.getScaleX());
