@@ -39,15 +39,16 @@ public class WaveByIntensity {
         Turtle result = new Turtle();
         TurtleIterator it = turtle.getIterator();
         Point2d prev = null;
+        boolean continuation=false;
         while (it.hasNext()) {
             var next = it.next();
             if(it.isTravel()) {
                 prev = next;
+                continuation=false;
                 continue;
             }
             assert prev != null;
-            var wave = lineToWave(prev, next);
-            result.add(wave);
+            continuation=lineToWave(result,prev, next,continuation);
             prev = next;
         }
 
@@ -59,11 +60,12 @@ public class WaveByIntensity {
      * @param start the start of the line
      * @param end the end of the line
      */
-    public Turtle lineToWave(Point2d start, Point2d end) {
-        Turtle turtle = new Turtle();
+    private boolean lineToWave(Turtle destination,Point2d start, Point2d end,boolean continuation) {
         // find the length of the line and the unit vector
         var direction = new Vector2d(end.x - start.x,end.y - start.y);
         double len = direction.length();
+        if(len==0) return continuation;  // line impossibly short, do nothing.
+
         direction.scale(1.0/len);
         // find the orthogonal vector
         var orthogonal = new Vector2d(-direction.y,direction.x);
@@ -71,7 +73,9 @@ public class WaveByIntensity {
         Point2d interpolated = new Point2d();
         Point2d offset = new Point2d();
         calculatePoint(start,orthogonal,offset);
-        turtle.jumpTo(offset.x,offset.y);
+        if(!continuation) {
+            destination.jumpTo(offset.x,offset.y);
+        }
 
         // controls the frequency of the wave.
         double i=0;
@@ -79,14 +83,16 @@ public class WaveByIntensity {
             interpolated.set(
                     start.x + direction.x * i,
                     start.y + direction.y * i);
-            double intensity = 1.0-(getIntensityAtPoint(interpolated)/255.0);
+            double amplitude = getIntensityAtPoint(interpolated);
+            double intensity = 1.0-(amplitude/255.0);
             var safeI = stepSize * ((intensity*0.8)+0.2);
             i += safeI * minimumFrequency;
             wavePosition += stepSize;
-            calculatePoint(interpolated,orthogonal,offset);
-            turtle.moveTo(offset.x,offset.y);
+            calculatePoint(interpolated,orthogonal,offset,amplitude);
+            destination.moveTo(offset.x,offset.y);
         }
-        return turtle;
+
+        return true;
     }
 
     /**
@@ -98,6 +104,10 @@ public class WaveByIntensity {
     private void calculatePoint(Point2d p, Vector2d orthogonal, Point2d d) {
         // read a block of the image and find the average intensity in this block
         double amplitude = getIntensityAtPoint(p);
+        calculatePoint(p, orthogonal, d, amplitude);
+    }
+
+    private void calculatePoint(Point2d p, Vector2d orthogonal, Point2d d, double amplitude) {
         // the sum controls the height of the pulse.
         var h = (amplitude<=1) ? 0 : Math.cos(wavePosition*2.0) * halfWaveHeight *(amplitude/255.0);
         d.x = p.x + orthogonal.x * h;
@@ -106,6 +116,6 @@ public class WaveByIntensity {
 
     private double getIntensityAtPoint(Point2d p) {
         // read a block of the image and find the average intensity in this block
-        return ( 255.0f - img.sample( p.x, p.y, halfWaveHeight) );
+        return 255.0-img.sample( p.x, p.y, halfWaveHeight );
     }
 }
