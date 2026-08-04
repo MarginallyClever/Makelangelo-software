@@ -121,6 +121,7 @@ public class Converter_SpiralPulseCMYK extends ImageConverter {
 		Point2d b = new Point2d();
 
 		a.set(Math.cos(0) * r, Math.sin(0) * r);
+		newTurtle.jumpTo(a.x, a.y);
 
 		while (r > toolDiameter*2) {
 			// find circumference of current circle
@@ -133,7 +134,7 @@ public class Converter_SpiralPulseCMYK extends ImageConverter {
 				double f = Math.PI * 2.0f * (float)i / circumference;
 				b.set(Math.cos(f) * r2, Math.sin(f) * r2);
 
-				newTurtle.add(wave.lineToWave(a,b));
+				newTurtle.moveTo(b.x,b.y);
 				a.set(b);
 			}
 			r -= ringSize;
@@ -143,8 +144,9 @@ public class Converter_SpiralPulseCMYK extends ImageConverter {
 			layer.setColor(channel);
 		}
 
-		CropTurtle.run(newTurtle, myPaper.getMarginRectangle());
-
-		turtle.add(newTurtle);
+		CropTurtle.run(newTurtle, myPaper.getRectangle());
+		Turtle temp = wave.turtleToWave(newTurtle);
+		CropTurtle.run(temp, myPaper.getMarginRectangle());
+		turtle.add(temp);
 	}
 }

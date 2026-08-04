@@ -86,23 +86,23 @@ public class Converter_SpiralPulse extends ImageConverter {
 		Rectangle2D.Double rect = myPaper.getMarginRectangle();
 		if (convertToCorners) {
 			// go right to the corners
-			double h2 = rect.getHeight();
-			double w2 = rect.getWidth();
-			maxr = (float) (Math.sqrt(h2 * h2 + w2 * w2) + 1.0f);
+			double h2 = rect.getHeight() / 2.0;
+			double w2 = rect.getWidth() / 2.0;
+			maxr = Math.sqrt(h2 * h2 + w2 * w2) *1.1;
 		} else {
 			// do the largest circle that still fits in the margin.
-			double w = rect.getWidth()/2.0f;
-			double h = rect.getHeight()/2.0f;
+			double w = rect.getWidth()/2.0;
+			double h = rect.getHeight()/2.0;
 			maxr = Math.min(h, w);
 		}
 
-		double r = maxr - toolDiameter * 5.0f;
+		double r = maxr - toolDiameter * 5.0;
 		double stepSize = height - toolDiameter;
-		double halfWaveHeight = stepSize / 2.0f;
+		double halfWaveHeight = stepSize / 2.0;
 		double ringSize = spacing;
 
-		turtle = new Turtle();
-		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
+		var origin = new Turtle();
+		origin.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 
 		var wave = new WaveByIntensity(img,halfWaveHeight,sampleRate,zigDensity);
 
@@ -110,6 +110,7 @@ public class Converter_SpiralPulse extends ImageConverter {
 		Point2d b = new Point2d();
 
 		a.set(Math.cos(0) * r, Math.sin(0) * r);
+		origin.jumpTo(a.x,a.y);
 
 		while (r > toolDiameter*2.0) {
 			// find circumference of current circle
@@ -121,14 +122,17 @@ public class Converter_SpiralPulse extends ImageConverter {
 				double r2 = r - ringSize * i / circumference;
 				double f = Math.PI * 2.0f * i / circumference;
 				b.set(Math.cos(f) * r2, Math.sin(f) * r2);
-
-				turtle.add(wave.lineToWave(a,b));
+				origin.moveTo(b.x,b.y);
 				a.set(b);
 			}
 			r -= ringSize;
 		}
 
+		CropTurtle.run(origin, myPaper.getRectangle());
+
 		// clip to paper boundaries
+		turtle = wave.turtleToWave(origin);
+		//turtle = origin;
 		CropTurtle.run(turtle, myPaper.getMarginRectangle());
 
 		fireConversionFinished();
