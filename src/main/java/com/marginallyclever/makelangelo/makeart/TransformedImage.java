@@ -8,7 +8,7 @@ import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 
 /**
- * TransformedImage is a {@link BufferedImage}, with a transformation matrix on top.
+ * TransformedImage is a {@link BufferedImage} with a transformation matrix on top.
  * All sampling interactions are done in paper space coordinates and {@link TransformedImage} takes care of the rest.
  * The original {@link BufferedImage} is not modified so there is no data loss.  This also means one matrix transform
  * per pixel sample, which is slow.
@@ -21,6 +21,42 @@ public class TransformedImage {
 	private final int componentCount;
 	private final double [] pixel;
 	private final WritableRaster raster;
+
+	class Box {
+		public double left, top, right, bottom;
+
+		public Box(double left, double top, double right, double bottom) {
+			this.left = left;
+			this.top = top;
+			this.right = right;
+			this.bottom = bottom;
+		}
+
+		public void transform() {
+			// transform the corners
+			left   = getTransformedX(left);
+			bottom = getTransformedY(bottom);
+			right  = getTransformedX(right);
+			top    = getTransformedY(top);
+			// make sure left <= right
+			if(left > right) {
+				double temp = left;
+				left = right;
+				right = temp;
+			}
+			// make sure bottom <= top
+			if(bottom > top) {
+				double temp = bottom;
+				bottom = top;
+				top = temp;
+			}
+			// find the bounds of the image once, instead of inside the loops.
+			bottom = Math.clamp(bottom, 0, sourceImage.getHeight());
+			top    = Math.clamp(top   , 0, sourceImage.getHeight());
+			left   = Math.clamp(left  , 0, sourceImage.getWidth());
+			right  = Math.clamp(right , 0, sourceImage.getWidth());
+		}
+	}
 
 	public TransformedImage(BufferedImage src) {
 		sourceImage = deepCopy(src);
@@ -89,42 +125,6 @@ public class TransformedImage {
 		return ((y / scaleY) - translateY);
 	}
 
-	class Box {
-		public double left, top, right, bottom;
-
-		public Box(double left, double top, double right, double bottom) {
-			this.left = left;
-			this.top = top;
-			this.right = right;
-			this.bottom = bottom;
-		}
-
-		public void transform() {
-			// transform the corners
-			left   = getTransformedX(left);
-			bottom = getTransformedY(bottom);
-			right  = getTransformedX(right);
-			top    = getTransformedY(top);
-			// make sure left <= right
-			if(left > right) {
-				double temp = left;
-				left = right;
-				right = temp;
-			}
-			// make sure bottom <= top
-			if(bottom > top) {
-				double temp = bottom;
-				bottom = top;
-				top = temp;
-			}
-			// find the bounds of the image once, instead of inside the loops.
-			bottom = Math.max(Math.min(bottom,sourceImage.getHeight()),0);
-			top    = Math.max(Math.min(top   ,sourceImage.getHeight()),0);
-			left   = Math.max(Math.min(left  ,sourceImage.getWidth()),0);
-			right  = Math.max(Math.min(right ,sourceImage.getWidth()),0);
-		}
-	}
-
 	/**
 	 * Returns the greyscale intensity [0...255]
 	 * @param cx center of the sample area
@@ -156,7 +156,7 @@ public class TransformedImage {
 			// sample whole pixels
 			for(int x = bLeft; x < bRight; ++x) {
 				raster.getPixel(x, y, pixel);
-				sum += averageIntensity(pixel);
+				sum += pixel[0];  // in a greyscale image all components are the same value, so only test one.
 				count++;
 			}
 		}
@@ -164,17 +164,9 @@ public class TransformedImage {
 		if(count==0) return 255;
 		// average the intensity
 		double result = sum / count;
-		return (int)Math.min( Math.max(result, 0), 255 );
+		return (int) Math.clamp(result, 0, 255);
 	}
 
-	// average intensity of the pixel
-	private double averageIntensity(double[] pixel) {
-		double sum = 0;
-		for(int i=0;i<componentCount;++i) {
-			sum += pixel[i];
-		}
-		return sum / componentCount;
-	}
 
 	/**
 	 * @param cx center of the sample area
@@ -211,7 +203,7 @@ public class TransformedImage {
 		// average the intensity
 		for(int i=0;i<componentCount;++i) {
 			int j = (int)(sum[i]/count);
-			sum[i] = Math.min(Math.max(j, 0), 255);
+			sum[i] = Math.clamp(j, 0, 255);
 		}
 		return new Color(
 				(int)sum[0], // red
