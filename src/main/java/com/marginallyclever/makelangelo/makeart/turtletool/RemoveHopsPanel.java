@@ -37,7 +37,54 @@ public class RemoveHopsPanel extends JPanel {
         controls.add(thresholdSpinner);
 
         add(controls, BorderLayout.CENTER);
-        removeHopsNow();
+        countHops();
+        //removeHopsNow();
+    }
+
+    /**
+     * Builds a histogram of hop distances, rounded up to the nearest 0.1, and counts how many hops fall into each bin.
+     */
+    private int[] countHops() {
+        Turtle turtle = context.getTurtle();
+        int[] histogram = new int[100]; // 0.1 to 10.0 in 0.1 increments, plus one for >10.0
+        for (StrokeLayer layer : turtle.getLayers()) {
+            if(layer.isEmpty()) continue;
+
+            var allLines = layer.getAllLines();
+            var iter = allLines.iterator();
+            Line2d currentLine = iter.next();
+            while(iter.hasNext()) {
+                Line2d line = iter.next();
+                if(line.isEmpty()) continue;
+
+                Point2d lastPoint = currentLine.getAllPoints().getLast();
+                Point2d firstPoint = line.getAllPoints().getFirst();
+
+                double distance = lastPoint.distance(firstPoint);
+                int index = (int) Math.ceil(distance * 10); // Round up to nearest 0.1
+                if (index >= histogram.length) {
+                    index = histogram.length - 1; // Cap at the last bin
+                }
+                histogram[index]++;
+                currentLine = line;
+            }
+        }
+
+        StringBuilder sb = new StringBuilder("Hop Distance Histogram:\n");
+        int sum = 0;
+        int [] cumulativeHistogram = new int[histogram.length];
+
+        for (int i = 0; i < histogram.length; i++) {
+            sum += histogram[i];
+            cumulativeHistogram[i] = sum;
+        }
+        for (int i=0;i<histogram.length;i++) {
+            double distance = i / 10.0;
+            sb.append(String.format("Distance %.1f: Count %d, Cumulative %.2f\n", distance, histogram[i], (double)cumulativeHistogram[i]*100.0/(double)sum));
+        }
+
+        System.out.println(sb);
+        return histogram;
     }
 
     public void removeHopsNow() {
@@ -64,6 +111,7 @@ public class RemoveHopsPanel extends JPanel {
                 if (lastPoint.distanceSquared(firstPoint) < thresholdSq) {
                     // Merge: add all points from 'line' to 'currentLine' except maybe the first if it's identical?
                     // Actually, just add all points for simplicity.
+                    currentLine.add(firstPoint);
                     while(iter2.hasNext()) {
                         currentLine.add(new Point2d(iter2.next()));
                     }
