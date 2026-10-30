@@ -1,5 +1,6 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.makelangelo.actions;
 
+import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 
 import javax.swing.*;
