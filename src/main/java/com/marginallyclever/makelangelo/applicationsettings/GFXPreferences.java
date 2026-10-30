@@ -16,8 +16,14 @@ import java.util.prefs.Preferences;
  * @author Dan Royer
  */
 public class GFXPreferences {
-	static private SelectBoolean activateDebugGL;
-	static private SelectBoolean activateTraceGL;
+	public static final String SHOW_ORIGIN = "show origin";
+	public static final String SHOW_PEN_UP = "show pen up";
+	public static final String ANTIALIAS = "antialias";
+	public static final String SPEED_OVER_QUALITY = "speed over quality";
+	private static final String DRAW_WHILE_RUNNING = "draw all while running";
+	private static final String DRAG_SPEED = "dragSpeed";
+
+	static private SelectBoolean showOrigin;
 	static private SelectBoolean showPenUp;
 	static private SelectBoolean antialias;
 	static private SelectBoolean speedOverQuality;
@@ -49,56 +55,70 @@ public class GFXPreferences {
 	
 	static public SelectPanel buildPanel() {
 		Preferences prefs = getPreferences();
-
 		SelectPanel panel = new SelectPanel();
-		activateDebugGL = new SelectBoolean("debugGL",Translator.get("GFXPreferences.debugGL"),prefs.getBoolean("debug GL", prefs.getBoolean("debugGL",false)));
-		activateTraceGL = new SelectBoolean("traceGL",Translator.get("GFXPreferences.traceGL"),prefs.getBoolean("trace GL", prefs.getBoolean("traceGL",false)));
-		showPenUp = new SelectBoolean("penup",Translator.get("GFXPreferences.showPenUp"),prefs.getBoolean("show pen up", false));
-		antialias = new SelectBoolean("antialias",Translator.get("GFXPreferences.antialias"),prefs.getBoolean("antialias", true));
-		speedOverQuality = new SelectBoolean("SpeedVSQuality",Translator.get("GFXPreferences.speedVSQuality"),prefs.getBoolean("speed over quality", true));
-		showAllWhileDrawing = new SelectBoolean("drawWhileRunning",Translator.get("GFXPreferences.showAllWhileDrawing"),prefs.getBoolean("Draw all while running", true));
-		dragSpeed = new SelectSpinner("dragSpeed", Translator.get("GFXPreferences.dragSpeed"), 1, 5, prefs.getInt("dragSpeed", 1));
+		showOrigin = new SelectBoolean(SHOW_ORIGIN,Translator.get("GFXPreferences.showOrigin"),prefs.getBoolean(SHOW_ORIGIN, false));
+		showPenUp = new SelectBoolean(SHOW_PEN_UP,Translator.get("GFXPreferences.showPenUp"),prefs.getBoolean(SHOW_PEN_UP, false));
+		antialias = new SelectBoolean(ANTIALIAS,Translator.get("GFXPreferences.antialias"),prefs.getBoolean(ANTIALIAS, true));
+		speedOverQuality = new SelectBoolean(SPEED_OVER_QUALITY,Translator.get("GFXPreferences.speedVSQuality"),prefs.getBoolean(SPEED_OVER_QUALITY, true));
+		showAllWhileDrawing = new SelectBoolean(DRAW_WHILE_RUNNING,Translator.get("GFXPreferences.showAllWhileDrawing"),prefs.getBoolean(DRAW_WHILE_RUNNING, true));
+		dragSpeed = new SelectSpinner(DRAG_SPEED, Translator.get("GFXPreferences.dragSpeed"), 1, 5, prefs.getInt(DRAG_SPEED, 1));
 
-		panel.add(activateDebugGL);
-		panel.add(activateTraceGL);
+		panel.add(showOrigin);
 		panel.add(showPenUp);
 		panel.add(showAllWhileDrawing);
 		panel.add(antialias);
 		panel.add(speedOverQuality);
 		panel.add(dragSpeed);
 
-		GFXPreferences.addListener((e)->{
-			showPenUp.setSelected((boolean)e.getNewValue());
-		});
-		showPenUp.addSelectListener((e)->{
-			GFXPreferences.setShowPenUp((boolean)e.getNewValue());
-		});
+		GFXPreferences.addListener( e -> {
+			if(SHOW_ORIGIN.equals(e.getPropertyName())) showOrigin.setSelected((boolean)e.getNewValue());
+		} );
+		GFXPreferences.addListener( e -> {
+			if(SHOW_PEN_UP.equals(e.getPropertyName())) showPenUp.setSelected((boolean)e.getNewValue());
+		} );
+
+		showOrigin.addSelectListener((e)-> GFXPreferences.setShowOrigin((boolean)e.getNewValue()) );
+		showPenUp.addSelectListener((e)-> GFXPreferences.setShowPenUp((boolean)e.getNewValue()) );
 
 		return panel;
 	}
 
 	static public void save() {
 		Preferences prefs = getPreferences();
-		prefs.putBoolean("debug GL", activateDebugGL.isSelected());
-		prefs.putBoolean("trace GL", activateTraceGL.isSelected());
-		prefs.putBoolean("show pen up", showPenUp.isSelected());
-		prefs.putBoolean("antialias", antialias.isSelected());
-		prefs.putBoolean("speed over quality", speedOverQuality.isSelected());
-		prefs.putBoolean("Draw all while running", showAllWhileDrawing.isSelected());
-		prefs.putInt("dragSpeed", dragSpeed.getValue());
+		prefs.putBoolean(SHOW_ORIGIN, showOrigin.isSelected());
+		prefs.putBoolean(SHOW_PEN_UP, showPenUp.isSelected());
+		prefs.putBoolean(ANTIALIAS, antialias.isSelected());
+		prefs.putBoolean(SPEED_OVER_QUALITY, speedOverQuality.isSelected());
+		prefs.putBoolean(DRAW_WHILE_RUNNING, showAllWhileDrawing.isSelected());
+		prefs.putInt(DRAG_SPEED, dragSpeed.getValue());
+	}
+
+	static public boolean getShowOrigin() {
+		Preferences prefs = getPreferences();
+		return prefs.getBoolean(SHOW_ORIGIN,false);
+	}
+
+	static public void setShowOrigin(boolean state) {
+		boolean old = getShowOrigin();
+		if(old != state) {
+			Preferences prefs = getPreferences();
+			prefs.putBoolean(SHOW_ORIGIN, state);
+			firePropertyChange(new PropertyChangeEvent(prefs,SHOW_ORIGIN,old,state));
+		}
 	}
 
 	static public boolean getShowPenUp() {
 		Preferences prefs = getPreferences();
-		return prefs.getBoolean("show pen up",false);
+		return prefs.getBoolean(SHOW_PEN_UP,false);
 	}
 	
 	static public void setShowPenUp(boolean state) {
 		boolean old = getShowPenUp();
 		if(old != state) {
 			Preferences prefs = getPreferences();
-			prefs.putBoolean("show pen up", state);
-			firePropertyChange(new PropertyChangeEvent(prefs,"show pen up",old,state));
+			prefs.putBoolean(SHOW_PEN_UP, state);
+			firePropertyChange(new PropertyChangeEvent(prefs,SHOW_PEN_UP,old,state));
 		}
 	}
+
 }
