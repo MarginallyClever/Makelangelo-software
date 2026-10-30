@@ -53,8 +53,8 @@ public class PlotterSettingsPanel extends JPanel {
 	private SelectTextArea startGcode;
 	private SelectTextArea endGcode;
 	private SelectTextField findHomeGcode;
-	private SelectTextField penUpGcode;
-	private SelectTextField penDownGcode;
+	private SelectTextArea penUpGcode;
+	private SelectTextArea penDownGcode;
 
 	private PlotterSettingsListener listener;
 
@@ -104,19 +104,31 @@ public class PlotterSettingsPanel extends JPanel {
 		visualStyle.addSelectListener(e->updateSizeEditable());
 	}
 
-	private SelectPanel rebuildTabGCode() {
+	private JComponent rebuildTabGCode() {
 		var panel = new SelectPanel();
 
+		addToPanel(panel,new SelectReadOnlyText("a","%1 "+Translator.get("PlotterSettingsPanel.penToolUp")));
+		addToPanel(panel,new SelectReadOnlyText("b","%2 "+Translator.get("PlotterSettingsPanel.penToolLiftSpeed")));
+		addToPanel(panel,new SelectReadOnlyText("c","%3 "+Translator.get("PlotterSettingsPanel.penToolMaxFeedRate")));
+		addToPanel(panel,new SelectReadOnlyText("d","%4 "+Translator.get("PlotterSettingsPanel.penToolDown")));
+		addToPanel(panel,new SelectReadOnlyText("e","%5 "+Translator.get("PlotterSettingsPanel.penToolLowerSpeed")));
+		addToPanel(panel,new SelectReadOnlyText("f","%6 "+Translator.get("PlotterSettingsPanel.Speed")));
+
+		addToPanel(panel,findHomeGcode = new SelectTextField("FindHomeGcode", Translator.get("PlotterSettings.FindHomeGcode"), settings.getFindHomeString()));
 		addToPanel(panel,startGcode = new SelectTextArea("StartGcode", Translator.get("PlotterSettings.StartGcode"), settings.getString(PlotterSettings.START_GCODE)));
 		addToPanel(panel,endGcode = new SelectTextArea("EndGcode", Translator.get("PlotterSettings.EndGcode"), settings.getString(PlotterSettings.END_GCODE)));
-		addToPanel(panel,findHomeGcode = new SelectTextField("FindHomeGcode", Translator.get("PlotterSettings.FindHomeGcode"), settings.getFindHomeString()));
-		addToPanel(panel,penUpGcode = new SelectTextField("PenUpGcode", Translator.get("PlotterSettings.PenUpGcode"), settings.getString(PlotterSettings.PEN_UP_GCODE)));
-		addToPanel(panel,penDownGcode = new SelectTextField("PenDownGcode", Translator.get("PlotterSettings.PenDownGcode"), settings.getString(PlotterSettings.PEN_DOWN_GCODE)));
+		addToPanel(panel,penUpGcode = new SelectTextArea("PenUpGcode", Translator.get("PlotterSettings.PenUpGcode"), settings.getString(PlotterSettings.PEN_UP_GCODE)));
+		addToPanel(panel,penDownGcode = new SelectTextArea("PenDownGcode", Translator.get("PlotterSettings.PenDownGcode"), settings.getString(PlotterSettings.PEN_DOWN_GCODE)));
 
 		startGcode.setLineWrap(false);
 		endGcode.setLineWrap(false);
+		penUpGcode.setLineWrap(false);
+		penDownGcode.setLineWrap(false);
 
-		return panel;
+		var scroll = new JScrollPane(panel);
+		scroll.setMaximumSize(new Dimension(500,500));
+		scroll.setPreferredSize(new Dimension(500,500));
+		return scroll;
 	}
 
 	private SelectPanel rebuildTabSimulate() {
