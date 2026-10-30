@@ -7,7 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## 7.80.2
+## 7.81.0
+### Added
+- added "remove hops" tool that cuts travel under your chosen threshold.
+- added more german translations
+- added "Mask Line By Image" tool
+- added "reverse turtle" tool that can reverse entire drawing or just the order travel between islands (pen down areas)
+### Changed
+- improved much faster Pulse converters
+- improved "fit image to paper" and "fill paper with image", which didn't work when the aspect ratios were just so.
+- improved simulation speed a lot for time estimates, etc.
+- improved Hexxy for lower travel time and more pen diamter respect
+- improved respect for feed rate and acceleration.  Please play with the numbers and report your results!
+- changed "Line Weight By Image" is now a tool, not a generator
+- changed some bits to support BTT mini e3 hardware.
+
 
 ### Added
 - Fully customizable shortcuts in the main menu, including the ability to add new shortcuts for any menu item.
