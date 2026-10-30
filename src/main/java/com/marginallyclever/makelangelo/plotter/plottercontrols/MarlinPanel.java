@@ -207,8 +207,8 @@ public class MarlinPanel extends JPanel {
 	}
 
 	private void clearOldHistory() {
-		while(myHistory.size()>0 && myHistory.get(0).lineNumber < lineNumberAdded-HISTORY_BUFFER_LIMIT) {
-			myHistory.remove(0);
+		while(!myHistory.isEmpty() && myHistory.getFirst().lineNumber < lineNumberAdded-HISTORY_BUFFER_LIMIT) {
+			myHistory.removeFirst();
 		}
 	}
 
