@@ -137,8 +137,9 @@ public class MainMenu extends JMenuBar {
         menu.add(new ZoomToFitMachineAction("MenuView.zoomFitMachine",camera,frame.getEditorContext().getPlotter()));
 
         JCheckBoxMenuItem checkboxShowPenUpMoves = new JCheckBoxMenuItem(new ActionShowPenUpMoves());
-        GFXPreferences.addListener((e)->checkboxShowPenUpMoves.setSelected ((boolean)e.getNewValue()));
+        GFXPreferences.addListener( e -> checkboxShowPenUpMoves.setSelected ((boolean)e.getNewValue()));
         menu.add(checkboxShowPenUpMoves);
+
 
         return menu;
     }

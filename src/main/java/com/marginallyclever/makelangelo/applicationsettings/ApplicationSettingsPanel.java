@@ -44,9 +44,9 @@ public class ApplicationSettingsPanel {
 		panel.add(top,BorderLayout.NORTH);
 
 		JTabbedPane pane = new JTabbedPane();
-		pane.add(Translator.get("SoundPreferences.Title"), SoundPreferences.buildPanel());
 		pane.add(Translator.get("GFXPreferences.Title"), GFXPreferences.buildPanel());
 		pane.add(Translator.get("LanguagePreferences.Title"), LanguagePreferences.buildPanel());
+		pane.add(Translator.get("SoundPreferences.Title"), SoundPreferences.buildPanel());
 		pane.add(Translator.get("MetricsPreferences.Title"), MetricsPreferences.buildPanel());
 		panel.add(pane,BorderLayout.CENTER);
 
