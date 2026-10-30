@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 
+import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
@@ -24,6 +25,8 @@ public class Zarplotter implements PlotterRenderer {
 		paintControlBox(graphics,robot);
 		if(robot.getDidFindHome()) 
 			paintPenHolderToCounterweights(graphics,robot);
+
+		if(GFXPreferences.getShowOrigin()) Polargraph.paintOrigin(graphics,robot);
 	}
 
 	private void paintPenHolderToCounterweights(Graphics graphics, Plotter robot) {

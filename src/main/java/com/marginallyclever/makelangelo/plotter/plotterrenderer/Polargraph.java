@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 
 import com.marginallyclever.convenience.helpers.DrawingHelper;
+import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
@@ -68,6 +69,17 @@ public abstract class Polargraph implements PlotterRenderer {
 		if(robot.getDidFindHome()) {
 			paintPenHolderToCounterweights(graphics, robot);
 		}
+		if(GFXPreferences.getShowOrigin()) paintOrigin(graphics,robot);
+	}
+
+	// draw a colorful marker near the 0,0 point.
+	static public void paintOrigin(Graphics graphics, Plotter robot) {
+		final int size = 10;
+
+		graphics.setColor(Color.RED);
+		graphics.drawLine(0,-size*2,0,size*2);
+		graphics.drawLine(-size*2,0,size*2,0);
+		graphics.drawOval(-size,-size,size*2,size*2);
 	}
 
 	static public void paintMotors(Graphics graphics,Plotter robot) {

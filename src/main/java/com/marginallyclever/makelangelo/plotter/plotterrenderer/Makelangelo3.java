@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 
+import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 
 import java.awt.*;
@@ -17,6 +18,8 @@ public class Makelangelo3 implements PlotterRenderer {
 		Polargraph.paintMotors(graphics,robot);
 		if(robot.getDidFindHome()) 
 			Polargraph.paintPenHolderToCounterweights(graphics,robot);
+
+		if(GFXPreferences.getShowOrigin()) Polargraph.paintOrigin(graphics,robot);
 	}
 
 	/**

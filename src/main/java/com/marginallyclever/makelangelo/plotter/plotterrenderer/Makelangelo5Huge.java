@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 
 import com.marginallyclever.convenience.helpers.DrawingHelper;
+import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.texture.TextureFactory;
@@ -40,6 +41,8 @@ public class Makelangelo5Huge implements PlotterRenderer {
 
         paintControlBoxFancy(graphics, robot, textureMotorMounts);
         //paintLogoFancy(graphics, robot);
+
+		if(GFXPreferences.getShowOrigin()) Polargraph.paintOrigin(graphics,robot);
 	}
 
 	private void paintControlBoxFancy(Graphics graphics, Plotter robot,TextureWithMetadata texture) {

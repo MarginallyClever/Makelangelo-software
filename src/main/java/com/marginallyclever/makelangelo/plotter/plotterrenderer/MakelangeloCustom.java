@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 
 import com.marginallyclever.convenience.helpers.DrawingHelper;
+import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.texture.TextureFactory;
@@ -32,6 +33,8 @@ public class MakelangeloCustom implements PlotterRenderer {
 		paintMotors(graphics, settings);
 		if(robot.getDidFindHome())
 			paintPenHolderToCounterweights(graphics,robot);
+
+		if(GFXPreferences.getShowOrigin()) Polargraph.paintOrigin(graphics,robot);
 	}
 
 	/**

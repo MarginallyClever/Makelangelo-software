@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 
+import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 
 import java.awt.*;
@@ -8,19 +9,21 @@ import java.awt.*;
  * Draws a cartesian plotter machine.
  */
 public class Cartesian implements PlotterRenderer {
-	final public double ZAR_MOTOR_MOUNT_SIZE=45; //cm
-	final public double ZAR_PLOTTER_SIZE=60; //cm
-	final public double ZAR_PLOTTER_OUTER_SIZE=70; //cm
-	final public double ZAR_PLOTTER_HOLE_SIZE=20; //cm
-	final public double ZAR_MOTOR_BODY_SIZE=42; //cm
+	public final double ZAR_MOTOR_MOUNT_SIZE=45; //cm
+	public final double ZAR_PLOTTER_SIZE=60; //cm
+	public final double ZAR_PLOTTER_OUTER_SIZE=70; //cm
+	public final double ZAR_PLOTTER_HOLE_SIZE=20; //cm
+	public final double ZAR_MOTOR_BODY_SIZE=42; //cm
 	
 	@Override
 	public void render(Graphics graphics, Plotter robot) {
 		paintGantryAndHead(graphics,robot);
 		paintMotors(graphics,robot);
 		paintControlBox(graphics,robot);
+
+		if(GFXPreferences.getShowOrigin()) Polargraph.paintOrigin(graphics,robot);
 	}
-	
+
 	private void paintGantryAndHead(Graphics graphics, Plotter plotter) {/*
 		//double dx, dy;
 		Point2d pos = plotter.getPos();
