@@ -18,6 +18,7 @@ import java.util.prefs.Preferences;
 public class GFXPreferences {
 	public static final String SHOW_ORIGIN = "show origin";
 	public static final String SHOW_PEN_UP = "show pen up";
+	private static final String SHOW_WORK_AREA = "show work area";
 	public static final String ANTIALIAS = "antialias";
 	public static final String SPEED_OVER_QUALITY = "speed over quality";
 	private static final String DRAW_WHILE_RUNNING = "draw all while running";
@@ -25,17 +26,18 @@ public class GFXPreferences {
 
 	static private SelectBoolean showOrigin;
 	static private SelectBoolean showPenUp;
+	static private SelectBoolean showWorkArea;
 	static private SelectBoolean antialias;
 	static private SelectBoolean speedOverQuality;
 	static private SelectBoolean showAllWhileDrawing;
 	static private SelectSpinner dragSpeed;
 	static EventListenerList listeners = new EventListenerList();
 
-	static public void addListener(PropertyChangeListener p) {
+	public static void addListener(PropertyChangeListener p) {
 		listeners.add(PropertyChangeListener.class,p);
 	}
 
-	static public void removeListener(PropertyChangeListener p) {
+	public static void removeListener(PropertyChangeListener p) {
 		listeners.remove(PropertyChangeListener.class,p);
 	}
 
@@ -53,11 +55,12 @@ public class GFXPreferences {
 		return PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
 	}
 	
-	static public SelectPanel buildPanel() {
+	public static SelectPanel buildPanel() {
 		Preferences prefs = getPreferences();
 		SelectPanel panel = new SelectPanel();
 		showOrigin = new SelectBoolean(SHOW_ORIGIN,Translator.get("GFXPreferences.showOrigin"),prefs.getBoolean(SHOW_ORIGIN, false));
 		showPenUp = new SelectBoolean(SHOW_PEN_UP,Translator.get("GFXPreferences.showPenUp"),prefs.getBoolean(SHOW_PEN_UP, false));
+		showWorkArea = new SelectBoolean(SHOW_WORK_AREA,Translator.get("GFXPreferences.showWorkArea"),prefs.getBoolean(SHOW_WORK_AREA, false));
 		antialias = new SelectBoolean(ANTIALIAS,Translator.get("GFXPreferences.antialias"),prefs.getBoolean(ANTIALIAS, true));
 		speedOverQuality = new SelectBoolean(SPEED_OVER_QUALITY,Translator.get("GFXPreferences.speedVSQuality"),prefs.getBoolean(SPEED_OVER_QUALITY, true));
 		showAllWhileDrawing = new SelectBoolean(DRAW_WHILE_RUNNING,Translator.get("GFXPreferences.showAllWhileDrawing"),prefs.getBoolean(DRAW_WHILE_RUNNING, true));
@@ -65,6 +68,7 @@ public class GFXPreferences {
 
 		panel.add(showOrigin);
 		panel.add(showPenUp);
+		panel.add(showWorkArea);
 		panel.add(showAllWhileDrawing);
 		panel.add(antialias);
 		panel.add(speedOverQuality);
@@ -76,6 +80,9 @@ public class GFXPreferences {
 		GFXPreferences.addListener( e -> {
 			if(SHOW_PEN_UP.equals(e.getPropertyName())) showPenUp.setSelected((boolean)e.getNewValue());
 		} );
+		GFXPreferences.addListener( e -> {
+			if(SHOW_WORK_AREA.equals(e.getPropertyName())) showWorkArea.setSelected((boolean)e.getNewValue());
+		} );
 
 		showOrigin.addSelectListener((e)-> GFXPreferences.setShowOrigin((boolean)e.getNewValue()) );
 		showPenUp.addSelectListener((e)-> GFXPreferences.setShowPenUp((boolean)e.getNewValue()) );
@@ -83,22 +90,23 @@ public class GFXPreferences {
 		return panel;
 	}
 
-	static public void save() {
+	public static void save() {
 		Preferences prefs = getPreferences();
 		prefs.putBoolean(SHOW_ORIGIN, showOrigin.isSelected());
 		prefs.putBoolean(SHOW_PEN_UP, showPenUp.isSelected());
+		prefs.putBoolean(SHOW_WORK_AREA, showWorkArea.isSelected());
 		prefs.putBoolean(ANTIALIAS, antialias.isSelected());
 		prefs.putBoolean(SPEED_OVER_QUALITY, speedOverQuality.isSelected());
 		prefs.putBoolean(DRAW_WHILE_RUNNING, showAllWhileDrawing.isSelected());
 		prefs.putInt(DRAG_SPEED, dragSpeed.getValue());
 	}
 
-	static public boolean getShowOrigin() {
+	public static boolean getShowOrigin() {
 		Preferences prefs = getPreferences();
 		return prefs.getBoolean(SHOW_ORIGIN,false);
 	}
 
-	static public void setShowOrigin(boolean state) {
+	public static void setShowOrigin(boolean state) {
 		boolean old = getShowOrigin();
 		if(old != state) {
 			Preferences prefs = getPreferences();
@@ -107,12 +115,12 @@ public class GFXPreferences {
 		}
 	}
 
-	static public boolean getShowPenUp() {
+	public static boolean getShowPenUp() {
 		Preferences prefs = getPreferences();
 		return prefs.getBoolean(SHOW_PEN_UP,false);
 	}
 	
-	static public void setShowPenUp(boolean state) {
+	public static void setShowPenUp(boolean state) {
 		boolean old = getShowPenUp();
 		if(old != state) {
 			Preferences prefs = getPreferences();
@@ -121,4 +129,17 @@ public class GFXPreferences {
 		}
 	}
 
+	public static boolean getShowWorkArea() {
+		Preferences prefs = getPreferences();
+		return prefs.getBoolean(SHOW_WORK_AREA,false);
+	}
+	
+	public static void setShowWorkArea(boolean state) {
+		boolean old = getShowWorkArea();
+		if(old != state) {
+			Preferences prefs = getPreferences();
+			prefs.putBoolean(SHOW_WORK_AREA, state);
+			firePropertyChange(new PropertyChangeEvent(prefs,SHOW_WORK_AREA,old,state));
+		}
+	}
 }

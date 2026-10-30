@@ -137,6 +137,8 @@ public class PreviewPanel extends JPanel implements EditorContextListener {
         bar.add(checkboxShowOrigin);
         checkboxShowOrigin.setName("");
 
+        var checkboxShowWorkArea = new JToggleButton(new ActionShowWorkArea());
+        checkboxShowWorkArea.setSelected(GFXPreferences.getShowWorkArea());
         return bar;
     }
 
