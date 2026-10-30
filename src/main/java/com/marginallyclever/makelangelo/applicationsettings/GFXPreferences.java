@@ -18,11 +18,11 @@ import java.util.prefs.Preferences;
 public class GFXPreferences {
 	public static final String SHOW_ORIGIN = "show origin";
 	public static final String SHOW_PEN_UP = "show pen up";
-	private static final String SHOW_WORK_AREA = "show work area";
+	public static final String SHOW_WORK_AREA = "show work area";
 	public static final String ANTIALIAS = "antialias";
 	public static final String SPEED_OVER_QUALITY = "speed over quality";
-	private static final String DRAW_WHILE_RUNNING = "draw all while running";
-	private static final String DRAG_SPEED = "dragSpeed";
+	public static final String DRAW_WHILE_RUNNING = "draw all while running";
+	public static final String DRAG_SPEED = "dragSpeed";
 
 	static private SelectBoolean showOrigin;
 	static private SelectBoolean showPenUp;
