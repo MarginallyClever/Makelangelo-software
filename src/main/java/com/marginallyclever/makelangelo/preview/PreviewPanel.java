@@ -4,6 +4,7 @@ import com.marginallyclever.makelangelo.actions.ActionShowOrigin;
 import com.marginallyclever.makelangelo.actions.ActionShowPenUpMoves;
 import com.marginallyclever.makelangelo.MakeleangeloRangeSlider;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.actions.ActionShowWorkArea;
 import com.marginallyclever.makelangelo.actions.ZoomToFitMachineAction;
 import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 import com.marginallyclever.makelangelo.editorcontext.EditorContext;

@@ -20,6 +20,6 @@ public class ActionShowWorkArea extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        GFXPreferences.setShowOrigin(!GFXPreferences.getShowOrigin());
+        GFXPreferences.setShowWorkArea(!GFXPreferences.getShowWorkArea());
     }
 }
