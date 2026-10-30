@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.preview;
 
-import com.marginallyclever.makelangelo.ActionShowPenUpMoves;
+import com.marginallyclever.makelangelo.actions.ActionShowOrigin;
+import com.marginallyclever.makelangelo.actions.ActionShowPenUpMoves;
 import com.marginallyclever.makelangelo.MakeleangeloRangeSlider;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.actions.ZoomToFitMachineAction;
@@ -116,12 +117,25 @@ public class PreviewPanel extends JPanel implements EditorContextListener {
         bar.add(buttonZoomToFit);
 
         var checkboxShowPenUpMoves = new JToggleButton(new ActionShowPenUpMoves());
-
         checkboxShowPenUpMoves.setSelected(GFXPreferences.getShowPenUp());
-        GFXPreferences.addListener((e)->checkboxShowPenUpMoves.setSelected ((boolean)e.getNewValue()));
-
+        GFXPreferences.addListener( e -> {
+            if(GFXPreferences.SHOW_PEN_UP.equals(e.getPropertyName())) {
+                checkboxShowPenUpMoves.setSelected((boolean)e.getNewValue());
+            }
+        } );
         bar.add(checkboxShowPenUpMoves);
         checkboxShowPenUpMoves.setName("");
+
+        var checkboxShowOrigin = new JToggleButton(new ActionShowOrigin());
+        checkboxShowOrigin.setSelected(GFXPreferences.getShowOrigin());
+        GFXPreferences.addListener( e -> {
+            if(GFXPreferences.SHOW_ORIGIN.equals(e.getPropertyName())) {
+                checkboxShowOrigin.setSelected((boolean)e.getNewValue());
+                repaint();
+            }
+        } );
+        bar.add(checkboxShowOrigin);
+        checkboxShowOrigin.setName("");
 
         return bar;
     }
