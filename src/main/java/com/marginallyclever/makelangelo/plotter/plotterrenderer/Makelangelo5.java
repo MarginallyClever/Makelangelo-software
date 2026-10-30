@@ -38,14 +38,13 @@ public class Makelangelo5 implements PlotterRenderer {
 
         paintControlBoxFancy(g2d, robot, textureMainBody);
 
-		Polargraph.paintSafeArea(g2d, robot);
-
 		if (robot.getDidFindHome())
 			paintPenHolderToCounterweights(g2d, robot);
 
 		paintControlBoxFancy(g2d, robot, textureMotors);
 		//paintLogoFancy(g2d, robot);
 
+		if(GFXPreferences.getShowWorkArea()) Polargraph.paintSafeArea(graphics,robot);
 		if(GFXPreferences.getShowOrigin()) Polargraph.paintOrigin(graphics,robot);
 	}
 

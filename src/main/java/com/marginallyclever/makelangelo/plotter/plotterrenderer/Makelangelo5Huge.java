@@ -34,14 +34,13 @@ public class Makelangelo5Huge implements PlotterRenderer {
 	public void render(Graphics graphics, Plotter robot) {
         paintControlBoxFancy(graphics, robot, textureMainBody);
 
-		Polargraph.paintSafeArea(graphics, robot);
-
 		if (robot.getDidFindHome())
 			paintPenHolderToCounterweights(graphics, robot);
 
         paintControlBoxFancy(graphics, robot, textureMotorMounts);
         //paintLogoFancy(graphics, robot);
 
+		if(GFXPreferences.getShowWorkArea()) Polargraph.paintSafeArea(graphics,robot);
 		if(GFXPreferences.getShowOrigin()) Polargraph.paintOrigin(graphics,robot);
 	}
 

@@ -19,6 +19,7 @@ public class Makelangelo3 implements PlotterRenderer {
 		if(robot.getDidFindHome()) 
 			Polargraph.paintPenHolderToCounterweights(graphics,robot);
 
+		if(GFXPreferences.getShowWorkArea()) Polargraph.paintSafeArea(graphics,robot);
 		if(GFXPreferences.getShowOrigin()) Polargraph.paintOrigin(graphics,robot);
 	}
 

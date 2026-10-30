@@ -16,7 +16,17 @@ public abstract class Polargraph implements PlotterRenderer {
 	public static final float MOTOR_SIZE= 21f; // cm
 	public static final float COUNTERWEIGHT_HALF_WIDTH = 15;
 	public static final float COUNTERWEIGHT_HEIGHT = 100;
-	
+
+	public static void paintWorkArea(Graphics graphics, Plotter plotter) {
+		int top = plotter.getSettings().getInteger(PlotterSettings.LIMIT_TOP);
+		int right = plotter.getSettings().getInteger(PlotterSettings.LIMIT_RIGHT);
+		int left = plotter.getSettings().getInteger(PlotterSettings.LIMIT_LEFT);
+		int bottom = plotter.getSettings().getInteger(PlotterSettings.LIMIT_BOTTOM);
+
+		graphics.setColor(Color.BLUE);
+		graphics.drawRect(left,top,right-left,bottom-top);
+	}
+
 	/**
 	 * convert from belt length mm to cartesian position.
 	 * @param beltL length of belt (mm)
@@ -229,17 +239,16 @@ public abstract class Polargraph implements PlotterRenderer {
         var g2d = (Graphics2D) graphics;
 
 		PlotterSettings settings = robot.getSettings();
-		float top = -(float)settings.getDouble(PlotterSettings.LIMIT_TOP);
-        float left = (float)settings.getDouble(PlotterSettings.LIMIT_LEFT);
+		int top = -settings.getInteger(PlotterSettings.LIMIT_TOP);
+        int left = settings.getInteger(PlotterSettings.LIMIT_LEFT);
+		int bottom = -settings.getInteger(PlotterSettings.LIMIT_BOTTOM);
+		int right = settings.getInteger(PlotterSettings.LIMIT_RIGHT);
 
-		float bottom = -(float)settings.getDouble(PlotterSettings.LIMIT_BOTTOM);
-		float right = (float)settings.getDouble(PlotterSettings.LIMIT_RIGHT);
-
-        g2d.setColor(Color.WHITE);
+        g2d.setColor(Color.RED);
         g2d.drawRect(
-                (int)left,
-                (int)top,
-                (int)Math.abs(right-left),
-                (int)Math.abs(top-bottom));
+                left,
+                top,
+                Math.abs(right-left),
+                Math.abs(top-bottom));
 	}
 }

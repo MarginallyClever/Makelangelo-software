@@ -26,6 +26,7 @@ public class Zarplotter implements PlotterRenderer {
 		if(robot.getDidFindHome()) 
 			paintPenHolderToCounterweights(graphics,robot);
 
+		if(GFXPreferences.getShowWorkArea()) Polargraph.paintSafeArea(graphics,robot);
 		if(GFXPreferences.getShowOrigin()) Polargraph.paintOrigin(graphics,robot);
 	}
 

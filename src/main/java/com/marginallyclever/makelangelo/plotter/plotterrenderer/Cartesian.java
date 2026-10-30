@@ -21,6 +21,7 @@ public class Cartesian implements PlotterRenderer {
 		paintMotors(graphics,robot);
 		paintControlBox(graphics,robot);
 
+		if(GFXPreferences.getShowWorkArea()) Polargraph.paintSafeArea(graphics,robot);
 		if(GFXPreferences.getShowOrigin()) Polargraph.paintOrigin(graphics,robot);
 	}
 
