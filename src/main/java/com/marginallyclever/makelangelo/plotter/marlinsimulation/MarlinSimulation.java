@@ -77,7 +77,7 @@ public class MarlinSimulation {
 		double len = delta.length();		
 		double seconds = len / feedrate;
 		int segments = (int)Math.ceil(seconds * settings.getInteger(PlotterSettings.SEGMENTS_PER_SECOND));
-		int maxSeg = (int)Math.ceil(len / settings.getDouble(PlotterSettings.MIN_SEGMENT_LENGTH));
+		int maxSeg = (int)Math.max(1,Math.ceil(len / settings.getDouble(PlotterSettings.MIN_SEGMENT_LENGTH)));
 		segments = Math.clamp(segments, 1, maxSeg);
 		Vector3d deltaSegment = new Vector3d(delta);
 		deltaSegment.scale(1.0/segments);
