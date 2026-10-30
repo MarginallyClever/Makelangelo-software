@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.actions;
 
 import com.marginallyclever.makelangelo.MainFrame;
-import com.marginallyclever.makelangelo.applicationsettings.ApplicationSettings;
+import com.marginallyclever.makelangelo.applicationsettings.ApplicationSettingsPanel;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class AdjustPreferencesAction extends NamedAbstractAction {
     private final MainFrame frame;
-    private final ApplicationSettings myPreferencesPanel = new ApplicationSettings();
+    private final ApplicationSettingsPanel myPreferencesPanel = new ApplicationSettingsPanel();
 
     public AdjustPreferencesAction(String label, MainFrame frame) {
         super(label);

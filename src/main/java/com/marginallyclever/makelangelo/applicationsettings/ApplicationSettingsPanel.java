@@ -16,10 +16,10 @@ import java.util.prefs.Preferences;
  * Application settings
  * @author Dan Royer
  */
-public class ApplicationSettings {
-	private static final Logger logger = LoggerFactory.getLogger(ApplicationSettings.class);
+public class ApplicationSettingsPanel {
+	private static final Logger logger = LoggerFactory.getLogger(ApplicationSettingsPanel.class);
 	
-	public ApplicationSettings() {
+	public ApplicationSettingsPanel() {
 		super();
 	}
 	
