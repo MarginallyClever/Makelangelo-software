@@ -4,7 +4,6 @@ import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.donatello.select.*;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
-
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +54,8 @@ public class PlotterSettingsPanel extends JPanel {
 	private SelectTextField findHomeGcode;
 	private SelectTextArea penUpGcode;
 	private SelectTextArea penDownGcode;
+
+	private SelectOneOfMany startPosIndex;
 
 	private PlotterSettingsListener listener;
 
@@ -115,10 +116,10 @@ public class PlotterSettingsPanel extends JPanel {
 		addToPanel(panel,new SelectReadOnlyText("f","%6 "+Translator.get("PlotterSettingsPanel.Speed")));
 
 		addToPanel(panel,findHomeGcode = new SelectTextField("FindHomeGcode", Translator.get("PlotterSettings.FindHomeGcode"), settings.getFindHomeString()));
-		addToPanel(panel,startGcode = new SelectTextArea("StartGcode", Translator.get("PlotterSettings.StartGcode"), settings.getString(PlotterSettings.START_GCODE)));
-		addToPanel(panel,endGcode = new SelectTextArea("EndGcode", Translator.get("PlotterSettings.EndGcode"), settings.getString(PlotterSettings.END_GCODE)));
-		addToPanel(panel,penUpGcode = new SelectTextArea("PenUpGcode", Translator.get("PlotterSettings.PenUpGcode"), settings.getString(PlotterSettings.PEN_UP_GCODE)));
-		addToPanel(panel,penDownGcode = new SelectTextArea("PenDownGcode", Translator.get("PlotterSettings.PenDownGcode"), settings.getString(PlotterSettings.PEN_DOWN_GCODE)));
+		addToPanel(panel,startGcode    = new SelectTextArea ("StartGcode",    Translator.get("PlotterSettings.StartGcode"   ), settings.getString(PlotterSettings.START_GCODE)));
+		addToPanel(panel,endGcode      = new SelectTextArea ("EndGcode",      Translator.get("PlotterSettings.EndGcode"     ), settings.getString(PlotterSettings.END_GCODE)));
+		addToPanel(panel,penUpGcode    = new SelectTextArea ("PenUpGcode",    Translator.get("PlotterSettings.PenUpGcode"   ), settings.getString(PlotterSettings.PEN_UP_GCODE)));
+		addToPanel(panel,penDownGcode  = new SelectTextArea ("PenDownGcode",  Translator.get("PlotterSettings.PenDownGcode" ), settings.getString(PlotterSettings.PEN_DOWN_GCODE)));
 
 		startGcode.setLineWrap(false);
 		endGcode.setLineWrap(false);
@@ -156,6 +157,21 @@ public class PlotterSettingsPanel extends JPanel {
 		addToPanel(panel,penDownAngle 		 = new SelectDouble("down",			Translator.get("PlotterSettingsPanel.penToolDown"			 ), settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN)));
 		addToPanel(panel,selectPenUpColor 	 = new SelectColor("colorUp",		    Translator.get("PlotterSettingsPanel.penUpColor"			 ), settings.getColor(PlotterSettings.PEN_UP_COLOR),this));
 		addToPanel(panel,selectPenDownColor  = new SelectColor("colorDown",		Translator.get("PlotterSettingsPanel.penDownColor"		     ), settings.getColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT),this));
+
+		String [] labels = new String[] {
+				Translator.get("PlotterSettingsPanel.StartingPosition.topLeft"),
+				Translator.get("PlotterSettingsPanel.StartingPosition.topCenter"),
+				Translator.get("PlotterSettingsPanel.StartingPosition.topRight"),
+				Translator.get("PlotterSettingsPanel.StartingPosition.left"),
+				Translator.get("PlotterSettingsPanel.StartingPosition.center"),
+				Translator.get("PlotterSettingsPanel.StartingPosition.right"),
+				Translator.get("PlotterSettingsPanel.StartingPosition.bottomLeft"),
+				Translator.get("PlotterSettingsPanel.StartingPosition.bottomCenter"),
+				Translator.get("PlotterSettingsPanel.StartingPosition.bottomRight"),
+		};
+		int index = settings.getInteger(PlotterSettings.STARTING_POS_INDEX);
+
+		addToPanel(panel,startPosIndex = new SelectOneOfMany("startPos",Translator.get("PlotterSettingsPanel.StartingPosition.label"),labels,index));
 
 		return panel;
 	}
@@ -234,6 +250,8 @@ public class PlotterSettingsPanel extends JPanel {
 		settings.setString(PlotterSettings.FIND_HOME_GCODE,findHomeGcode.getText());
 		settings.setString(PlotterSettings.PEN_UP_GCODE,penUpGcode.getText());
 		settings.setString(PlotterSettings.PEN_DOWN_GCODE,penDownGcode.getText());
+
+		settings.setInteger(PlotterSettings.STARTING_POS_INDEX,startPosIndex.getSelectedIndex());
 
 		settings.save();
 	}
