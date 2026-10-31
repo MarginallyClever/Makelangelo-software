@@ -16,6 +16,16 @@ It pairs really well with [Marlin 3D printer firmware](https://github.com/Margin
 [Get the latest nightly build](https://github.com/MarginallyClever/Makelangelo-software/releases/tag/Nightly)
 [How to use Makelangelo Software 7.24.0+](https://mcr.dozuki.com/Guide/1.+How+to+use+Makelangelo+Software+7.24.*/5?lang=en)
 
+## Machine coordinate origin
+
+The nine-position starting-position setting declares where the firmware already considers `(0, 0)` relative to the active paper's outer edges. Paper center offsets are included; machine limits and drawing margins do not define the nine positions. This setting does not change firmware settings, re-zero the machine, or move the artwork on the paper. Make sure the selected position and paper placement match the firmware before plotting: a mismatch can send the machine to unintended positions or beyond its safe range.
+
+Artwork and the preview remain in application coordinates; generated live moves and exported G-code use machine coordinates. The origin marker shows firmware zero, and the cursor tooltip labels both coordinate systems. G-code imported with the active profile is converted back to application coordinates.
+
+The center setting identifies the active paper's center, including any configured center offset; changing machine limits does not move that origin. Homing remains controlled by the configured home command and does not imply that home is the selected origin.
+
+User-provided start, end, home, pen, and tool-change G-code is passed through unchanged; its coordinates and positioning modes remain the user's responsibility. Generated XY moves explicitly select absolute positioning.
+
 ## Where to go from here
 - [Join our Discord community](https://discord.gg/QtvHqAv8yp).  Share your creations, make new friends!  The best place to get support.
 - Read more of [our friendly manuals](http://mcr.dozuki.com).  Pictures and arrows and everything.

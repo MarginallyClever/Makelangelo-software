@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.makeart.io;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.turtletool.TrimTurtle;
+import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -69,6 +71,31 @@ class SaveGCodeTest {
             settings.setDouble(PlotterSettings.FEED_RATE_DRAW,draw);
             settings.setDouble(PlotterSettings.FEED_RATE_TRAVEL,travel);
         }
+    }
+
+    @Test
+    public void saveUsesMachineCoordinatesAndProtectsGeneratedMovesFromRelativeMode() throws Exception {
+        settings.setDouble(PlotterSettings.LIMIT_LEFT, -100);
+        settings.setDouble(PlotterSettings.LIMIT_RIGHT, 100);
+        settings.setDouble(PlotterSettings.LIMIT_BOTTOM, -200);
+        settings.setDouble(PlotterSettings.LIMIT_TOP, 200);
+        settings.setInteger(PlotterSettings.STARTING_POS_INDEX, 0);
+        settings.setString(PlotterSettings.START_GCODE, "G91");
+        settings.setString(PlotterSettings.END_GCODE, "G91");
+        settings.setString(PlotterSettings.PEN_UP_GCODE, "G91");
+        settings.setString(PlotterSettings.PEN_DOWN_GCODE, "G91");
+        Paper paper = new Paper();
+        paper.setPaperSize(200, 400, 0, 0);
+
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        new SaveGCode().save(output, simpleMoves(), settings, paper);
+        String gcode = output.toString(StandardCharsets.UTF_8);
+
+        Assertions.assertTrue(gcode.contains(";MINX:85.000\n;MINY:-207.000"));
+        Assertions.assertTrue(gcode.contains(";MAXX:112.000\n;MAXY:-182.000"));
+        Assertions.assertTrue(gcode.contains("G90\nG0 X85.000 Y-207.000"));
+        Assertions.assertTrue(gcode.contains("G90\nG1 X103.000 Y-196.000"));
+        Assertions.assertTrue(gcode.contains(";Start of user gcode\nG91\n;End of user gcode"));
     }
 
     private void verifySavedFile(Turtle turtle, String expectedFilename) throws Exception {

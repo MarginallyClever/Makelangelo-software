@@ -27,6 +27,8 @@ public class PlotterEvent {
 	public static final int POSITION = 11;
 	// robot has raised or lowered pen.  extra is true if pen is up, false if pen is down.
 	public static final int PEN_UPDOWN = 12;
+	// position received from the firmware, not a request to move.
+	public static final int POSITION_FEEDBACK = 13;
 	
 	public Plotter subject;
 	public int type;

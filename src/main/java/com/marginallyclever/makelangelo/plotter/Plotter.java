@@ -18,6 +18,7 @@ import java.util.ArrayList;
  */
 public class Plotter implements RenderListener, Cloneable {
 	private PlotterSettings settings = new PlotterSettings("Makelangelo 5");
+	private Paper paper;
 
 	// are motors actively engaged?  when disengaged pen can drift and re-homing is required.
 	private boolean areMotorsEngaged = true;
@@ -94,12 +95,11 @@ public class Plotter implements RenderListener, Cloneable {
 	
 	/**
 	 * When the {@link Plotter} first turns on it has no idea where it is.
-	 * This method will instruct it to touch off the limit switches, after which 
-	 * it will be at the home position obtained from {@code getHome()}.
+	 * This method instructs it to touch off the limit switches.  The displayed position remains
+	 * unknown until a position report is received from the firmware.
 	 */
 	public void findHome() {
 		raisePen();
-		pos.set(settings.getHome());
 		didFindHome = true;
 		firePlotterEvent(new PlotterEvent(PlotterEvent.HOME_FOUND,this));
 	}
@@ -119,6 +119,16 @@ public class Plotter implements RenderListener, Cloneable {
 	public void setPos(double x, double y) {
 		pos.set(x,y);
 		firePlotterEvent(new PlotterEvent(PlotterEvent.POSITION,this));
+	}
+
+	/**
+	 * Update the displayed position from a firmware report without sending a move command.
+	 * @param x reported X position in the application coordinate frame
+	 * @param y reported Y position in the application coordinate frame
+	 */
+	public void setPosFromFeedback(double x, double y) {
+		pos.set(x,y);
+		firePlotterEvent(new PlotterEvent(PlotterEvent.POSITION_FEEDBACK,this));
 	}
 
 	/**
@@ -157,6 +167,14 @@ public class Plotter implements RenderListener, Cloneable {
 	 */
 	public PlotterSettings getSettings() {
 		return settings;
+	}
+
+	public Paper getPaper() {
+		return paper;
+	}
+
+	public void setPaper(Paper paper) {
+		this.paper = paper;
 	}
 	
 	/**

@@ -1,5 +1,8 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
+import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.plotter.plottersettings.MachineCoordinateTransform;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -189,6 +192,20 @@ public class LoadGCode implements TurtleLoader {
 			throw new Exception("GCODE parse failure ("+lineNumber+"): "+line, e);
 		}
 
+		return turtle;
+	}
+
+	public Turtle load(InputStream in, PlotterSettings settings) throws Exception {
+		return load(in, settings, null);
+	}
+
+	public Turtle load(InputStream in, PlotterSettings settings, Paper paper) throws Exception {
+		MachineCoordinateTransform transform = paper == null
+				? MachineCoordinateTransform.fromSettings(settings)
+				: MachineCoordinateTransform.fromSettings(settings, paper);
+		Turtle turtle = load(in);
+		var origin = transform.getOrigin();
+		turtle.translate(origin.x, origin.y);
 		return turtle;
 	}
 

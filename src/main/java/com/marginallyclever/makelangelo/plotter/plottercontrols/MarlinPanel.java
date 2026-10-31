@@ -299,6 +299,10 @@ public class MarlinPanel extends JPanel {
 		return busyCount<=0;
 	}
 
+	protected boolean hasPendingCommands() {
+		return lineNumberToSend <= lineNumberAdded || busyCount < MARLIN_SEND_LIMIT || waitingForResponse;
+	}
+
 	public void sendESTOP() {
 		logger.warn("Emergency stop");
 		chatInterface.sendCommand("M112");

@@ -1,5 +1,10 @@
 package com.marginallyclever.makelangelo.preview;
 
+import com.marginallyclever.convenience.helpers.StringHelper;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.plotter.plottersettings.MachineCoordinateTransform;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +29,8 @@ public class RenderPanel extends JPanel implements MouseWheelListener, MouseList
 	private final List<RenderListener> renderListeners = new ArrayList<>();
 	
 	private Camera camera;
+	private PlotterSettings plotterSettings;
+	private Paper paper;
 
 	public Color backgroundColor = new Color(255-67,255-67,255-67);
 
@@ -158,7 +165,32 @@ public class RenderPanel extends JPanel implements MouseWheelListener, MouseList
 
 	private void setTipXY() {
 		Vector2d p = getMousePositionInWorld();
-		this.setToolTipText((int)p.x + ", " + (int)p.y);
+		String application = StringHelper.formatDouble(p.x) + ", " + StringHelper.formatDouble(p.y);
+		String machine = "unavailable";
+		if (plotterSettings != null) {
+			try {
+				MachineCoordinateTransform transform = paper == null
+						? MachineCoordinateTransform.fromSettings(plotterSettings)
+						: MachineCoordinateTransform.fromSettings(plotterSettings, paper);
+				Point2d position = transform
+						.applicationToMachine(new Point2d(p.x, p.y));
+				machine = StringHelper.formatDouble(position.x) + ", " + StringHelper.formatDouble(position.y);
+			} catch (IllegalArgumentException e) {
+				logger.warn("Cannot display machine coordinates with invalid settings", e);
+			}
+		}
+		setToolTipText("<html><span style='color:#1565c0'>" + Translator.get("RenderPanel.tooltipApp"    ) + ": " + application + "</span><br/>"
+				           + "<span style='color:#c62828'>" + Translator.get("RenderPanel.tooltipMachine") + ": " + machine     + "</span></html>");
+	}
+
+	public void setPlotterSettings(PlotterSettings settings) {
+		plotterSettings = settings;
+		setTipXY();
+	}
+
+	public void setPaper(Paper paper) {
+		this.paper = paper;
+		setTipXY();
 	}
 
     /**

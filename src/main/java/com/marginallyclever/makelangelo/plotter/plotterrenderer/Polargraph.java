@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 import com.marginallyclever.convenience.helpers.DrawingHelper;
 import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.makelangelo.plotter.plottersettings.MachineCoordinateTransform;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
 import javax.vecmath.Point2d;
@@ -82,14 +83,28 @@ public abstract class Polargraph implements PlotterRenderer {
 		if(GFXPreferences.getShowOrigin()) paintOrigin(graphics,robot);
 	}
 
-	// draw a colorful marker near the 0,0 point.
+	// Draw the firmware origin in application coordinates.
 	static public void paintOrigin(Graphics graphics, Plotter robot) {
 		final int size = 10;
-
-		graphics.setColor(Color.RED);
-		graphics.drawLine(0,-size*2,0,size*2);
-		graphics.drawLine(-size*2,0,size*2,0);
-		graphics.drawOval(-size,-size,size*2,size*2);
+		Point2d origin;
+		try {
+			MachineCoordinateTransform transform = robot.getPaper() == null
+					? MachineCoordinateTransform.fromSettings(robot.getSettings())
+					: MachineCoordinateTransform.fromSettings(robot.getSettings(), robot.getPaper());
+			origin = transform.getOrigin();
+		} catch (IllegalArgumentException e) {
+			return;
+		}
+		Graphics2D marker = (Graphics2D) graphics.create();
+		try {
+			marker.translate(origin.x, origin.y);
+			marker.setColor(Color.RED);
+			marker.drawLine(0,-size*2,0,size*2);
+			marker.drawLine(-size*2,0,size*2,0);
+			marker.drawOval(-size,-size,size*2,size*2);
+		} finally {
+			marker.dispose();
+		}
 	}
 
 	static public void paintMotors(Graphics graphics,Plotter robot) {

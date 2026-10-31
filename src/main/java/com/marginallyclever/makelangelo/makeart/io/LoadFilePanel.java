@@ -93,7 +93,7 @@ public class LoadFilePanel extends JPanel implements RenderListener {
 				mySubRenderListener = myConvertImage;
 				return true;
 			} else {
-				Turtle t = TurtleFactory.load(filename);
+				Turtle t = TurtleFactory.load(filename, myPlotterSettings, myPaper);
 				notifyListeners(new ActionEvent(t,0, COMMAND_TURTLE));
 				if (parent != null) {
 					parent.dispatchEvent(new WindowEvent(parent, WindowEvent.WINDOW_CLOSING));

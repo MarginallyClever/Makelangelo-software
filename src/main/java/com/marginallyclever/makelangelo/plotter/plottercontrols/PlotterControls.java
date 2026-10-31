@@ -189,6 +189,7 @@ public class PlotterControls extends JPanel {
 			// done
 			addUserEndGCODE();
 			pause();
+			marlinInterface.finishJob();
 		}
 	}
 
@@ -213,6 +214,7 @@ public class PlotterControls extends JPanel {
 	}
 
 	private void play() {
+		marlinInterface.beginJob();
 		isRunning = true;
 		updateButtonStatusConnected();
 		if (!penIsUpBeforePause)
@@ -249,6 +251,7 @@ public class PlotterControls extends JPanel {
 	}
 
 	private void onConnect() {
+		marlinInterface.cancelJob();
 		myPlotter.reInit();
 		bFindHome.setEnabled(true);
 		bEmergencyStop.setEnabled(true);
@@ -259,6 +262,7 @@ public class PlotterControls extends JPanel {
 	}
 
 	private void onDisconnect() {
+		marlinInterface.cancelJob();
 		myPlotter.reInit();
 		bFindHome.setEnabled(false);
 		bEmergencyStop.setEnabled(false);

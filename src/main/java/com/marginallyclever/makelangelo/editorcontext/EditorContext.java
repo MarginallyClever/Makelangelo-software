@@ -16,6 +16,10 @@ public class EditorContext {
     private Turtle turtle = new Turtle();
     private final EventListenerList listeners = new EventListenerList();
 
+    public EditorContext() {
+        plotter.setPaper(paper);
+    }
+
     public void mutate(Consumer<Turtle> edit) {
         edit.accept(turtle);
         fireDocumentChanged();
@@ -46,6 +50,7 @@ public class EditorContext {
 
     public void setPaper(Paper next) {
         this.paper = next;
+        plotter.setPaper(next);
     }
 
     public Plotter getPlotter() {
@@ -54,5 +59,6 @@ public class EditorContext {
 
     public void setPlotter(Plotter next) {
         plotter = next;
+        plotter.setPaper(paper);
     }
 }

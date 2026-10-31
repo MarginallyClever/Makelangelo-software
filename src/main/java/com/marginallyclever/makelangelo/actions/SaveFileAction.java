@@ -27,7 +27,8 @@ public class SaveFileAction extends NamedAbstractAction {
     public void actionPerformed(ActionEvent e) {
         var ancestor = SwingUtilities.getWindowAncestor(frame);
         try {
-            saveDialog.run(frame.getEditorContext().getTurtle(), ancestor,frame.getEditorContext().getPlotter().getSettings());
+            saveDialog.run(frame.getEditorContext().getTurtle(), ancestor,
+                    frame.getEditorContext().getPlotter().getSettings(), frame.getEditorContext().getPaper());
         } catch(Exception e1) {
             logger.error("Error while saving the vector file", e1);
             JOptionPane.showMessageDialog(ancestor,

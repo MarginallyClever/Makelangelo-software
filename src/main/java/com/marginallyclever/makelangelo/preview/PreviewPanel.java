@@ -9,6 +9,8 @@ import com.marginallyclever.makelangelo.actions.ZoomToFitMachineAction;
 import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 import com.marginallyclever.makelangelo.editorcontext.EditorContext;
 import com.marginallyclever.makelangelo.editorcontext.EditorContextListener;
+import com.marginallyclever.makelangelo.plotter.PlotterEvent;
+import com.marginallyclever.makelangelo.plotter.PlotterEventListener;
 import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRenderer;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
@@ -34,6 +36,11 @@ public class PreviewPanel extends JPanel implements EditorContextListener {
 
     private EditorContext editorContext;
     private final RenderPanel renderPanel = new RenderPanel();
+    private final PlotterEventListener plotterEventListener = event -> {
+        if (event.type == PlotterEvent.POSITION || event.type == PlotterEvent.POSITION_FEEDBACK) {
+            renderPanel.repaint();
+        }
+    };
     private final MakeleangeloRangeSlider rangeSlider = new MakeleangeloRangeSlider();
     private final Camera camera = new Camera();
     private final TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
@@ -59,8 +66,10 @@ public class PreviewPanel extends JPanel implements EditorContextListener {
         });
 
         renderPanel.setCamera(camera);
+        renderPanel.setPaper(editorContext.getPaper());
         renderPanel.addRenderListener(editorContext.getPaper());
         renderPanel.addRenderListener(editorContext.getPlotter());
+        editorContext.getPlotter().addPlotterEventListener(plotterEventListener);
         renderPanel.addRenderListener(myTurtleRenderer);
         addPlotterRendererToPreviewPanel();
 
@@ -164,6 +173,8 @@ public class PreviewPanel extends JPanel implements EditorContextListener {
 
     public void onPlotterSettingsUpdate(PlotterSettings settings) {
         editorContext.getPlotter().setSettings(settings);
+        renderPanel.setPaper(editorContext.getPaper());
+        renderPanel.setPlotterSettings(settings);
 
         TurtleRenderer turtleRenderer = TurtleRenderFactory.getTurtleRenderer(TurtleRenderFactory.MARLIN_SIMULATION);
         if(turtleRenderer instanceof MarlinSimulationVisualizer msv) {
@@ -190,6 +201,7 @@ public class PreviewPanel extends JPanel implements EditorContextListener {
 
     public void stop() {
         renderPanel.removePreviewListener(editorContext.getPlotter());
+        editorContext.getPlotter().removePlotterEventListener(plotterEventListener);
         editorContext.getPlotter().getSettings().save();
         plotterSettingsManager.setLastSelectedProfile(editorContext.getPlotter().getSettings().getUID());
     }

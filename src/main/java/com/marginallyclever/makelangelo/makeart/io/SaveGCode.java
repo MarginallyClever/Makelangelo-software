@@ -4,9 +4,11 @@ import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.makelangelo.MakelangeloVersion;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.turtletool.TrimTurtle;
+import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottercontrols.MarlinPlotterPanel;
 import com.marginallyclever.makelangelo.plotter.plottercontrols.ProgramPanel;
+import com.marginallyclever.makelangelo.plotter.plottersettings.MachineCoordinateTransform;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Line2d;
 import com.marginallyclever.makelangelo.turtle.StrokeLayer;
@@ -143,7 +145,7 @@ public class SaveGCode implements TurtleSaver {
 	protected void saveOneFile(String filename, Turtle turtle, Plotter robot) throws Exception {
 		logger.debug("saving...");
 		try (FileOutputStream stream = new FileOutputStream(filename)) {
-			save(stream, turtle, robot.getSettings());
+			save(stream, turtle, robot.getSettings(), robot.getPaper());
 		}
 		logger.debug("done.");
 	}
@@ -163,8 +165,15 @@ public class SaveGCode implements TurtleSaver {
 	 */
 	@Override
 	public boolean save(OutputStream outputStream, Turtle turtle, PlotterSettings settings) throws Exception {
+		return save(outputStream, turtle, settings, null);
+	}
+
+	public boolean save(OutputStream outputStream, Turtle turtle, PlotterSettings settings, Paper paper) throws Exception {
+		MachineCoordinateTransform transform = paper == null
+				? MachineCoordinateTransform.fromSettings(settings)
+				: MachineCoordinateTransform.fromSettings(settings, paper);
 		try (Writer out = new OutputStreamWriter(outputStream)) {
-			writeHeader(out,settings,turtle.getBounds());
+			writeHeader(out,settings,turtle.getBounds(), transform);
 			out.write(settings.getPenUpString() + "\n");
 
 			StrokeLayer previousLayer = null;
@@ -179,7 +188,7 @@ public class SaveGCode implements TurtleSaver {
 				}
 
 				StringBuilder sb = new StringBuilder();
-				int count = saveLayer(sb, layer, settings);
+				int count = saveLayer(sb, layer, settings, transform);
 				if (count > 0) out.write(sb.toString());
 			}
 			writeFooter(out,settings);
@@ -194,11 +203,11 @@ public class SaveGCode implements TurtleSaver {
 	 * @param settings the plotter settings
 	 * @return the number of points in the layer
 	 */
-	private int saveLayer(StringBuilder sb, StrokeLayer layer, PlotterSettings settings) {
+	private int saveLayer(StringBuilder sb, StrokeLayer layer, PlotterSettings settings, MachineCoordinateTransform transform) {
 		int count = 0;
 		for( var line : layer.getAllLines() ) {
 			StringBuilder sb2 = new StringBuilder();
-			int c2 = saveLine(sb2, line, settings);
+			int c2 = saveLine(sb2, line, settings, transform);
 			if(c2>0) {
 				sb.append(sb2);
 				count += c2;
@@ -214,17 +223,20 @@ public class SaveGCode implements TurtleSaver {
 	 * @param settings the plotter settings
 	 * @return the number of points in the line
 	 */
-	private int saveLine(StringBuilder sb, Line2d line, PlotterSettings settings) {
+	private int saveLine(StringBuilder sb, Line2d line, PlotterSettings settings, MachineCoordinateTransform transform) {
 		if(line.isEmpty()) return 0;
 
 		int count=0;
 		var iter = line.iterator();
 		Point2d p0 = iter.next();
-		sb.append(settings.getTravelToString(p0.x, p0.y)).append("\n")
+		Point2d machinePosition = transform.applicationToMachine(p0);
+		sb.append("G90\n")
+		  .append(settings.getTravelToString(machinePosition.x, machinePosition.y)).append("\n")
 		  .append(settings.getPenDownString()).append("\n");
 		while(iter.hasNext()) {
-			var p = iter.next();
-			sb.append(settings.getDrawToString(p.x, p.y)).append("\n");
+			Point2d p = transform.applicationToMachine(iter.next());
+			sb.append("G90\n")
+			  .append(settings.getDrawToString(p.x, p.y)).append("\n");
 			count++;
 		}
 		sb.append(settings.getPenUpString()).append("\n");
@@ -239,18 +251,20 @@ public class SaveGCode implements TurtleSaver {
 		out.flush();
 	}
 
-	private void writeHeader(Writer out, PlotterSettings settings,Rectangle2D.Double bounds) throws IOException{
+	private void writeHeader(Writer out, PlotterSettings settings,Rectangle2D.Double bounds, MachineCoordinateTransform transform) throws IOException{
 		out.write(";Generated with " + MakelangeloVersion.getFullOrLiteVersionStringRelativeToSysEnvDevValue() + "\n");
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
 		Date date = new Date(System.currentTimeMillis());
 		out.write("; " + formatter.format(date) + "\n");
 
 		out.write(";FLAVOR:Marlin-polargraph\n");
-		out.write(";MINX:" + StringHelper.formatDouble(bounds.x) + "\n");
-		out.write(";MINY:" + StringHelper.formatDouble(bounds.y) + "\n");
+		Point2d min = transform.applicationToMachine(new Point2d(bounds.x, bounds.y));
+		Point2d max = transform.applicationToMachine(new Point2d(bounds.x + bounds.width, bounds.y + bounds.height));
+		out.write(";MINX:" + StringHelper.formatDouble(min.x) + "\n");
+		out.write(";MINY:" + StringHelper.formatDouble(min.y) + "\n");
 		//out.write(";MINZ:0.000\n");
-		out.write(";MAXX:" + StringHelper.formatDouble(bounds.width + bounds.x) + "\n");
-		out.write(";MAXY:" + StringHelper.formatDouble(bounds.height + bounds.y) + "\n");
+		out.write(";MAXX:" + StringHelper.formatDouble(max.x) + "\n");
+		out.write(";MAXY:" + StringHelper.formatDouble(max.y) + "\n");
 		//out.write(";MAXZ:0.000\n");
 		out.write(";Start of user gcode\n");
 		out.write(settings.getString(PlotterSettings.START_GCODE));

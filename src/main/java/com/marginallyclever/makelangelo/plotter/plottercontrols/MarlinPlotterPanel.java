@@ -5,6 +5,7 @@ import com.marginallyclever.communications.NetworkSessionEvent;
 import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;
+import com.marginallyclever.makelangelo.plotter.plottersettings.MachineCoordinateTransform;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,8 @@ public class MarlinPlotterPanel extends MarlinPanel {
 	private static final String M665 = "M665";
 
 	private final Plotter myPlotter;
+	private volatile MachineCoordinateTransform jobTransform;
+	private boolean finishJobWhenIdle;
 
 	public MarlinPlotterPanel(Plotter plotter, ChooseConnection chooseConnection) {
 		super(chooseConnection);
@@ -39,6 +42,34 @@ public class MarlinPlotterPanel extends MarlinPanel {
 		myPlotter = plotter;
 
 		plotter.addPlotterEventListener(this::onPlotterEvent);
+		addListener(event -> {
+			if (event.getID() == MarlinPanelEvent.IDLE) releaseJobTransformIfIdle();
+		});
+	}
+
+	public void beginJob() {
+		if (jobTransform == null) {
+			jobTransform = createCoordinateTransform();
+		}
+		finishJobWhenIdle = false;
+	}
+
+	public void finishJob() {
+		if (jobTransform == null) return;
+		finishJobWhenIdle = true;
+		releaseJobTransformIfIdle();
+	}
+
+	public void cancelJob() {
+		jobTransform = null;
+		finishJobWhenIdle = false;
+	}
+
+	private void releaseJobTransformIfIdle() {
+		if (finishJobWhenIdle && !hasPendingCommands()) {
+			jobTransform = null;
+			finishJobWhenIdle = false;
+		}
 	}
 
 	public void stopListeningToPlotter() {
@@ -79,6 +110,7 @@ public class MarlinPlotterPanel extends MarlinPanel {
 
 	private void sendFindHome() {
 		queueAndSendCommands(myPlotter.getSettings().getFindHomeString());
+		queueAndSendCommands("M114");
 	}
 
 	private void sendPenUpDown() {
@@ -93,11 +125,27 @@ public class MarlinPlotterPanel extends MarlinPanel {
 	}
 
 	private void sendGoto() {
-		Point2d p = myPlotter.getPos();
-		String msg = myPlotter.getPenIsUp()
-				? myPlotter.getSettings().getTravelToString(p.x, p.y)
-				: myPlotter.getSettings().getDrawToString(p.x, p.y);
-		queueAndSendCommands(msg);
+		try {
+			MachineCoordinateTransform transform = getCoordinateTransform();
+			Point2d p = transform.applicationToMachine(myPlotter.getPos());
+			String msg = myPlotter.getPenIsUp()
+					? myPlotter.getSettings().getTravelToString(p.x, p.y)
+					: myPlotter.getSettings().getDrawToString(p.x, p.y);
+			queueAndSendCommands("G90" + System.lineSeparator() + msg);
+		} catch (IllegalArgumentException e) {
+			logger.error("Cannot send plotter position with invalid paper coordinate settings", e);
+		}
+	}
+
+	private MachineCoordinateTransform getCoordinateTransform() {
+		MachineCoordinateTransform activeTransform = jobTransform;
+		return activeTransform != null ? activeTransform : createCoordinateTransform();
+	}
+
+	private MachineCoordinateTransform createCoordinateTransform() {
+		return myPlotter.getPaper() == null
+				? MachineCoordinateTransform.fromSettings(myPlotter.getSettings())
+				: MachineCoordinateTransform.fromSettings(myPlotter.getSettings(), myPlotter.getPaper());
 	}
 
 	/**
@@ -140,7 +188,8 @@ public class MarlinPlotterPanel extends MarlinPanel {
 		if(evt.flag == NetworkSessionEvent.DATA_RECEIVED) {
 			String message = ((String)evt.data).trim();
 			//logger.debug("MarlinPlotterInterface received '"+message.trim()+"'.");
-			if (message.startsWith("X:") && message.contains("Count")) {
+			if ((message.startsWith("X:") || message.startsWith("Y:") || message.startsWith("Z:"))
+					&& message.contains("Count")) {
 				onHearM114(message);
 			} else if (message.startsWith(STR_FEEDRATE)) {
 				onHearFeedrate(message);
@@ -154,19 +203,34 @@ public class MarlinPlotterPanel extends MarlinPanel {
 	// trim everything after and including "Count", then read the state data.
 	protected void onHearM114(String message) {
 		try {
-			String position = message.substring(0, message.indexOf("Count"));
-			String[] majorParts = position.split("\s");
-			Point2d pos = myPlotter.getPos();
+			int countIndex = message.indexOf("Count");
+			if (countIndex < 0) throw new IllegalArgumentException("M114 response missing Count section");
 
-			for (String s : majorParts) {
-				String[] minorParts = s.split(":");
-				double v = Double.parseDouble(minorParts[1].trim());
-				if (minorParts[0].equalsIgnoreCase("X")) pos.x = v;
-				if (minorParts[0].equalsIgnoreCase("Y")) pos.y = v;
+			MachineCoordinateTransform transform = getCoordinateTransform();
+			Point2d machinePosition = transform.applicationToMachine(myPlotter.getPos());
+			boolean hasPosition = false;
+			String[] majorParts = message.substring(0, countIndex).trim().split("\\s+");
+			for (String part : majorParts) {
+				int colonIndex = part.indexOf(':');
+				String axis = colonIndex < 0 ? part : part.substring(0, colonIndex);
+				boolean isX = axis.equalsIgnoreCase("X");
+				boolean isY = axis.equalsIgnoreCase("Y");
+				if (!isX && !isY && !axis.equalsIgnoreCase("Z") && !axis.matches("(?i)E\\d*")) continue;
+				if (colonIndex < 0 || colonIndex == part.length() - 1) {
+					throw new IllegalArgumentException("M114 response has an invalid axis value");
+				}
+
+				double value = Double.parseDouble(part.substring(colonIndex + 1));
+				if (!Double.isFinite(value)) throw new IllegalArgumentException("M114 axis value is not finite");
+				if (isX) machinePosition.x = value;
+				if (isY) machinePosition.y = value;
+				if (isX || isY) hasPosition = true;
 			}
+			if (!hasPosition) throw new IllegalArgumentException("M114 response has no X or Y position");
 
-			myPlotter.setPos(pos.x,pos.y);
-		} catch (NumberFormatException e) {
+			Point2d applicationPosition = transform.machineToApplication(machinePosition);
+			myPlotter.setPosFromFeedback(applicationPosition.x, applicationPosition.y);
+		} catch (IllegalArgumentException e) {
 			logger.warn("M114 problem, continuing anyway: {}", message);
 		}
 	}

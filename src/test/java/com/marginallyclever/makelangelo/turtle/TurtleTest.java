@@ -189,6 +189,8 @@ class TurtleTest {
         turtle.translate(-10, 3);
         var after = turtle.getBounds();
         assertEquals(new Rectangle.Double(-25,-4,35,37),after);
+        assertEquals(2, turtle.getX());
+        assertEquals(21, turtle.getY());
 
         assertEquals(before.getCenterX()-10,after.getCenterX(),1e-3);
         assertEquals(before.getCenterY()+3,after.getCenterY(),1e-3);

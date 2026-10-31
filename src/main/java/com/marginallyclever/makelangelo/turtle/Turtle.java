@@ -349,6 +349,8 @@ public class Turtle implements Cloneable {
 	 */
 	public void translate(double dx, double dy) {
 		lock();
+		p.x += dx;
+		p.y += dy;
 		for (var cl : strokeLayers) {
 			for (var line : cl.getAllLines()) {
 				for (var point : line.getAllPoints()) {

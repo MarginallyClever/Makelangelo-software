@@ -48,7 +48,7 @@ public class ImportFileAction extends NamedAbstractAction {
             // commit the load
             try {
                 Turtle sum = frame.getEditorContext().getTurtle();
-                sum.add(TurtleFactory.load(filename));
+                sum.add(TurtleFactory.load(filename, frame.getEditorContext().getPlotter().getSettings(), frame.getEditorContext().getPaper()));
                 frame.getEditorContext().setTurtle(sum);
             } catch(Exception e1) {
                 logger.error("Failed to load {}", filename, e1);
