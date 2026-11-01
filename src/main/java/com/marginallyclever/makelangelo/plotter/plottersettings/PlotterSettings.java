@@ -179,6 +179,7 @@ public class PlotterSettings {
 	}
 
 	private void setDefaults() {
+		json.put(VERSION,                   2);
 		json.put(IS_REGISTERED, 			false);
 		json.put(HANDLE_SMALL_SEGMENTS, 	false);
 		json.put(MIN_SEGMENT_LENGTH, 		0.5);	// mm

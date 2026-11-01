@@ -72,17 +72,17 @@ public class PlotterSettingsTest {
 
     public void saveAndLoadZAxis(String up,String down) {
         // given
-        PlotterSettings plotterSettings = new PlotterSettings();
-        plotterSettings.setRobotUID(ROBOT_TEST_UID);
-        plotterSettings.setString(PlotterSettings.PEN_UP_GCODE, up);
-        plotterSettings.setString(PlotterSettings.PEN_DOWN_GCODE, down);
-        plotterSettings.save();
+        PlotterSettings before = new PlotterSettings();
+        before.setRobotUID(ROBOT_TEST_UID);
+        before.setString(PlotterSettings.PEN_UP_GCODE, up);
+        before.setString(PlotterSettings.PEN_DOWN_GCODE, down);
+        before.save();
 
         // then
-        PlotterSettings plotterSettingsRead = new PlotterSettings();
-        plotterSettingsRead.load(ROBOT_TEST_UID);
-        Assertions.assertEquals(plotterSettings.getString(PlotterSettings.PEN_UP_GCODE),plotterSettingsRead.getString(PlotterSettings.PEN_UP_GCODE));
-        Assertions.assertEquals(plotterSettings.getString(PlotterSettings.PEN_DOWN_GCODE),plotterSettingsRead.getString(PlotterSettings.PEN_DOWN_GCODE));
+        PlotterSettings after = new PlotterSettings();
+        after.load(ROBOT_TEST_UID);
+        Assertions.assertEquals(before.getString(PlotterSettings.PEN_UP_GCODE),after.getString(PlotterSettings.PEN_UP_GCODE));
+        Assertions.assertEquals(before.getString(PlotterSettings.PEN_DOWN_GCODE),after.getString(PlotterSettings.PEN_DOWN_GCODE));
 
     }
 
