@@ -16,6 +16,7 @@ import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 /**
  * ChooseConnection provides a human interface to open or close a
@@ -25,6 +26,8 @@ import java.util.List;
  * @since 7.28.0
  */
 public class ChooseConnection extends JPanel {
+	public static final String PORT = "port";
+
 	private static final Logger logger = LoggerFactory.getLogger(ChooseConnection.class);
 
 	private final ToggleButtonIcon bConnect = new ToggleButtonIcon(
@@ -37,8 +40,11 @@ public class ChooseConnection extends JPanel {
 	private TransportLayerUI previousTransportLayerUI;
 	private final List<TransportLayerUI> availableTransportsUI = new ArrayList<>();
 	private NetworkSession mySession;
+	private Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.NETWORK);
 
 	public ChooseConnection() {
+		super();
+
 		availableTransportsUI.add(new SerialUI());
 		if ("true".equalsIgnoreCase(System.getenv("DEV"))) {
 			availableTransportsUI.add(new DummyUI());
@@ -75,13 +81,39 @@ public class ChooseConnection extends JPanel {
 		logger.debug("Fetching connections");
 		for (TransportLayerUI transportLayerUi : availableTransportsUI) {
 			TransportLayer transportLayer = transportLayerUi.getTransportLayer();
-			for (String connection: transportLayer.listConnections()) {
+			for (String connection : transportLayer.listConnections()) {
 				Configuration configuration = new Configuration(transportLayer, connection);
 				comboBox.addItem(new ComboItem(configuration, transportLayerUi));
 			}
 		}
 
 		bConnect.setEnabled(comboBox.getItemCount() > 0);
+		loadLastUsedPort(comboBox);
+	}
+
+	private void loadLastUsedPort(JComboBox<ComboItem> comboBox) {
+		String lastPort = preferences.get(PORT, "");
+		if (!lastPort.isEmpty()) {
+			for (int i = 0; i < comboBox.getItemCount(); i++) {
+				ComboItem item = comboBox.getItemAt(i);
+				if (item.configuration.getConnectionName().equals(lastPort)) {
+					comboBox.setSelectedIndex(i);
+					break;
+				}
+			}
+		}
+	}
+
+	private void setLastUsedPort(String value) {
+		if(value==null) return;
+
+		preferences.put(PORT, value);
+
+		try {
+			preferences.flush();
+		} catch (Exception e) {
+			logger.error("Failed to save last used port", e);
+		}
 	}
 
 	private void onConnectAction() {
@@ -123,6 +155,8 @@ public class ChooseConnection extends JPanel {
 				onClose();
 			}
 		});
+
+		setLastUsedPort(connectionComboBox.getSelectedItem().toString());
 
 		connectionComboBox.setEnabled(false);
 		refresh.setEnabled(false);

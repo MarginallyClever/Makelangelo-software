@@ -59,6 +59,7 @@ public final class PreferencesHelper {
 		initialMap.put(METRICS, legacyMakelangeloPreferenceNode.node(METRICS.getNodeName()));
 		initialMap.put(PAPER, legacyMakelangeloPreferenceNode.node(PAPER.getNodeName()));
 		initialMap.put(FILE, legacyMakelangeloPreferenceNode.node(FILE.getNodeName()));
+		initialMap.put(NETWORK, legacyMakelangeloPreferenceNode.node(NETWORK.getNodeName()));
 
 		Map<? extends MakelangeloPreferenceKey, ? extends Preferences> castedMap = (Map<? extends MakelangeloPreferenceKey, ? extends Preferences>) initialMap;
 		CLASS_TO_PREFERENCE_NODE_MAP = Collections.unmodifiableMap(castedMap);
@@ -69,7 +70,6 @@ public final class PreferencesHelper {
 	 * See #getPreferenceNode(MakelangeloPreferenceKey)
 	 */
 	public enum MakelangeloPreferenceKey {
-
 		/**
 		 * Graphics preference node path, used to store things such as {@code "Draw all while running"} used when OpenGL
 		 * renders the application.
@@ -92,7 +92,11 @@ public final class PreferencesHelper {
 		 * Legacy preference node path.
 		 */
 		@Deprecated
-		LEGACY_MAKELANGELO_ROOT("DrawBot");
+		LEGACY_MAKELANGELO_ROOT("DrawBot"),
+
+
+		NETWORK("Network");
+
 
 		MakelangeloPreferenceKey(String nodeName) {
 			this.nodeName = nodeName;
